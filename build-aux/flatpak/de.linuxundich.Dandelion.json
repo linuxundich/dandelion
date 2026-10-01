@@ -25,7 +25,9 @@
     {
       "name": "blueprint-compiler",
       "buildsystem": "meson",
-      "cleanup": ["*"],
+      "cleanup": [
+        "*"
+      ],
       "sources": [
         {
           "type": "git",
@@ -35,9 +37,34 @@
       ]
     },
     {
+      "name": "libportal",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dbackend-gtk4=enabled",
+        "-Dbackend-gtk3=disabled",
+        "-Dbackend-qt5=disabled",
+        "-Dbackend-qt6=disabled",
+        "-Ddocs=false",
+        "-Dtests=false",
+        "-Dintrospection=true",
+        "-Dvapi=false"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/flatpak/libportal.git",
+          "tag": "0.11.0"
+        }
+      ]
+    },
+    {
       "name": "libspelling",
       "buildsystem": "meson",
-      "config-opts": ["-Ddocs=false", "-Dvapi=false", "-Dintrospection=enabled"],
+      "config-opts": [
+        "-Ddocs=false",
+        "-Dvapi=false",
+        "-Dintrospection=enabled"
+      ],
       "sources": [
         {
           "type": "git",
