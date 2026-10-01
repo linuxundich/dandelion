@@ -5,11 +5,15 @@ from __future__ import annotations
 
 import logging
 import os
+from datetime import datetime
 from gettext import gettext as _
 from gettext import ngettext
 from typing import TYPE_CHECKING
 
-from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, GtkSource, Spelling
+import gi
+
+gi.require_version("Graphene", "1.0")
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Graphene, Gtk, GtkSource, Spelling  # noqa: E402
 
 from .alt_text_dialog import DandelionAltTextDialog
 from .core import imaging
@@ -17,7 +21,9 @@ from .core.compose import base_text, composition_for, text_hash
 from .core.counting import find_hashtags, find_mentions, find_urls
 from .core.models import Media, Post, PostState, Profile, Role, Target, Variant
 from .core.publisher import AlreadySending
-from .core.store import media_dir
+from .core.scheduler import to_utc_iso
+from .core.store import EDITABLE_STATES, PostLocked, media_dir
+from .schedule_dialog import DandelionScheduleDialog, format_when
 from .core.validation import Report, validate
 from .net.linkcard import LinkCard, fetch_card
 from .send_dialog import DandelionSendDialog
@@ -70,9 +76,16 @@ class DandelionComposer(Adw.BreakpointBin):
     issues_icon: Gtk.Image = Gtk.Template.Child()
     issues_label: Gtk.Label = Gtk.Template.Child()
     issues_list: Gtk.Box = Gtk.Template.Child()
-    chips_box: Gtk.Box = Gtk.Template.Child()
+    chips_box: Adw.WrapBox = Gtk.Template.Child()
     variant_group: Adw.ToggleGroup = Gtk.Template.Child()
-    variant_banner: Adw.Banner = Gtk.Template.Child()
+    card_head: Gtk.Box = Gtk.Template.Child()
+    variant_info: Gtk.Box = Gtk.Template.Child()
+    variant_info_label: Gtk.Label = Gtk.Template.Child()
+    variant_info_button: Gtk.Button = Gtk.Template.Child()
+    media_box: Gtk.Box = Gtk.Template.Child()
+    strict_counter: Gtk.Label = Gtk.Template.Child()
+    density_group: Adw.ToggleGroup = Gtk.Template.Child()
+    schedule_banner: Adw.Banner = Gtk.Template.Child()
     cw_revealer: Gtk.Revealer = Gtk.Template.Child()
     cw_entry: Gtk.Entry = Gtk.Template.Child()
     cw_button: Gtk.ToggleButton = Gtk.Template.Child()
@@ -84,8 +97,11 @@ class DandelionComposer(Adw.BreakpointBin):
     visibility_dropdown: Gtk.DropDown = Gtk.Template.Child()
     label_dropdown: Gtk.DropDown = Gtk.Template.Child()
     signature_button: Gtk.ToggleButton = Gtk.Template.Child()
-    counters_box: Gtk.FlowBox = Gtk.Template.Child()
     preview_tiles: Gtk.Box = Gtk.Template.Child()
+    preview_scroller: Gtk.ScrolledWindow = Gtk.Template.Child()
+    status_strip: Adw.WrapBox = Gtk.Template.Child()
+    filter_hint: Gtk.Box = Gtk.Template.Child()
+    filter_label: Gtk.Label = Gtk.Template.Child()
 
     can_publish = GObject.Property(type=bool, default=False)
 
@@ -101,6 +117,8 @@ class DandelionComposer(Adw.BreakpointBin):
         self.buffers: dict[str, GtkSource.Buffer] = {}
         self.report: Report | None = None
         self.link_cards: dict[str, LinkCard | None] = {}
+        self._preview_show_all = False
+        self._tile_for_profile: dict[int, Gtk.Widget] = {}
         self._loading = False
         self._autosave = Debouncer(800, self.save_now)
         self._refresh = Debouncer(150, self.refresh)
@@ -147,6 +165,10 @@ class DandelionComposer(Adw.BreakpointBin):
         self.editor_scroller.add_controller(drop)
 
         self.preview_split.set_show_sidebar(self.settings.get_boolean("show-preview"))
+        self._loading = True
+        self.density_group.set_active_name(
+            "compact" if self.settings.get_boolean("preview-compact") else "full")
+        self._loading = False
         self.drafts_split.set_show_sidebar(self.settings.get_boolean("drafts-sidebar-visible"))
         self.drafts_split.connect("notify::show-sidebar", self._on_drafts_shown)
         self._style.connect("notify::accent-color-rgba", lambda *_: self._update_tags_color())
@@ -287,8 +309,10 @@ class DandelionComposer(Adw.BreakpointBin):
                 if rp.profile_id in self.profiles]
 
     def _build_chips(self) -> None:
-        while (child := self.chips_box.get_first_child()) is not None:
-            self.chips_box.remove(child)
+        # Im selben Container stehen auch Rollen-Knopf und „an“; nur Chips entfernen
+        for widget in getattr(self, "_chip_widgets", []):
+            self.chips_box.remove(widget)
+        self._chip_widgets: list[Gtk.Widget] = []
         self.chips.clear()
         shown: list[int] = []
         if self.role:
@@ -304,8 +328,10 @@ class DandelionComposer(Adw.BreakpointBin):
             chip.set_active(pid in enabled)
             chip.connect("toggled", self._on_chip_toggled)
             self._add_chip_menu(chip)
+            chip.set_compact(self.layout_view.get_layout_name() == "narrow")
             self.chips[pid] = chip
             self.chips_box.append(chip)
+            self._chip_widgets.append(chip)
         others = [p for p in self.profiles.values() if p.id not in shown]
         if others:
             menu_button = Gtk.MenuButton(icon_name="list-add-symbolic",
@@ -325,6 +351,7 @@ class DandelionComposer(Adw.BreakpointBin):
             pop.set_child(box)
             menu_button.set_popover(pop)
             self.chips_box.append(menu_button)
+            self._chip_widgets.append(menu_button)
 
     def _add_chip_menu(self, chip: ProfileChip) -> None:
         group = Gio.SimpleActionGroup()
@@ -442,7 +469,7 @@ class DandelionComposer(Adw.BreakpointBin):
             for i, (key, label) in enumerate(keys):
                 self.variant_group.get_toggle(i).set_label(
                     label + (" ✎" if self._variant(key) else ""))
-        self.variant_group.set_visible(len(keys) > 1)
+        self.card_head.set_visible(len(keys) > 1)
         self._show_variant()
 
     def _variant(self, key: str) -> Variant | None:
@@ -467,6 +494,9 @@ class DandelionComposer(Adw.BreakpointBin):
     def on_variant_changed(self, *_args: object) -> None:
         if not self._loading:
             self._show_variant()
+            # Die Vorschau folgt dem Tab; ein „Alle anzeigen“ gilt nur bis zum nächsten Wechsel
+            self._preview_show_all = False
+            self._update_previews()
 
     def _show_variant(self) -> None:
         key = self.variant_group.get_active_name() or MAIN
@@ -474,7 +504,7 @@ class DandelionComposer(Adw.BreakpointBin):
             self.text_view.set_buffer(self.buffers[MAIN])
             self.text_view.set_editable(True)
             self.text_view.remove_css_class("inherited")
-            self.variant_banner.set_revealed(False)
+            self.variant_info.set_visible(False)
             return
         name = self._key_platform_name(key)
         variant = self._variant(key)
@@ -494,8 +524,8 @@ class DandelionComposer(Adw.BreakpointBin):
             title = _("{name} uses its own text.").format(name=name)
             if changed:
                 title += " " + _("The main text has changed since.")
-            self.variant_banner.set_title(title)
-            self.variant_banner.set_button_label(_("_Use Main Text"))
+            self.variant_info_label.set_label(title)
+            self.variant_info_button.set_label(_("_Use Main Text"))
         else:
             if key.startswith("profile:"):
                 p = self.profiles.get(int(key.split(":", 1)[1]))
@@ -506,9 +536,9 @@ class DandelionComposer(Adw.BreakpointBin):
             self.text_view.set_buffer(self._inherit_buffer)
             self.text_view.set_editable(False)
             self.text_view.add_css_class("inherited")
-            self.variant_banner.set_title(_("{name} uses the main text.").format(name=name))
-            self.variant_banner.set_button_label(_("_Customize"))
-        self.variant_banner.set_revealed(True)
+            self.variant_info_label.set_label(_("{name} uses the main text.").format(name=name))
+            self.variant_info_button.set_label(_("_Customize"))
+        self.variant_info.set_visible(True)
 
     @Gtk.Template.Callback()
     def on_variant_banner_clicked(self, *_args: object) -> None:
@@ -657,7 +687,7 @@ class DandelionComposer(Adw.BreakpointBin):
         platforms = {p.platform for p in selected}
         self.visibility_dropdown.set_visible("mastodon" in platforms)
         self.label_dropdown.set_visible("bluesky" in platforms and bool(self.post.media))
-        self._update_counters()
+        self._update_status_strip()
         self._update_issues()
         self._update_media()
         self._update_previews()
@@ -675,30 +705,62 @@ class DandelionComposer(Adw.BreakpointBin):
         return ngettext("Cannot publish: {n} problem", "Cannot publish: {n} problems",
                         len(errors)).format(n=len(errors))
 
-    def _update_counters(self) -> None:
-        self.counters_box.remove_all()
-        summary = []
-        for t in self.report.targets if self.report else []:
+    def _update_status_strip(self) -> None:
+        """Eine kompakte Zeile pro Profil: Avatar, Name, Zähler, Status."""
+        while (child := self.status_strip.get_first_child()) is not None:
+            self.status_strip.remove(child)
+        targets = self.report.targets if self.report else []
+        over = 0
+        for t in targets:
             c = t.count
-            label = Gtk.Label(label=f"{t.platform.name} {t.profile.label or '@' + t.profile.handle}"
-                              f"  {c.used}/{c.limit}")
-            label.add_css_class("caption")
-            label.add_css_class("numeric")
+            btn = Gtk.Button()
+            btn.add_css_class("status-chip")
+            box = Gtk.Box(spacing=5)
+            avatar = Adw.Avatar(size=18, text=t.profile.title, show_initials=True)
+            self.avatars.apply(avatar, t.profile.avatar_url)
+            box.append(avatar)
+            box.append(Gtk.Label(label=t.profile.label or t.profile.handle, ellipsize=3,
+                                 max_width_chars=16))
+            counter = Gtk.Label(label=f"{c.used}/{c.limit}")
+            counter.add_css_class("numeric")
+            counter.add_css_class("dim-label")
+            box.append(counter)
             state = _("within the limit")
+            errors = [i for i in t.issues if i.severity == "error"]
             if c.over:
-                label.add_css_class("error")
+                over += 1
                 state = _("over the limit")
+                counter.remove_css_class("dim-label")
+                counter.add_css_class("error")
             elif c.ratio >= 0.9:
-                label.add_css_class("warning")
                 state = _("close to the limit")
-            label.update_property([Gtk.AccessibleProperty.LABEL], [
-                _("{platform} {handle}: {used} of {limit} characters, {state}").format(
-                    platform=t.platform.name, handle=t.profile.full_handle, used=c.used,
-                    limit=c.limit, state=state)])
-            self.counters_box.append(label)
-            summary.append(f"{t.platform.name} {c.used}/{c.limit}")
-        self.sheet_bar_label.set_label(_("Preview") + (" · " + " · ".join(summary)
-                                                      if summary else ""))
+                counter.remove_css_class("dim-label")
+                counter.add_css_class("warning")
+            if t.issues:
+                icon = Gtk.Image(icon_name="dialog-error-symbolic" if errors
+                                 else "dialog-warning-symbolic")
+                icon.add_css_class("error" if errors else "warning")
+                box.append(icon)
+            btn.set_child(box)
+            text = _("{platform} {handle}: {used} of {limit} characters, {state}").format(
+                platform=t.platform.name, handle=t.profile.full_handle, used=c.used,
+                limit=c.limit, state=state)
+            if t.issues:
+                text += ". " + " ".join(i.message for i in t.issues)
+            btn.update_property([Gtk.AccessibleProperty.LABEL], [text])
+            btn.set_tooltip_text(text)
+            btn.connect("clicked", lambda _b, pid=t.profile.id: self._scroll_to_preview(pid))
+            self.status_strip.append(btn)
+        self.status_strip.set_visible(len(targets) > 1)
+        self._update_strict_counter(targets)
+        summary = _("Preview")
+        if targets:
+            summary += " · " + ngettext("{n} profile", "{n} profiles", len(targets)).format(
+                n=len(targets))
+        if over:
+            summary += " · " + ngettext("{n} over the limit", "{n} over the limit",
+                                        over).format(n=over)
+        self.sheet_bar_label.set_label(summary)
 
     def _update_issues(self) -> None:
         while (child := self.issues_list.get_first_child()) is not None:
@@ -728,8 +790,10 @@ class DandelionComposer(Adw.BreakpointBin):
                                      max_width_chars=40))
                 self.issues_list.append(row)
         n_err, n_warn = len(rep.errors), len(rep.warnings)
-        self.issues_label.set_label(ngettext("{n} problem", "{n} problems",
-                                             n_err + n_warn).format(n=n_err + n_warn))
+        text = ngettext("{n} problem", "{n} problems", n_err + n_warn).format(n=n_err + n_warn)
+        self.issues_label.set_label(str(n_err + n_warn))
+        self.issues_button.set_tooltip_text(text)
+        self.issues_button.update_property([Gtk.AccessibleProperty.LABEL], [text])
         self.issues_icon.set_from_icon_name("dialog-error-symbolic" if n_err
                                             else "dialog-warning-symbolic")
         for w in (self.issues_icon, self.issues_label):
@@ -748,29 +812,151 @@ class DandelionComposer(Adw.BreakpointBin):
             self.media_tiles.remove(child)
         required = self._alt_required()
         total = len(self.post.media)
+        self.media_box.set_visible(total > 0)
         for i, m in enumerate(self.post.media):
             self.media_tiles.append(MediaTile(
                 m, i, total, required, on_edit_alt=self._edit_alt,
                 on_remove=self._remove_media, on_move=self._move_media))
 
+    def _update_strict_counter(self, targets: list) -> None:  # type: ignore[type-arg]
+        """Zähler in der Werkzeugleiste: das Profil, das seinem Limit am nächsten ist."""
+        label = self.strict_counter
+        for cls in ("error", "warning", "dim-label"):
+            label.remove_css_class(cls)
+        if not targets:
+            label.set_visible(False)
+            return
+
+        def tightness(t) -> float:  # type: ignore[no-untyped-def]
+            c = t.count
+            ratio = c.used / c.limit if c.limit else 0.0
+            if c.bytes_limit:
+                ratio = max(ratio, (c.bytes_used or 0) / c.bytes_limit)
+            return ratio
+
+        t = max(targets, key=tightness)
+        c = t.count
+        label.set_label(f"{c.used} / {c.limit}")
+        label.set_visible(True)
+        if c.over:
+            label.add_css_class("error")
+        elif c.ratio >= 0.9:
+            label.add_css_class("warning")
+        else:
+            label.add_css_class("dim-label")
+        text = _("Strictest limit: {platform} {handle}, {used} of {limit} characters").format(
+            platform=t.platform.name, handle=t.profile.full_handle, used=c.used, limit=c.limit)
+        label.set_tooltip_text(text)
+        label.update_property([Gtk.AccessibleProperty.LABEL], [text])
+
+    @Gtk.Template.Callback()
+    def on_density_changed(self, *_args: object) -> None:
+        if not self.app or self._loading:
+            return
+        self.settings.set_boolean("preview-compact",
+                                  self.density_group.get_active_name() != "full")
+        self._update_previews()
+
+    def _preview_filter(self) -> tuple[str | None, int | None, str]:
+        """(Plattform, Profil, Beschriftung) passend zum aktiven Varianten-Tab."""
+        key = self.variant_group.get_active_name() or MAIN
+        if self._preview_show_all or key == MAIN:
+            return None, None, ""
+        if key.startswith("platform:"):
+            pid = key.split(":", 1)[1]
+            return pid, None, self._key_platform_name(key)
+        profile_id = int(key.split(":", 1)[1])
+        return None, profile_id, self._key_platform_name(key)
+
     def _update_previews(self) -> None:
         while (child := self.preview_tiles.get_first_child()) is not None:
             self.preview_tiles.remove(child)
+        self._tile_for_profile.clear()
         targets = self.report.targets if self.report else []
         if not targets:
+            self.filter_hint.set_visible(False)
             status = Adw.StatusPage(icon_name="view-reveal-symbolic", title=_("No Preview"),
                                     description=_("Select a profile to see how the post "
                                                   "will look."))
             status.add_css_class("compact")
             self.preview_tiles.append(status)
             return
+
+        platform_filter, profile_filter, label = self._preview_filter()
+        if platform_filter:
+            shown = [t for t in targets if t.profile.platform == platform_filter]
+        elif profile_filter is not None:
+            shown = [t for t in targets if t.profile.id == profile_filter]
+        else:
+            shown = list(targets)
+        self.filter_hint.set_visible(bool(label))
+        if label:
+            self.filter_label.set_label(_("Filtered: {name}").format(name=label))
+
+        # Gleich aussehende Profile zu einer Kachel zusammenfassen
         accent = _rgba_hex(self._style.get_accent_color_rgba())
-        for t in targets:
+        groups: dict[tuple, list] = {}
+        for t in shown:
             comp = composition_for(self.post, t.profile, self.role)
+            key = (
+                t.platform.id,
+                t.platform.display_text(comp.text),
+                comp.content_warning if t.limits.supports_content_warning else "",
+                comp.content_label or "",
+                tuple((m.path, m.alt_text) for m in comp.media),
+                t.count.used, t.count.limit,
+                tuple((i.severity, i.code, i.message) for i in t.issues),
+            )
+            groups.setdefault(key, []).append((t, comp))
+
+        def rank(items: list) -> tuple[int, int]:
+            issues = items[0][0].issues
+            severity = 0 if any(i.severity == "error" for i in issues) else 1 if issues else 2
+            order = [p.id for p in self.app.registry.all()].index(items[0][0].platform.id) \
+                if items[0][0].platform.id in [p.id for p in self.app.registry.all()] else 99
+            return severity, order
+
+        for items in sorted(groups.values(), key=rank):
+            t, comp = items[0]
             urls = find_urls(comp.text)
             card = self.link_cards.get(urls[0].value) if urls else None
-            self.preview_tiles.append(PreviewTile(t.platform, t.profile, comp, t.limits, t.count,
-                                                  self.avatars, card, accent))
+            compact = (self.settings.get_boolean("preview-compact")
+                       or self.layout_view.get_layout_name() == "narrow")
+            tile = PreviewTile(t.platform, [it[0].profile for it in items], comp, t.limits,
+                               t.count, self.avatars, card, accent, t.issues, compact=compact)
+            for it in items:
+                self._tile_for_profile[it[0].profile.id] = tile
+            self.preview_tiles.append(tile)
+
+    def _scroll_to_preview(self, profile_id: int) -> None:
+        if profile_id not in self._tile_for_profile:
+            # Durch den Tab-Filter ausgeblendet: vorübergehend alle zeigen
+            self._preview_show_all = True
+            self._update_previews()
+        tile = self._tile_for_profile.get(profile_id)
+        if tile is None:
+            return
+        if self.layout_view.get_layout_name() == "narrow":
+            self.sheet.set_open(True)
+        else:
+            self.preview_split.set_show_sidebar(True)
+
+        def scroll() -> bool:
+            ok, point = tile.compute_point(self.preview_tiles.get_parent(),
+                                           Graphene.Point().init(0, 0))
+            if ok:
+                adj = self.preview_scroller.get_vadjustment()
+                adj.set_value(max(0.0, point.y - 12))
+            tile.add_css_class("flash")
+            GLib.timeout_add(900, lambda: (tile.remove_css_class("flash"), False)[1])
+            return False
+
+        GLib.idle_add(scroll)
+
+    @Gtk.Template.Callback()
+    def on_show_all_previews(self, *_args: object) -> None:
+        self._preview_show_all = True
+        self._update_previews()
 
     def _maybe_fetch_card(self) -> None:
         texts = [self.post.body] + [v.body for v in self.post.variants]
@@ -923,7 +1109,7 @@ class DandelionComposer(Adw.BreakpointBin):
     def _on_layout_changed(self) -> None:
         narrow = self.layout_view.get_layout_name() == "narrow"
         for chip in self.chips.values():
-            chip.set_compact(narrow and self.get_width() < 420)
+            chip.set_compact(narrow)
 
     def reload_drafts(self) -> None:
         self.drafts_list.remove_all()
@@ -1014,17 +1200,24 @@ class DandelionComposer(Adw.BreakpointBin):
         self._show_role()
         self._build_chips()
         self.text_view.set_buffer(self.buffers[MAIN])
+        self._show_schedule_banner()
         self.refresh()
         self.reload_drafts()
 
     def save_now(self, toast: bool = False) -> None:
         self._autosave_cancel()
-        if not self.app or self.post.state != PostState.DRAFT:
+        if not self.app or str(self.post.state) not in EDITABLE_STATES:
             return
         if self.post.id is None and self.post.is_empty():
             return
         new = self.post.id is None
-        self.store.save_post(self.post)
+        try:
+            self.store.save_post(self.post, guard_editable=True)
+        except PostLocked:
+            # Der Hintergrunddienst hat den Beitrag inzwischen gesendet
+            self.win.toast(_("This post has been published in the meantime"))
+            self.new_post(save_current=False)
+            return
         if new:
             self.reload_drafts()
         if toast:
@@ -1034,6 +1227,87 @@ class DandelionComposer(Adw.BreakpointBin):
         if self._autosave._source:
             GLib.source_remove(self._autosave._source)
             self._autosave._source = 0
+
+    # ------------------------------------------------------------------
+    # Planen
+    # ------------------------------------------------------------------
+    def _show_schedule_banner(self) -> None:
+        post = self.post
+        if post.state == PostState.DRAFT or not post.scheduled_at:
+            self.schedule_banner.set_revealed(False)
+            return
+        when = format_when(datetime.fromisoformat(post.scheduled_at), post.timezone)
+        title = {
+            PostState.SCHEDULED: _("Scheduled for {when}. Changes are saved automatically."),
+            PostState.PAUSED: _("Paused, planned for {when}."),
+            PostState.MISSED: _("Missed, it was planned for {when}."),
+        }.get(post.state, "{when}").format(when=when)
+        self.schedule_banner.set_title(title)
+        self.schedule_banner.set_revealed(True)
+
+    @Gtk.Template.Callback()
+    def on_unschedule(self, *_args: object) -> None:
+        if self.post.id is None:
+            return
+        prev = (self.post.state, self.post.scheduled_at)
+        self.post.state = PostState.DRAFT
+        self.post.scheduled_at = None
+        self.save_now()
+        self._show_schedule_banner()
+        self.app.scheduling.schedule_changed()
+
+        def undo() -> None:
+            self.post.state, self.post.scheduled_at = prev
+            self.save_now()
+            self._show_schedule_banner()
+            self.app.scheduling.schedule_changed()
+
+        self.win.toast(_("Schedule removed, the post is a draft again"), _("_Undo"), undo)
+
+    def edit_post(self, post_id: int) -> None:
+        self.save_now()
+        post = self.store.load_post(post_id)
+        if post:
+            self.load_post(post)
+            self.win.stack.set_visible_child_name("composer")
+
+    def schedule(self) -> None:
+        self._refresh.flush()
+        if not self.report or not self.props.can_publish:
+            return
+        initial = None
+        if self.post.scheduled_at:
+            initial = datetime.fromisoformat(self.post.scheduled_at)
+            if initial < datetime.now(initial.tzinfo):
+                initial = None
+        tz = self.post.timezone or self.settings.get_string("default-timezone") or None
+        DandelionScheduleDialog(initial=initial, timezone=tz,
+                                service_active=self.app.scheduling.props.active,
+                                on_schedule=self._do_schedule,
+                                on_enable_service=lambda: self.app.scheduling.enable(self.win)
+                                ).present(self.win)
+
+    def _do_schedule(self, when: datetime, tz: str) -> None:
+        post = self.post
+        post.targets = [t for t in post.targets if t.enabled]
+        post.state = PostState.SCHEDULED
+        post.scheduled_at = to_utc_iso(when)
+        post.timezone = tz
+        try:
+            self.store.save_post(post, guard_editable=True)
+        except PostLocked:
+            self.win.toast(_("This post has been published in the meantime"))
+            return
+        self.app.scheduling.schedule_changed()
+        self.new_post(save_current=False)
+
+        def undo() -> None:
+            self.store.set_post_schedule(post.id, PostState.DRAFT, None)  # type: ignore[arg-type]
+            self.app.scheduling.schedule_changed()
+            self.edit_post(post.id)  # type: ignore[arg-type]
+
+        self.win.toast(_("Scheduled for {when}").format(when=format_when(when, tz)),
+                       _("_Undo"), undo)
 
     # ------------------------------------------------------------------
     # Senden
@@ -1102,4 +1376,5 @@ class DandelionComposer(Adw.BreakpointBin):
             text = _("Published on {ok} of {total} profiles").format(ok=ok, total=total)
         self.win.toast(text, _("_Details"), self.win.show_history)
         self.win.history.reload()
+        self.app.scheduling.schedule_changed()
 

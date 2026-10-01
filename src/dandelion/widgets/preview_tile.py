@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 from gettext import gettext as _
+from gettext import ngettext
 
 from gi.repository import Adw, Gdk, GLib, Gtk, Pango
 
 from ..core.counting import find_hashtags, find_mentions, find_urls
 from ..core.graphemes import iter_graphemes
 from ..net.linkcard import LinkCard
-from ..platforms.base import Composition, Count, Platform, PlatformLimits
+from ..platforms.base import Composition, Count, Issue, Platform, PlatformLimits
 from ..core.models import Profile
 from .avatars import AvatarCache
 from .profile_chip import platform_badge
@@ -45,30 +46,54 @@ def _truncate(text: str, limit: int | None) -> tuple[str, bool]:
     return text, False
 
 
+COMPACT_GRAPHEMES = 160
+COMPACT_LINES = 3
+
+
+def _compact_text(text: str) -> str:
+    """Kürzt auf etwa vier Zeilen: höchstens drei Absatzzeilen bzw. 160 Grapheme."""
+    lines = text.strip().split("\n")
+    cut = "\n".join(lines[:COMPACT_LINES]).rstrip()
+    shortened, truncated = _truncate(cut, COMPACT_GRAPHEMES)
+    if truncated:
+        return shortened
+    return cut + "…" if len(lines) > COMPACT_LINES else cut
+
+
 class PreviewTile(Gtk.Box):
-    def __init__(self, platform: Platform, profile: Profile, comp: Composition,
+    """Vorschau für ein Profil oder eine Gruppe gleich aussehender Profile."""
+
+    def __init__(self, platform: Platform, profiles: list[Profile], comp: Composition,
                  limits: PlatformLimits, count: Count, avatars: AvatarCache,
-                 card: LinkCard | None, accent_hex: str) -> None:
-        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                 card: LinkCard | None, accent_hex: str, issues: list[Issue] | None = None,
+                 compact: bool = False) -> None:
+        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=8 if compact else 10)
+        self.compact = compact
+        self.profile_ids = {p.id for p in profiles}
         self.add_css_class("card")
         self.add_css_class("preview-tile")
         self.add_css_class(platform.style_class)
+        handles = ", ".join(p.full_handle for p in profiles)
         self.update_property([Gtk.AccessibleProperty.LABEL],
                              [_("Preview for {handle} on {platform}").format(
-                                 handle=profile.full_handle, platform=platform.name)])
+                                 handle=handles, platform=platform.name)])
 
-        # Kopf: Avatar, Name, Handle
+        # Kopf: Avatar(e), Name, Handle(s)
         head = Gtk.Box(spacing=10)
-        overlay = Gtk.Overlay()
-        avatar = Adw.Avatar(size=40, text=profile.title, show_initials=True)
-        avatars.apply(avatar, profile.avatar_url)
-        overlay.set_child(avatar)
-        overlay.add_overlay(platform_badge(profile.platform, 12))
-        head.append(overlay)
-        names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER)
-        name = Gtk.Label(label=profile.display_name or profile.handle, xalign=0, ellipsize=3)
+        head.append(self._avatars(profiles, platform.id, avatars))
+        names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER,
+                        hexpand=True)
+        first = profiles[0]
+        if len(profiles) == 1:
+            title = first.display_name or first.handle
+            subtitle = first.full_handle
+        else:
+            title = ngettext("{platform} · {n} profile", "{platform} · {n} profiles",
+                             len(profiles)).format(platform=platform.name, n=len(profiles))
+            subtitle = handles
+        name = Gtk.Label(label=title, xalign=0, ellipsize=3)
         name.add_css_class("heading")
-        handle = Gtk.Label(label=profile.full_handle, xalign=0, ellipsize=3)
+        handle = Gtk.Label(label=subtitle, xalign=0, ellipsize=3, tooltip_text=handles)
         handle.add_css_class("dim-label")
         handle.add_css_class("caption")
         names.append(name)
@@ -89,6 +114,18 @@ class PreviewTile(Gtk.Box):
             more = Gtk.Label(label=_("Show more"), xalign=0)
             more.add_css_class("accent")
             content.append(more)
+        elif compact:
+            short = _compact_text(shown)
+            if short != shown:
+                # Kompakt: gekürzter Text, auf Wunsch aufklappen
+                full_markup = _markup(shown).replace("{accent}", accent_hex)
+                short_markup = _markup(short).replace("{accent}", accent_hex)
+                body.set_markup(short_markup)
+                toggle = Gtk.Button(label=_("Show more"), halign=Gtk.Align.START)
+                toggle.add_css_class("flat")
+                toggle.add_css_class("small-button")
+                toggle.connect("clicked", self._toggle_body, body, short_markup, full_markup)
+                content.append(toggle)
 
         images = [m for m in comp.media if m.is_image]
         if images:
@@ -132,13 +169,48 @@ class PreviewTile(Gtk.Box):
         foot.append(counter)
         self.append(foot)
 
+        # Probleme dieser Kachel direkt anzeigen
+        for issue in (issues or [])[:4]:
+            row = Gtk.Box(spacing=6)
+            icon = Gtk.Image(icon_name="dialog-error-symbolic" if issue.severity == "error"
+                             else "dialog-warning-symbolic", valign=Gtk.Align.START)
+            icon.add_css_class("error" if issue.severity == "error" else "warning")
+            row.append(icon)
+            label = Gtk.Label(label=issue.message, xalign=0, wrap=True, hexpand=True)
+            label.add_css_class("caption")
+            row.append(label)
+            self.append(row)
+        if issues:
+            worst = "error" if any(i.severity == "error" for i in issues) else "warning"
+            self.add_css_class(f"has-{worst}")
+
+    @staticmethod
+    def _avatars(profiles: list[Profile], platform_id: str, avatars: AvatarCache) -> Gtk.Widget:
+        """Ein Avatar oder bis zu drei überlappende, dazu der Plattform-Punkt."""
+        shown = profiles[:3]
+        size = 40 if len(shown) == 1 else 32
+        step = size - 12
+        fixed = Gtk.Fixed(width_request=size + step * (len(shown) - 1), height_request=size,
+                          valign=Gtk.Align.CENTER)
+        for i, p in enumerate(reversed(shown)):
+            avatar = Adw.Avatar(size=size, text=p.title, show_initials=True)
+            avatar.add_css_class("stacked-avatar")
+            avatars.apply(avatar, p.avatar_url)
+            fixed.put(avatar, step * (len(shown) - 1 - i), 0)
+        overlay = Gtk.Overlay(child=fixed, valign=Gtk.Align.CENTER)
+        overlay.add_overlay(platform_badge(platform_id, 12))
+        return overlay
+
     def _grid(self, images, max_images: int) -> Gtk.Widget:  # type: ignore[no-untyped-def]
         grid = Gtk.Grid(column_spacing=4, row_spacing=4, column_homogeneous=True,
                         row_homogeneous=True)
         grid.add_css_class("preview-grid")
         shown = images[:max_images]
         n = len(shown)
-        height = 180 if n == 1 else 120
+        if self.compact:
+            height = 110 if n == 1 else 72
+        else:
+            height = 180 if n == 1 else 120
         for i, m in enumerate(shown):
             pic = Gtk.Picture.new_for_filename(m.path)
             pic.set_content_fit(Gtk.ContentFit.COVER)
@@ -165,7 +237,23 @@ class PreviewTile(Gtk.Box):
                 grid.attach(frame, i % 2, i // 2, 1, 1)
         return grid
 
+    @staticmethod
+    def _toggle_body(button: Gtk.Button, body: Gtk.Label, short: str, full: str) -> None:
+        expanded = button.get_label() == _("Show less")
+        body.set_markup(short if expanded else full)
+        button.set_label(_("Show more") if expanded else _("Show less"))
+
+    def _texture(self, card: LinkCard) -> Gdk.Texture | None:
+        if not card.image_data:
+            return None
+        try:
+            return Gdk.Texture.new_from_bytes(GLib.Bytes.new(card.image_data))
+        except GLib.Error:
+            return None
+
     def _card(self, card: LinkCard) -> Gtk.Widget:
+        if self.compact:
+            return self._card_compact(card)
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, overflow=Gtk.Overflow.HIDDEN)
         box.add_css_class("preview-card")
         if card.image_data:
@@ -191,5 +279,30 @@ class PreviewTile(Gtk.Box):
             desc = Gtk.Label(label=card.description, xalign=0, wrap=True, lines=2, ellipsize=3)
             desc.add_css_class("caption")
             text.append(desc)
+        box.append(text)
+        return box
+
+    def _card_compact(self, card: LinkCard) -> Gtk.Widget:
+        """Link-Karte als eine Zeile: kleines Vorschaubild, Website und Titel."""
+        box = Gtk.Box(spacing=10, overflow=Gtk.Overflow.HIDDEN)
+        box.add_css_class("preview-card")
+        tex = self._texture(card)
+        if tex is not None:
+            pic = Gtk.Picture.new_for_paintable(tex)
+            pic.set_content_fit(Gtk.ContentFit.COVER)
+            pic.set_can_shrink(True)
+            pic.set_size_request(64, 64)
+            box.append(pic)
+        text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1, valign=Gtk.Align.CENTER,
+                       margin_top=6, margin_bottom=6, margin_end=10,
+                       margin_start=0 if tex is not None else 10, hexpand=True)
+        site = Gtk.Label(label=card.site, xalign=0, ellipsize=3)
+        site.add_css_class("caption")
+        site.add_css_class("dim-label")
+        title = Gtk.Label(label=card.title or card.description, xalign=0, wrap=True, lines=2,
+                          ellipsize=3)
+        title.add_css_class("caption-heading")
+        text.append(site)
+        text.append(title)
         box.append(text)
         return box

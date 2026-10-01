@@ -28,6 +28,10 @@ def main(version: str, app_id: str) -> int:
         warnings.simplefilter("ignore", DeprecationWarning)
         asyncio.set_event_loop_policy(GLibEventLoopPolicy())
 
+    if "--run-due" in sys.argv:
+        from .runner import run_due
+        return run_due(app_id)
+
     from gi.repository import GtkSource
     GtkSource.init()
 

@@ -10,6 +10,8 @@
     <file preprocess="xml-stripblanks">ui/add-profile.ui</file>
     <file preprocess="xml-stripblanks">ui/alt-text-dialog.ui</file>
     <file preprocess="xml-stripblanks">ui/send-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/schedule-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/scheduled.ui</file>
     <file preprocess="xml-stripblanks">ui/shortcuts-dialog.ui</file>
     <file>style.css</file>
   </gresource>

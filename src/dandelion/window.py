@@ -6,6 +6,7 @@ from gi.repository import Adw, Gio, GLib, Gtk
 
 from .composer import DandelionComposer  # noqa: F401  (Typ für das Template)
 from .history import DandelionHistoryView  # noqa: F401
+from .scheduled import DandelionScheduledView  # noqa: F401
 
 
 @Gtk.Template(resource_path="/de/linuxundich/Dandelion/ui/window.ui")
@@ -16,7 +17,9 @@ class DandelionWindow(Adw.ApplicationWindow):
     stack: Adw.ViewStack = Gtk.Template.Child()
     composer: DandelionComposer = Gtk.Template.Child()
     history: DandelionHistoryView = Gtk.Template.Child()
-    publish_button: Gtk.Button = Gtk.Template.Child()
+    scheduled: DandelionScheduledView = Gtk.Template.Child()
+    scheduled_page: Adw.ViewStackPage = Gtk.Template.Child()
+    publish_button: Adw.SplitButton = Gtk.Template.Child()
     drafts_button: Gtk.ToggleButton = Gtk.Template.Child()
     search_button: Gtk.ToggleButton = Gtk.Template.Child()
 
@@ -33,6 +36,7 @@ class DandelionWindow(Adw.ApplicationWindow):
 
         self._action("new-post", lambda *_: self.composer.new_post())
         self._action("publish", lambda *_: self.composer.publish())
+        self._action("schedule", lambda *_: self.composer.schedule())
         self._action("save-draft", lambda *_: self.composer.save_now(toast=True))
         self._action("add-media", lambda *_: self.composer.open_file_dialog())
         self._action("choose-role", lambda *_: self.composer.popup_roles())
@@ -54,6 +58,11 @@ class DandelionWindow(Adw.ApplicationWindow):
 
         self.composer.setup(app, self)
         self.history.setup(app, self)
+        self.scheduled.setup(app, self)
+        app.scheduling.connect("changed", lambda *_: self._sync_scheduled_badge())
+        app.scheduling.connect("missed", lambda *_: self.show_missed_dialog())
+        self._sync_scheduled_badge()
+        GLib.idle_add(lambda: (self.show_missed_dialog(), False)[1])
         self.composer.connect("notify::can-publish", self._sync_publish)
         self.stack.connect("notify::visible-child-name", self._on_view_changed)
         self._on_view_changed()
@@ -83,9 +92,12 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.search_button.set_visible(name == "history")
         if name == "history":
             self.history.reload()
+        elif name == "scheduled":
+            self.scheduled.reload()
 
     def _sync_publish(self, *_args: object) -> None:
         self.lookup_action("publish").set_enabled(self.composer.props.can_publish)
+        self.lookup_action("schedule").set_enabled(self.composer.props.can_publish)
         self.publish_button.set_tooltip_text(self.composer.publish_tooltip())
 
     def _on_close(self, *_args: object) -> bool:
@@ -116,6 +128,62 @@ class DandelionWindow(Adw.ApplicationWindow):
             prefs.set_visible_page_name(page)
         prefs.connect("closed", lambda *_: self.composer.reload_profiles())
         prefs.present(self)
+
+    def _sync_scheduled_badge(self) -> None:
+        from .core.models import PostState
+        store = self.get_application().store
+        missed = len(store.post_ids([PostState.MISSED]))
+        self.scheduled_page.set_needs_attention(missed > 0)
+        self.scheduled_page.set_badge_number(missed)
+        if self.stack.get_visible_child_name() == "scheduled":
+            self.scheduled.reload()
+
+    def show_missed_dialog(self) -> None:
+        """Fragt nach, was mit verpassten Beiträgen passieren soll."""
+        from gettext import gettext as _
+        from gettext import ngettext
+
+        from .core.models import PostState
+        from .util import first_line
+        app = self.get_application()
+        if getattr(self, "_missed_dialog_open", False):
+            return
+        ids = app.store.post_ids([PostState.MISSED], order="scheduled_at")
+        if not ids:
+            return
+        posts = [p for i in ids if (p := app.store.load_post(i))]
+        lines = [f"• {first_line(p.body, 60)}" for p in posts[:5]]
+        if len(posts) > 5:
+            lines.append("…")
+        dialog = Adw.AlertDialog(
+            heading=ngettext("A Scheduled Post Was Not Sent", "{n} Scheduled Posts Were Not Sent",
+                             len(posts)).format(n=len(posts)),
+            body=_("The computer was off or asleep at the planned time.") + "\n\n" +
+            "\n".join(lines))
+        dialog.add_response("later", _("_Decide Later"))
+        dialog.add_response("drafts", _("Move to _Drafts"))
+        dialog.add_response("send", _("_Send Now"))
+        dialog.set_response_appearance("send", Adw.ResponseAppearance.SUGGESTED)
+        dialog.set_default_response("send")
+        dialog.set_close_response("later")
+
+        def on_response(_d: Adw.AlertDialog, response: str) -> None:
+            self._missed_dialog_open = False
+            if response == "send":
+                for p in posts:
+                    self.composer.retry(p.id, None)  # type: ignore[arg-type]
+            elif response == "drafts":
+                for p in posts:
+                    app.store.set_post_schedule(p.id, PostState.DRAFT, None)  # type: ignore[arg-type]
+                self.composer.reload_drafts()
+            if response != "later":
+                for p in posts:
+                    app.withdraw_notification(f"post-{p.id}")
+            app.scheduling.schedule_changed()
+
+        dialog.connect("response", on_response)
+        self._missed_dialog_open = True
+        dialog.present(self)
 
     def show_history(self) -> None:
         self.stack.set_visible_child_name("history")

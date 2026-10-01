@@ -2,7 +2,7 @@
 
 Stand: 2026-10-01 · App-ID-Schema: `de.linuxundich.<Name>`
 
-> **Nachtrag 2026-10-01:** Ursprünglich war `io.github.linuxundich.<Name>` geplant. Umgestellt auf die Blog-Domain, damit Dandelion und Blocksatz demselben Schema folgen. Die Prüfung für Flathub läuft über `https://linuxundich.de/.well-known/org.flathub.VerifiedApps.txt`, siehe `blocksmith/docs/flathub-verification.md`.
+> **Nachtrag 2026-10-01:** Ursprünglich war `io.github.linuxundich.<Name>` geplant. Umgestellt auf die Blog-Domain, damit Dandelion und Blocksatz demselben Schema folgen. Die Prüfung für Flathub läuft über `https://linuxundich.de/.well-known/org.flathub.VerifiedApps.txt`, siehe `blocksatz/docs/flathub-verification.md`.
 
 Gesucht ist ein Name für eine native GNOME-App (GTK4/libadwaita). Man schreibt einen Beitrag einmal und veröffentlicht ihn auf Mastodon, Bluesky, X, Facebook und LinkedIn, sofort oder zeitgesteuert. Der Name soll kurz sein, sich auf Deutsch und Englisch aussprechen lassen, international verständlich und GNOME-typisch sein (vgl. Fragments, Tuba, Amberol, Foliate, Errands, Letterpress). Namen wie „Tootle“ scheiden aus.
 

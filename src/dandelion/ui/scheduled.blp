@@ -1,0 +1,81 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionScheduledView: Adw.Bin {
+  child: Box {
+    orientation: vertical;
+
+    Adw.Banner service_banner {
+      title: _("Scheduled posts are only sent while Dandelion is open.");
+      button-label: _("_Enable Background Service");
+      button-clicked => $on_enable_service();
+    }
+
+    Stack stack {
+      vexpand: true;
+
+      StackPage {
+        name: "empty";
+
+        child: Adw.StatusPage {
+          icon-name: "alarm-symbolic";
+          title: _("Nothing Scheduled");
+          description: _("Use “Schedule…” next to the publish button to plan a post.");
+
+          child: Button {
+            label: _("_Write a Post");
+            use-underline: true;
+            halign: center;
+            action-name: "win.view";
+            action-target: "'composer'";
+
+            styles [
+              "pill",
+            ]
+          };
+        };
+      }
+
+      StackPage {
+        name: "list";
+
+        child: ScrolledWindow {
+          hscrollbar-policy: never;
+
+          child: Adw.Clamp {
+            maximum-size: 760;
+
+            child: Box {
+              orientation: vertical;
+              spacing: 18;
+              margin-top: 12;
+              margin-bottom: 18;
+              margin-start: 12;
+              margin-end: 12;
+
+              Adw.WrapBox {
+                child-spacing: 6;
+                line-spacing: 6;
+
+                DropDown role_filter {
+                  tooltip-text: _("Filter by role");
+                  notify::selected => $on_filter_changed();
+                }
+
+                DropDown platform_filter {
+                  tooltip-text: _("Filter by platform");
+                  notify::selected => $on_filter_changed();
+                }
+              }
+
+              Box list_box {
+                orientation: vertical;
+                spacing: 18;
+              }
+            };
+          };
+        };
+      }
+    }
+  };
+}

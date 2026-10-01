@@ -38,11 +38,13 @@ template $DandelionWindow: Adw.ApplicationWindow {
         }
 
         [end]
-        Button publish_button {
+        Adw.SplitButton publish_button {
           label: _("_Publish");
           use-underline: true;
           action-name: "win.publish";
+          menu-model: publish_menu;
           tooltip-text: _("Publish to all selected profiles");
+          dropdown-tooltip: _("More Publishing Options");
 
           styles [
             "suggested-action",
@@ -65,6 +67,14 @@ template $DandelionWindow: Adw.ApplicationWindow {
           icon-name: "document-edit-symbolic";
 
           child: $DandelionComposer composer {};
+        }
+
+        Adw.ViewStackPage scheduled_page {
+          name: "scheduled";
+          title: _("Scheduled");
+          icon-name: "alarm-symbolic";
+
+          child: $DandelionScheduledView scheduled {};
         }
 
         Adw.ViewStackPage {
@@ -90,6 +100,15 @@ template $DandelionWindow: Adw.ApplicationWindow {
       switcher_bar.reveal: true;
       header_bar.show-title: false;
       publish_button.label: _("_Send");
+    }
+  }
+}
+
+menu publish_menu {
+  section {
+    item {
+      label: _("_Schedule…");
+      action: "win.schedule";
     }
   }
 }

@@ -30,6 +30,13 @@ from .models import (
 
 SCHEMA_VERSION = 1
 
+#: Zustände, in denen ein Beitrag noch bearbeitet werden darf
+EDITABLE_STATES = ("draft", "scheduled", "paused", "missed")
+
+
+class PostLocked(Exception):
+    """Der Beitrag wird gerade gesendet oder ist schon veröffentlicht."""
+
 _MIGRATIONS: dict[int, str] = {
     1: """
 CREATE TABLE role (
@@ -375,10 +382,19 @@ class Store:
     # ------------------------------------------------------------------
     # Beiträge
     # ------------------------------------------------------------------
-    def save_post(self, post: Post) -> Post:
-        """Speichert Beitrag samt Varianten, Medien und Zielen (ersetzend)."""
+    def save_post(self, post: Post, *, guard_editable: bool = False) -> Post:
+        """Speichert Beitrag samt Varianten, Medien und Zielen (ersetzend).
+
+        Mit `guard_editable` wird nur gespeichert, solange der Beitrag in der
+        Datenbank noch bearbeitbar ist. Sonst `PostLocked`: Der Hintergrund-
+        dienst hat ihn inzwischen gesendet.
+        """
         post.updated_at = now_iso()
         with self.transaction():
+            if guard_editable and post.id is not None:
+                row = self.db.execute("SELECT state FROM post WHERE id = ?", (post.id,)).fetchone()
+                if row and row[0] not in EDITABLE_STATES:
+                    raise PostLocked(row[0])
             vals = (post.role_id, str(post.state), post.body, post.content_warning, post.language,
                     post.visibility, post.bluesky_label, int(post.use_signature), post.thread_mode,
                     post.scheduled_at, post.timezone, post.updated_at, post.published_at)
@@ -529,6 +545,29 @@ class Store:
         sql += f" ORDER BY {order} LIMIT ?"
         args.append(limit)
         return [r[0] for r in self.db.execute(sql, args)]
+
+    def post_state(self, post_id: int) -> PostState | None:
+        row = self.db.execute("SELECT state FROM post WHERE id = ?", (post_id,)).fetchone()
+        return PostState(row[0]) if row else None
+
+    def due_post_ids(self, now: str) -> list[int]:
+        rows = self.db.execute(
+            "SELECT id FROM post WHERE state = 'scheduled' AND deleted_at IS NULL"
+            " AND scheduled_at <= ? ORDER BY scheduled_at", (now,))
+        return [r[0] for r in rows]
+
+    def next_scheduled_at(self) -> str | None:
+        row = self.db.execute(
+            "SELECT MIN(scheduled_at) FROM post WHERE state = 'scheduled' AND deleted_at IS NULL"
+        ).fetchone()
+        return row[0] if row else None
+
+    def set_post_schedule(self, post_id: int, state: PostState, scheduled_at: str | None,
+                          timezone: str | None = None) -> None:
+        self.db.execute(
+            "UPDATE post SET state = ?, scheduled_at = ?, timezone = COALESCE(?, timezone),"
+            " updated_at = ? WHERE id = ?",
+            (str(state), scheduled_at, timezone, now_iso(), post_id))
 
     def delete_post(self, post_id: int) -> None:
         self.db.execute("DELETE FROM post WHERE id = ?", (post_id,))

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk
 
+from .schedule_dialog import all_timezones, format_when, system_timezone
 from .core.models import ROLE_COLORS, Profile, ProfileStatus, Role
 from .util import LANGUAGES, VISIBILITY_LABELS, Debouncer, spawn, system_language
 from .widgets.avatars import AvatarCache
@@ -39,6 +40,13 @@ class DandelionPreferences(Adw.PreferencesDialog):
     signature_row: Adw.SwitchRow = Gtk.Template.Child()
     preview_row: Adw.SwitchRow = Gtk.Template.Child()
     retention_row: Adw.SpinRow = Gtk.Template.Child()
+    service_row: Adw.SwitchRow = Gtk.Template.Child()
+    next_row: Adw.ActionRow = Gtk.Template.Child()
+    notify_success_row: Adw.SwitchRow = Gtk.Template.Child()
+    notify_failure_row: Adw.SwitchRow = Gtk.Template.Child()
+    missed_row: Adw.ComboRow = Gtk.Template.Child()
+    grace_row: Adw.SpinRow = Gtk.Template.Child()
+    tz_row: Adw.ComboRow = Gtk.Template.Child()
 
     def __init__(self, app: DandelionApplication, win: Gtk.Window) -> None:
         super().__init__()
@@ -53,7 +61,63 @@ class DandelionPreferences(Adw.PreferencesDialog):
         s.bind("append-signature", self.signature_row, "active", flags)
         s.bind("show-preview", self.preview_row, "active", flags)
         s.bind("draft-retention-days", self.retention_row, "value", flags)
+        s.bind("notify-success", self.notify_success_row, "active", flags)
+        s.bind("notify-failure", self.notify_failure_row, "active", flags)
+        s.bind("missed-grace-minutes", self.grace_row, "value", flags)
+        self._setup_scheduling()
         self.reload()
+
+    # -- Planung -------------------------------------------------------------
+    _POLICIES = ("ask", "send", "discard")
+
+    def _setup_scheduling(self) -> None:
+        s = self.app.settings
+        sched = self.app.scheduling
+        self.missed_row.set_selected(self._POLICIES.index(s.get_string("missed-policy")))
+        self.missed_row.connect("notify::selected", lambda r, _p: s.set_string(
+            "missed-policy", self._POLICIES[r.get_selected()]))
+
+        zones = all_timezones()
+        self._zones = ["", *zones]
+        self.tz_row.set_model(Gtk.StringList.new(
+            [_("System ({zone})").format(zone=system_timezone()), *zones]))
+        self.tz_row.set_expression(Gtk.PropertyExpression.new(Gtk.StringObject, None, "string"))
+        current = s.get_string("default-timezone")
+        self.tz_row.set_selected(self._zones.index(current) if current in self._zones else 0)
+        self.tz_row.connect("notify::selected", lambda r, _p: s.set_string(
+            "default-timezone", self._zones[r.get_selected()]))
+
+        self._service_lock = False
+        self.service_row.connect("notify::active", self._on_service_toggled)
+        sched.connect("notify::active", lambda *_: self._sync_service())
+        sched.connect("notify::available", lambda *_: self._sync_service())
+        sched.connect("changed", lambda *_: self._sync_service())
+        self._sync_service()
+
+    def _sync_service(self) -> None:
+        sched = self.app.scheduling
+        self._service_lock = True
+        self.service_row.set_active(sched.props.active)
+        self._service_lock = False
+        self.service_row.set_sensitive(sched.props.available)
+        if not sched.props.available:
+            self.service_row.set_subtitle(_("Not available: the systemd user instance cannot "
+                                            "be reached."))
+        elif sched.props.active:
+            self.service_row.set_subtitle(_("Active"))
+        else:
+            self.service_row.set_subtitle(_("Inactive: posts are only sent while Dandelion "
+                                            "is open."))
+        nxt = sched.scheduler().next_due()
+        self.next_row.set_subtitle(format_when(nxt) if nxt else _("Nothing scheduled"))
+
+    def _on_service_toggled(self, row: Adw.SwitchRow, _pspec: object) -> None:
+        if self._service_lock:
+            return
+        if row.get_active():
+            self.app.scheduling.enable(self.win)
+        else:
+            self.app.scheduling.disable()
 
     def reload(self) -> None:
         self._fill_roles()

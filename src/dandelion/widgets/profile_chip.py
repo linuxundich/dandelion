@@ -43,8 +43,7 @@ class ProfileChip(Gtk.ToggleButton):
         overlay.add_overlay(platform_badge(profile.platform))
         box.append(overlay)
 
-        self.label = Gtk.Label(label=profile.label or profile.full_handle, ellipsize=3,
-                               max_width_chars=28)
+        self.label = Gtk.Label(label=profile.label or profile.full_handle)
         box.append(self.label)
 
         if profile.status != ProfileStatus.OK:

@@ -79,4 +79,73 @@ template $DandelionPreferences: Adw.PreferencesDialog {
       }
     }
   }
+
+  Adw.PreferencesPage scheduling_page {
+    name: "scheduling";
+    title: _("Scheduling");
+    icon-name: "alarm-symbolic";
+
+    Adw.PreferencesGroup {
+      title: _("Background Service");
+      description: _("Publishes scheduled posts even when the Dandelion window is closed.");
+
+      Adw.SwitchRow service_row {
+        title: _("Publish in the Background");
+      }
+
+      Adw.ActionRow next_row {
+        title: _("Next Post");
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Notifications");
+
+      Adw.SwitchRow notify_success_row {
+        title: _("When a Scheduled Post Was Published");
+      }
+
+      Adw.SwitchRow notify_failure_row {
+        title: _("When a Scheduled Post Failed");
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Missed Posts");
+      description: _("What happens when the computer was off or asleep at the planned time.");
+
+      Adw.ComboRow missed_row {
+        title: _("Action");
+
+        model: StringList {
+          strings [
+            _("Ask"),
+            _("Send Anyway"),
+            _("Do Not Send"),
+          ]
+        };
+      }
+
+      Adw.SpinRow grace_row {
+        title: _("Counts as Missed After");
+        subtitle: _("Minutes after the planned time");
+
+        adjustment: Adjustment {
+          lower: 1;
+          upper: 1440;
+          step-increment: 5;
+          page-increment: 60;
+        };
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Time Zone");
+
+      Adw.ComboRow tz_row {
+        title: _("Default Time Zone");
+        enable-search: true;
+      }
+    }
+  }
 }

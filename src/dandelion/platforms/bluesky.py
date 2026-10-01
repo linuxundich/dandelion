@@ -12,6 +12,7 @@ import base64
 import json
 import re
 import time
+import urllib.parse
 from datetime import UTC, datetime
 from gettext import gettext as _
 from typing import Any
@@ -38,6 +39,7 @@ from .base import (
 )
 
 APPVIEW = "https://public.api.bsky.app"
+ENTRYWAY = "https://bsky.social"
 PLC = "https://plc.directory"
 IMAGE_MAX = 2_000_000
 THUMB_MAX = 1_000_000
@@ -49,8 +51,23 @@ BSKY_MENTION_RE = re.compile(r"(?<![\w@/])@([a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-
 
 
 def normalize_handle(text: str) -> str:
-    text = text.strip().lstrip("@").lower()
-    if text and "." not in text and not text.startswith("did:"):
+    """Macht aus Eingaben wie „@lui“, „lui.bsky.social“, „https://bsky.app/profile/
+    linuxundich.de“ oder „at://did:plc:…“ ein Handle bzw. eine DID."""
+    text = text.strip()
+    # Profil-Adresse eines Clients: …/profile/<handle oder DID>[/…]
+    m = re.search(r"/profile/([^/?#\s]+)", text)
+    if m:
+        text = urllib.parse.unquote(m.group(1))
+    elif text.startswith("at://"):
+        text = text.removeprefix("at://").split("/", 1)[0]
+    else:
+        # Eigene Domain als Adresse eingegeben, z. B. https://linuxundich.de/
+        text = re.sub(r"^https?://", "", text, flags=re.IGNORECASE).split("/", 1)[0]
+    text = text.lstrip("@")
+    if text.startswith("did:"):
+        return text                       # DIDs sind groß-/kleinschreibungssensitiv
+    text = text.lower()
+    if text and "." not in text:
         text += ".bsky.social"
     return text
 
@@ -139,18 +156,43 @@ class Bluesky(Platform):
             e.message = _("Bluesky rejected the post: {reason}").format(reason=msg)
         raise e
 
+    async def resolve_handle(self, handle: str) -> str | None:
+        """Handle → DID. Mehrere Wege, weil einzelne Dienste Handles mit
+        HTTPS-Verifizierung (/.well-known/atproto-did) nicht immer auflösen."""
+        try:
+            resp = await self.http.send(Request(
+                "GET", f"https://{handle}/.well-known/atproto-did",
+                headers={"Accept": "text/plain"}, timeout=10))
+            text = resp.text().strip() if resp.ok else ""
+            if text.startswith("did:") and len(text) < 200 and "\n" not in text:
+                return text
+        except NetworkError:
+            pass
+        for url in (f"{ENTRYWAY}/xrpc/com.atproto.identity.resolveHandle",
+                    f"{APPVIEW}/xrpc/com.atproto.identity.resolveHandle"):
+            try:
+                resp = await self.http.send(Request("GET", url, params={"handle": handle}))
+            except NetworkError:
+                continue
+            if resp.ok and (resp.json() or {}).get("did"):
+                return str(resp.json()["did"])
+        try:
+            resp = await self.http.send(Request(
+                "GET", f"{APPVIEW}/xrpc/app.bsky.actor.getProfile", params={"actor": handle}))
+            if resp.ok and (resp.json() or {}).get("did"):
+                return str(resp.json()["did"])
+        except NetworkError:
+            pass
+        return None
+
     async def resolve_pds(self, handle_or_did: str) -> tuple[str, str]:
         """Liefert (DID, PDS-URL) für ein Handle oder eine DID."""
         did = handle_or_did
         if not did.startswith("did:"):
-            try:
-                resp = await self._send(Request(
-                    "GET", f"{APPVIEW}/xrpc/com.atproto.identity.resolveHandle",
-                    params={"handle": handle_or_did}))
-            except PlatformError as e:
+            did = await self.resolve_handle(handle_or_did)
+            if not did:
                 raise PlatformError(_("The handle {handle} was not found on Bluesky.").format(
-                    handle=handle_or_did), e.detail) from e
-            did = resp.json()["did"]
+                    handle=handle_or_did))
         if did.startswith("did:plc:"):
             doc = (await self._send(Request("GET", f"{PLC}/{did}"))).json()
         elif did.startswith("did:web:"):
@@ -273,16 +315,13 @@ class Bluesky(Platform):
             handle = m.group(1).lower()
             if any(s <= m.start() < e for s, e, _u in links):
                 continue
-            try:
-                resp = await self._send(Request(
-                    "GET", f"{APPVIEW}/xrpc/com.atproto.identity.resolveHandle",
-                    params={"handle": handle}))
-            except PlatformError:
+            did = await self.resolve_handle(handle)
+            if not did:
                 continue
             facets.append({"index": {"byteStart": _byte_offset(text, m.start()),
                                      "byteEnd": _byte_offset(text, m.end())},
                            "features": [{"$type": "app.bsky.richtext.facet#mention",
-                                         "did": resp.json()["did"]}]})
+                                         "did": did}]})
         for span in find_hashtags(text):
             tag = span.value[1:]
             if len(tag) > 64:

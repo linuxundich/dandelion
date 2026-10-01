@@ -1,0 +1,112 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionScheduleDialog: Adw.Dialog {
+  title: _("Schedule Post");
+  content-width: 440;
+  content-height: 720;
+  default-widget: schedule_button;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-end-title-buttons: false;
+      show-start-title-buttons: false;
+
+      [start]
+      Button {
+        label: _("_Cancel");
+        use-underline: true;
+        clicked => $on_cancel();
+      }
+
+      [end]
+      Button schedule_button {
+        label: _("_Schedule");
+        use-underline: true;
+        clicked => $on_schedule();
+
+        styles [
+          "suggested-action",
+        ]
+      }
+    }
+
+    [top]
+    Adw.Banner service_banner {
+      title: _("Without the background service, posts are only sent while Dandelion is open.");
+      button-label: _("_Enable");
+      button-clicked => $on_enable_service();
+    }
+
+    content: Adw.PreferencesPage {
+      Adw.PreferencesGroup {
+        title: _("Quick Choice");
+
+        Adw.WrapBox presets_box {
+          child-spacing: 6;
+          line-spacing: 6;
+        }
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Date");
+
+        Calendar calendar {
+          day-selected => $on_changed();
+
+          styles [
+            "card",
+          ]
+        }
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Time");
+
+        Adw.SpinRow hour_row {
+          title: _("Hour");
+          wrap: true;
+          numeric: true;
+          notify::value => $on_changed();
+          output => $on_output();
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 23;
+            step-increment: 1;
+            page-increment: 6;
+          };
+        }
+
+        Adw.SpinRow minute_row {
+          title: _("Minute");
+          wrap: true;
+          numeric: true;
+          notify::value => $on_changed();
+          output => $on_output();
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 59;
+            step-increment: 5;
+            page-increment: 15;
+          };
+        }
+
+        Adw.ComboRow tz_row {
+          title: _("Time Zone");
+          enable-search: true;
+          notify::selected => $on_changed();
+        }
+      }
+
+      Adw.PreferencesGroup {
+        Label summary_label {
+          wrap: true;
+          xalign: 0;
+        }
+      }
+    };
+  };
+}

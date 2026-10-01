@@ -151,6 +151,7 @@ DE: dict[str, str | tuple[str, str]] = {
     "Use an app password instead of your main password. You can revoke it at any time in the Bluesky settings.":
         "Verwende ein App-Passwort statt deines Hauptpassworts. Du kannst es jederzeit in den Bluesky-Einstellungen widerrufen.",
     "Handle, e.g. name.bsky.social": "Handle, z. B. name.bsky.social",
+    "Handle or profile address": "Handle oder Profiladresse",
     "App Password": "App-Passwort",
     "Create App Password": "App-Passwort erstellen",
     "_Sign In": "_Anmelden",
@@ -375,6 +376,137 @@ DE: dict[str, str | tuple[str, str]] = {
     "not selected": "nicht ausgewählt",
     "Profile {handle} on {platform}, {status}, {state}":
         "Profil {handle} auf {platform}, {status}, {state}",
+    # Phase 5: Planen
+    "More Publishing Options": "Weitere Optionen zum Veröffentlichen",
+    "Scheduled": "Geplant",
+    "_Schedule…": "_Planen …",
+    "_Unschedule": "Planung _aufheben",
+    "Scheduling": "Planung",
+    "Background Service": "Hintergrunddienst",
+    "Publishes scheduled posts even when the Dandelion window is closed.":
+        "Veröffentlicht geplante Beiträge auch, wenn das Fenster von Dandelion geschlossen ist.",
+    "Publish in the Background": "Im Hintergrund veröffentlichen",
+    "Next Post": "Nächster Beitrag",
+    "Notifications": "Benachrichtigungen",
+    "When a Scheduled Post Was Published": "Wenn ein geplanter Beitrag veröffentlicht wurde",
+    "When a Scheduled Post Failed": "Wenn ein geplanter Beitrag fehlgeschlagen ist",
+    "Missed Posts": "Verpasste Beiträge",
+    "What happens when the computer was off or asleep at the planned time.":
+        "Was passiert, wenn der Rechner zum geplanten Zeitpunkt aus war oder geschlafen hat.",
+    "Action": "Aktion",
+    "Ask": "Nachfragen",
+    "Send Anyway": "Trotzdem senden",
+    "Do Not Send": "Nicht senden",
+    "Counts as Missed After": "Gilt als verpasst nach",
+    "Minutes after the planned time": "Minuten nach dem geplanten Zeitpunkt",
+    "Time Zone": "Zeitzone",
+    "Default Time Zone": "Standard-Zeitzone",
+    "Schedule Post": "Beitrag planen",
+    "_Schedule": "_Planen",
+    "Without the background service, posts are only sent while Dandelion is open.":
+        "Ohne Hintergrunddienst werden Beiträge nur gesendet, solange Dandelion geöffnet ist.",
+    "_Enable": "_Aktivieren",
+    "Quick Choice": "Schnellauswahl",
+    "Date": "Datum",
+    "Time": "Uhrzeit",
+    "Hour": "Stunde",
+    "Minute": "Minute",
+    "Scheduled posts are only sent while Dandelion is open.":
+        "Geplante Beiträge werden nur gesendet, solange Dandelion geöffnet ist.",
+    "_Enable Background Service": "Hintergrunddienst _aktivieren",
+    "Nothing Scheduled": "Nichts geplant",
+    "Use “Schedule…” next to the publish button to plan a post.":
+        "Mit „Planen …“ neben dem Veröffentlichen-Knopf planst du einen Beitrag.",
+    "_Write a Post": "Beitrag _verfassen",
+    "Filter by role": "Nach Rolle filtern",
+    "Filter by platform": "Nach Plattform filtern",
+    "Schedule": "Planen",
+    "Run without a window to publish scheduled posts":
+        "Ohne Fenster laufen, um geplante Beiträge zu veröffentlichen",
+    "A Scheduled Post Was Not Sent": ("Ein geplanter Beitrag wurde nicht gesendet",
+                                      "{n} geplante Beiträge wurden nicht gesendet"),
+    "The computer was off or asleep at the planned time.":
+        "Der Rechner war zum geplanten Zeitpunkt aus oder im Ruhezustand.",
+    "_Decide Later": "_Später entscheiden",
+    "Move to _Drafts": "In _Entwürfe verschieben",
+    "_Send Now": "Jetzt _senden",
+    "This post has been published in the meantime": "Dieser Beitrag wurde inzwischen veröffentlicht",
+    "Scheduled for {when}. Changes are saved automatically.":
+        "Geplant für {when}. Änderungen werden automatisch gespeichert.",
+    "Paused, planned for {when}.": "Pausiert, geplant für {when}.",
+    "Missed, it was planned for {when}.": "Verpasst, geplant war {when}.",
+    "Schedule removed, the post is a draft again": "Planung aufgehoben, der Beitrag ist wieder ein Entwurf",
+    "Scheduled for {when}": "Geplant für {when}",
+    "System ({zone})": "System ({zone})",
+    "Not available: the systemd user instance cannot be reached.":
+        "Nicht verfügbar: Die systemd-Benutzerinstanz ist nicht erreichbar.",
+    "Active": "Aktiv",
+    "Inactive: posts are only sent while Dandelion is open.":
+        "Inaktiv: Beiträge werden nur gesendet, solange Dandelion geöffnet ist.",
+    "Nothing scheduled": "Nichts geplant",
+    "today": "heute",
+    "tomorrow": "morgen",
+    "{day} at {time}": "{day} um {time}",
+    "In One Hour": "In einer Stunde",
+    "This Evening, 18:00": "Heute Abend, 18:00",
+    "Tomorrow, 08:00": "Morgen, 08:00",
+    "Tomorrow, 12:00": "Morgen, 12:00",
+    "Monday, 08:00": "Montag, 08:00",
+    "This time is in the past.": "Dieser Zeitpunkt liegt in der Vergangenheit.",
+    "Will be published {when}.": "Wird {when} veröffentlicht.",
+    "That is {when} in your local time.": "Das ist {when} in deiner Ortszeit.",
+    "All Roles": "Alle Rollen",
+    "All Platforms": "Alle Plattformen",
+    "Missed": "Verpasst",
+    "Without Date": "Ohne Datum",
+    "No Matches": "Keine Treffer",
+    "No scheduled post matches the filter.": "Kein geplanter Beitrag passt zum Filter.",
+    "Paused": "Pausiert",
+    "Send _Now": "Jetzt _senden",
+    "Edit": "Bearbeiten",
+    "Change Time…": "Zeit ändern …",
+    "Resume": "Fortsetzen",
+    "Pause": "Pausieren",
+    "Send Now": "Jetzt senden",
+    "Duplicate": "Duplizieren",
+    "Move to Drafts": "In Entwürfe verschieben",
+    "Delete": "Löschen",
+    "Actions": "Aktionen",
+    "Rescheduled": "Neu geplant",
+    "Resumed": "Fortgesetzt",
+    "Publish Now?": "Jetzt veröffentlichen?",
+    "The post will be published immediately instead of at the planned time.":
+        "Der Beitrag wird sofort statt zum geplanten Zeitpunkt veröffentlicht.",
+    "Copy created as draft": "Kopie als Entwurf angelegt",
+    "Moved to drafts": "In Entwürfe verschoben",
+    "Scheduled post deleted": "Geplanter Beitrag gelöscht",
+    "Scheduled post published": "Geplanter Beitrag veröffentlicht",
+    "{text}\nPublished on {n} profile.": ("{text}\nAuf {n} Profil veröffentlicht.",
+                                          "{text}\nAuf {n} Profilen veröffentlicht."),
+    "Sent late, it was planned for {time}.": "Verspätet gesendet, geplant war {time}.",
+    "Scheduled post failed": "Geplanter Beitrag fehlgeschlagen",
+    "{text}\nPublished on {ok} of {total} profiles.": "{text}\nAuf {ok} von {total} Profilen veröffentlicht.",
+    "Details": "Details",
+    "A scheduled post was not sent": "Ein geplanter Beitrag wurde nicht gesendet",
+    "{text}\nIt was planned for {time}, but the computer was off or asleep.":
+        "{text}\nGeplant war {time}, aber der Rechner war aus oder im Ruhezustand.",
+    "Discard": "Verwerfen",
+    "Dandelion publishes scheduled posts even when its window is closed.":
+        "Dandelion veröffentlicht geplante Beiträge auch bei geschlossenem Fenster.",
+    # Vorschau-Spalte
+    "Status of all selected profiles": "Status aller ausgewählten Profile",
+    "Show _All": "_Alle anzeigen",
+    "Filtered: {name}": "Gefiltert: {name}",
+    "{platform} · {n} profile": ("{platform} · {n} Profil", "{platform} · {n} Profile"),
+    "{n} over the limit": ("{n} über dem Limit", "{n} über dem Limit"),
+    # Layout: Composer-Karte und kompakte Vorschau
+    "to": "an",
+    "Compact": "Kompakt",
+    "Full": "Voll",
+    "Show less": "Weniger anzeigen",
+    "Show compact preview tiles": "Kompakte Vorschaukacheln anzeigen",
+    "Strictest limit: {platform} {handle}, {used} of {limit} characters":
+        "Strengstes Limit: {platform} {handle}, {used} von {limit} Zeichen",
 }
 
 
@@ -413,7 +545,11 @@ def main() -> None:
         tr = DE.get(msgid)
         if tr is None:
             missing.append(msgid)
-        entry = (comments + "\n" if comments else "") + f'msgid "{esc(msgid)}"\n'
+        ctx = re.search(r'msgctxt ((?:".*"\n?)+)msgid', block)
+        entry = (comments + "\n" if comments else "")
+        if ctx:
+            entry += f'msgctxt "{esc(unesc(ctx.group(1)))}"\n'
+        entry += f'msgid "{esc(msgid)}"\n'
         if m.group(2):
             plural = unesc(m.group(2))
             one, many = tr if isinstance(tr, tuple) else ("", "")

@@ -22,6 +22,12 @@ def test_normalize():
     assert normalize_instance("@toff@social.tchncs.de") == "social.tchncs.de"
     assert normalize_handle("@Lui") == "lui.bsky.social"
     assert normalize_handle("linuxundich.de") == "linuxundich.de"
+    assert normalize_handle("https://bsky.app/profile/linuxundich.de") == "linuxundich.de"
+    assert normalize_handle("bsky.app/profile/Lui.bsky.social/post/3k") == "lui.bsky.social"
+    assert normalize_handle("https://bsky.app/profile/did:plc:AbC123") == "did:plc:AbC123"
+    assert normalize_handle("at://did:plc:abc/app.bsky.feed.post/1") == "did:plc:abc"
+    assert normalize_handle("https://linuxundich.de/") == "linuxundich.de"
+    assert normalize_handle(" @linuxundich.de ") == "linuxundich.de"
 
 
 def test_mastodon_login_flow(http, run):
@@ -156,3 +162,16 @@ def test_bluesky_reply_refs(http, run):
                                 idempotency_key="k"))
     rec = http.requests[-1].json["record"]
     assert rec["reply"]["parent"]["cid"] == "c1" and rec["reply"]["root"]["uri"].endswith("/1")
+
+
+def test_bluesky_handle_via_well_known(http, run):
+    store, secrets, reg, *_ = setup_world(http)
+    # AppView kann das Handle nicht auflösen, die Domain selbst schon
+    http.add("GET", "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle",
+             {"error": "InvalidRequest", "message": "Unable to resolve handle"}, 400)
+    http.add("GET", "https://linuxundich.de/.well-known/atproto-did",
+             raw=b"did:plc:tmhtgp2s4kt4vxyv4xv6vo5t\n", headers={"content-type": "text/plain"})
+    http.add("GET", "https://plc.directory/did:plc:tmhtgp2s4kt4vxyv4xv6vo5t", {"service": [
+        {"id": "#atproto_pds", "serviceEndpoint": "https://pds.example/"}]})
+    did, pds = run(reg.get("bluesky").resolve_pds("linuxundich.de"))
+    assert did == "did:plc:tmhtgp2s4kt4vxyv4xv6vo5t" and pds == "https://pds.example"

@@ -10,6 +10,8 @@ src/dandelion/ui/profile-page.blp
 src/dandelion/ui/add-profile.blp
 src/dandelion/ui/alt-text-dialog.blp
 src/dandelion/ui/send-dialog.blp
+src/dandelion/ui/schedule-dialog.blp
+src/dandelion/ui/scheduled.blp
 src/dandelion/ui/shortcuts-dialog.blp
 src/dandelion/application.py
 src/dandelion/window.py
@@ -29,3 +31,7 @@ src/dandelion/platforms/bluesky.py
 src/dandelion/widgets/media_tile.py
 src/dandelion/widgets/preview_tile.py
 src/dandelion/widgets/profile_chip.py
+src/dandelion/schedule_dialog.py
+src/dandelion/scheduled.py
+src/dandelion/notify.py
+src/dandelion/core/trigger.py

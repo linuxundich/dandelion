@@ -1,0 +1,7 @@
+[Unit]
+Description=Dandelion: geplante Beiträge senden
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=@bindir@/dandelion --run-due
