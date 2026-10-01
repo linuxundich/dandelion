@@ -40,7 +40,7 @@ from .util import (
 from .widgets.avatars import AvatarCache
 from .widgets.media_tile import MediaTile
 from .widgets.preview_tile import PreviewTile
-from .widgets.profile_chip import ProfileChip
+from .widgets.profile_chip import ProfileChip, platform_badge
 
 if TYPE_CHECKING:
     from .application import DandelionApplication
@@ -85,6 +85,15 @@ class DandelionComposer(Adw.BreakpointBin):
     media_box: Gtk.Box = Gtk.Template.Child()
     strict_counter: Gtk.Label = Gtk.Template.Child()
     density_group: Adw.ToggleGroup = Gtk.Template.Child()
+    ai_button: Gtk.MenuButton = Gtk.Template.Child()
+    ai_revealer: Gtk.Revealer = Gtk.Template.Child()
+    ai_title: Gtk.Label = Gtk.Template.Child()
+    ai_spinner: Adw.Spinner = Gtk.Template.Child()
+    ai_result: Gtk.Label = Gtk.Template.Child()
+    ai_tags: Adw.WrapBox = Gtk.Template.Child()
+    ai_actions: Gtk.Box = Gtk.Template.Child()
+    ai_retry_button: Gtk.Button = Gtk.Template.Child()
+    ai_accept_button: Gtk.Button = Gtk.Template.Child()
     schedule_banner: Adw.Banner = Gtk.Template.Child()
     cw_revealer: Gtk.Revealer = Gtk.Template.Child()
     cw_entry: Gtk.Entry = Gtk.Template.Child()
@@ -176,6 +185,7 @@ class DandelionComposer(Adw.BreakpointBin):
         self._apply_scheme(self._inherit_buffer)
         self.layout_view.connect("notify::layout-name", lambda *_: self._on_layout_changed())
 
+        self._setup_ai()
         self.reload_profiles()
         last = self.store.post_ids([PostState.DRAFT], limit=1)
         if last:
@@ -688,6 +698,7 @@ class DandelionComposer(Adw.BreakpointBin):
         self.visibility_dropdown.set_visible("mastodon" in platforms)
         self.label_dropdown.set_visible("bluesky" in platforms and bool(self.post.media))
         self._update_status_strip()
+        self._rebuild_ai_menu()
         self._update_issues()
         self._update_media()
         self._update_previews()
@@ -718,9 +729,14 @@ class DandelionComposer(Adw.BreakpointBin):
             box = Gtk.Box(spacing=5)
             avatar = Adw.Avatar(size=18, text=t.profile.title, show_initials=True)
             self.avatars.apply(avatar, t.profile.avatar_url)
-            box.append(avatar)
+            overlay = Gtk.Overlay(child=avatar)
+            overlay.add_overlay(platform_badge(t.profile.platform, 8))
+            box.append(overlay)
+            platform_label = Gtk.Label(label=t.platform.name)
+            platform_label.add_css_class("dim-label")
+            box.append(platform_label)
             box.append(Gtk.Label(label=t.profile.label or t.profile.handle, ellipsize=3,
-                                 max_width_chars=16))
+                                 max_width_chars=20))
             counter = Gtk.Label(label=f"{c.used}/{c.limit}")
             counter.add_css_class("numeric")
             counter.add_css_class("dim-label")
@@ -1067,7 +1083,15 @@ class DandelionComposer(Adw.BreakpointBin):
             media.alt_text = text
             self._changed()
 
-        DandelionAltTextDialog(media, limit, limit_platform, hints, done).present(self.win)
+        dialog: DandelionAltTextDialog
+        ai_on = self.app.ai.enabled
+        dialog = DandelionAltTextDialog(
+            media, limit, limit_platform, hints, done,
+            ai_suggest=(lambda then: self.app.ai.confirm_privacy(dialog, True, then))
+            if ai_on else None,
+            ai_generate=self.ai_alt_text if ai_on else None,
+            ai_provider=self.app.ai.provider().name if ai_on else "")
+        dialog.present(self.win)
 
     def _remove_media(self, media: Media) -> None:
         idx = self.post.media.index(media)
@@ -1227,6 +1251,246 @@ class DandelionComposer(Adw.BreakpointBin):
         if self._autosave._source:
             GLib.source_remove(self._autosave._source)
             self._autosave._source = 0
+
+    # ------------------------------------------------------------------
+    # KI-Assistent (nur Vorschläge, nichts wird ungefragt übernommen)
+    # ------------------------------------------------------------------
+    _TRANSLATE = (("de", "Deutsch"), ("en", "English"), ("fr", "Français"), ("es", "Español"),
+                  ("it", "Italiano"), ("nl", "Nederlands"))
+
+    def _setup_ai(self) -> None:
+        self._ai_task = None
+        self._ai_request: tuple[str, str, str] | None = None   # (Art, Argument, Ziel-Tab)
+        self._ai_answer: str | list[str] | None = None
+        group = Gio.SimpleActionGroup()
+        for name in ("rephrase", "translate", "adapt"):
+            act = Gio.SimpleAction.new(name, GLib.VariantType.new("s"))
+            act.connect("activate", lambda a, v, n=name: self._ai_start(n, v.get_string()))
+            group.add_action(act)
+        tags = Gio.SimpleAction.new("hashtags", None)
+        tags.connect("activate", lambda *_: self._ai_start("hashtags", ""))
+        group.add_action(tags)
+        self.insert_action_group("ai", group)
+        self.settings.bind("ai-enabled", self.ai_button, "visible", Gio.SettingsBindFlags.GET)
+        self.settings.connect("changed::ai-enabled", lambda *_: (
+            None if self.settings.get_boolean("ai-enabled") else self.on_ai_discard()))
+
+    def _rebuild_ai_menu(self) -> None:
+        menu = Gio.Menu()
+        tone = Gio.Menu()
+        for mode, label in (("shorter", _("Shorter")), ("longer", _("Longer")),
+                            ("casual", _("More Casual")), ("factual", _("More Factual"))):
+            tone.append(label, f"ai.rephrase::{mode}")
+        menu.append_section(None, tone)
+        fix = Gio.Menu()
+        fix.append(_("Correct Spelling and Grammar"), "ai.rephrase::correct")
+        translate = Gio.Menu()
+        for _code, name in self._TRANSLATE:
+            translate.append(name, f"ai.translate::{name}")
+        fix.append_submenu(_("Translate"), translate)
+        menu.append_section(None, fix)
+        extra = Gio.Menu()
+        platforms: list[str] = []
+        for p in self._selected_profiles():
+            if p.platform not in platforms and p.platform in self.app.registry:
+                platforms.append(p.platform)
+        if platforms:
+            adapt = Gio.Menu()
+            for pid in platforms:
+                adapt.append(self.app.registry.get(pid).name, f"ai.adapt::{pid}")
+            extra.append_submenu(_("Adapt for Platform"), adapt)
+        extra.append(_("Suggest Hashtags"), "ai.hashtags")
+        menu.append_section(None, extra)
+        self.ai_button.set_menu_model(menu)
+
+    def _ai_source(self, key: str) -> str:
+        """Text des Tabs, auf den sich der Vorschlag bezieht."""
+        if key == MAIN:
+            return self.post.body
+        variant = self._variant(key)
+        if variant:
+            return variant.body
+        if key.startswith("profile:"):
+            p = self.profiles.get(int(key.split(":", 1)[1]))
+            return base_text(self.post, p) if p else self.post.body
+        return self.post.body
+
+    def _ai_start(self, kind: str, arg: str) -> None:
+        key = self.variant_group.get_active_name() or MAIN
+        if kind == "adapt":
+            key = f"platform:{arg}"
+            source = self._ai_source(key) if self._variant(key) else self.post.body
+        else:
+            source = self._ai_source(key)
+        if not source.strip():
+            self.win.toast(_("Write some text first"))
+            return
+        self._ai_request = (kind, arg, key)
+        self.app.ai.confirm_privacy(self.win, False, lambda: self._ai_run(source))
+
+    def _ai_run(self, source: str) -> None:
+        from .ai import tasks
+        kind, arg, key = self._ai_request  # type: ignore[misc]
+        titles = {"shorter": _("Shorter"), "longer": _("Longer"), "casual": _("More Casual"),
+                  "factual": _("More Factual"), "correct": _("Corrected")}
+        if kind == "rephrase":
+            title = titles.get(arg, arg)
+        elif kind == "translate":
+            title = _("Translation: {language}").format(language=arg)
+        elif kind == "adapt":
+            title = _("Adapted for {platform}").format(platform=self.app.registry.get(arg).name)
+        else:
+            title = _("Hashtag Suggestions")
+        provider = self.app.ai.provider().name
+        self.ai_title.set_label(f"{title} · {provider}")
+        self.ai_result.set_label(_("Waiting for the answer"))
+        self.ai_result.add_css_class("dim-label")
+        self.ai_result.set_visible(True)
+        self.ai_tags.set_visible(False)
+        self.ai_spinner.set_visible(True)
+        self.ai_accept_button.set_sensitive(False)
+        self.ai_retry_button.set_sensitive(False)
+        self.ai_revealer.set_reveal_child(True)
+        self._ai_answer = None
+
+        async def run() -> None:
+            ctx = await self.app.ai.context(self.role)
+            if kind == "rephrase":
+                answer: str | list[str] = await tasks.rephrase(ctx, source, arg)
+            elif kind == "translate":
+                answer = await tasks.translate(ctx, source, arg)
+            elif kind == "adapt":
+                platform = self.app.registry.get(arg)
+                limits = min((platform.limits_for(p) for p in self._selected_profiles()
+                              if p.platform == arg), key=lambda lim: lim.max_chars,
+                             default=platform.default_limits())
+                answer = await tasks.adapt(ctx, source, arg, platform.name, limits.max_chars)
+            else:
+                pid = arg or (key.split(":", 1)[1] if key.startswith("platform:") else None)
+                answer = await tasks.hashtags(ctx, source, pid)
+            self._ai_show(answer)
+
+        def failed(e: BaseException) -> None:
+            self.ai_spinner.set_visible(False)
+            self.ai_retry_button.set_sensitive(True)
+            self.ai_result.set_label(getattr(e, "message", None) or str(e))
+            log.info("KI-Anfrage fehlgeschlagen: %s", getattr(e, "detail", e))
+
+        self._ai_source_text = source
+        self._ai_task = spawn(run(), on_error=failed)
+
+    def _ai_show(self, answer: str | list[str]) -> None:
+        self._ai_answer = answer
+        self.ai_spinner.set_visible(False)
+        self.ai_retry_button.set_sensitive(True)
+        self.ai_result.remove_css_class("dim-label")
+        if isinstance(answer, list):
+            self.ai_result.set_visible(not answer)
+            self.ai_result.set_label(_("No suggestions"))
+            for child in list(self._ai_tag_buttons()):
+                self.ai_tags.remove(child)
+            for tag in answer:
+                btn = Gtk.ToggleButton(label=tag, active=True)
+                btn.add_css_class("tag-chip")
+                self.ai_tags.append(btn)
+            self.ai_tags.set_visible(bool(answer))
+            self.ai_accept_button.set_sensitive(bool(answer))
+        else:
+            self.ai_result.set_label(answer)
+            self.ai_accept_button.set_sensitive(bool(answer.strip()))
+
+    def _ai_tag_buttons(self) -> list[Gtk.ToggleButton]:
+        out, child = [], self.ai_tags.get_first_child()
+        while child is not None:
+            out.append(child)
+            child = child.get_next_sibling()
+        return out
+
+    @Gtk.Template.Callback()
+    def on_ai_discard(self, *_args: object) -> None:
+        if self._ai_task and not self._ai_task.done():
+            self._ai_task.cancel()
+        self._ai_answer = None
+        self.ai_revealer.set_reveal_child(False)
+
+    @Gtk.Template.Callback()
+    def on_ai_retry(self, *_args: object) -> None:
+        if self._ai_request:
+            self._ai_run(self._ai_source_text)
+
+    @Gtk.Template.Callback()
+    def on_ai_accept(self, *_args: object) -> None:
+        if self._ai_request is None or self._ai_answer is None:
+            return
+        kind, arg, key = self._ai_request
+        if isinstance(self._ai_answer, list):
+            tags = [b.get_label() for b in self._ai_tag_buttons() if b.get_active()]
+            current = self._ai_source(key)
+            tags = [t for t in tags if t.lower() not in current.lower()]
+            if not tags:
+                self.on_ai_discard()
+                return
+            last = current.rstrip().splitlines()[-1] if current.strip() else ""
+            joiner = " " if last.startswith("#") else "\n\n"
+            new_text = current.rstrip() + joiner + " ".join(tags)
+        else:
+            new_text = self._ai_answer
+        self._apply_ai_text(key, new_text)
+        self.ai_revealer.set_reveal_child(False)
+
+    def _apply_ai_text(self, key: str, text: str) -> None:
+        """Übernimmt Text in den Ziel-Tab; rückgängig per Toast oder Strg+Z."""
+        created = False
+        if key != MAIN and self._variant(key) is None:
+            self._create_variant(key)
+            created = True
+        if key != MAIN:
+            self._rebuild_variant_group()
+            self.variant_group.set_active_name(key)
+            self._show_variant()
+        buf = self.buffers[MAIN] if key == MAIN else self.buffers.get(key)
+        if buf is None:
+            return
+        old = buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
+        buf.begin_user_action()
+        buf.delete(buf.get_start_iter(), buf.get_end_iter())
+        buf.insert(buf.get_start_iter(), text)
+        buf.end_user_action()
+
+        def undo() -> None:
+            variant = self._variant(key)
+            if created and variant:
+                self._discard_variant_silent(key, variant)
+                return
+            target = self.buffers[MAIN] if key == MAIN else self.buffers.get(key)
+            if target:
+                target.begin_user_action()
+                target.delete(target.get_start_iter(), target.get_end_iter())
+                target.insert(target.get_start_iter(), old)
+                target.end_user_action()
+
+        self.win.toast(_("Suggestion applied"), _("_Undo"), undo)
+
+    def _discard_variant_silent(self, key: str, variant: Variant) -> None:
+        self.post.variants.remove(variant)
+        self.buffers.pop(key, None)
+        self._rebuild_variant_group()
+        self.variant_group.set_active_name(MAIN)
+        self._show_variant()
+        self._changed()
+
+    async def ai_alt_text(self, media: Media, limit: int | None) -> str:
+        """Alt-Text-Vorschlag für ein Bild (vom Alt-Text-Dialog aufgerufen)."""
+        from .ai import ImageInput, tasks
+        data = imaging.load_bytes(media.path)
+        mime = media.mime
+        if len(data) > 1_500_000 or mime not in ("image/jpeg", "image/png", "image/webp"):
+            data, mime, _w, _h = imaging.shrink_to(data, 1_500_000, max_dim=1600)
+        ctx = await self.app.ai.context(self.role)
+        code = self.post.language or (self.role.language if self.role else None) or "de"
+        language = dict(LANGUAGES).get(code, code)
+        return await tasks.alt_text(ctx, ImageInput(mime, data), limit, language,
+                                    self.post.body)
 
     # ------------------------------------------------------------------
     # Planen

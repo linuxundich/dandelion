@@ -69,6 +69,12 @@ template $DandelionRolePage: Adw.NavigationPage {
           title: _("Signature or Hashtags");
           changed => $on_signature_changed();
         }
+
+        Adw.EntryRow ai_style_row {
+          title: _("Style for the AI Assistant");
+          tooltip-text: _("For example: casual, addresses readers informally, technical but easy to understand");
+          changed => $on_signature_changed();
+        }
       }
 
       Adw.PreferencesGroup {

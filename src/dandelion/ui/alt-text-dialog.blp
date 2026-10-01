@@ -96,6 +96,71 @@ template $DandelionAltTextDialog: Adw.Dialog {
           ]
         }
 
+        Button ai_button {
+          visible: false;
+          halign: start;
+          clicked => $on_ai_generate();
+
+          child: Adw.ButtonContent {
+            icon-name: "starred-symbolic";
+            label: _("_Describe Image");
+            use-underline: true;
+          };
+        }
+
+        Revealer ai_revealer {
+          transition-type: slide_down;
+
+          child: Box {
+            orientation: vertical;
+            spacing: 8;
+
+            Box {
+              spacing: 8;
+
+              Label ai_status {
+                hexpand: true;
+                xalign: 0;
+                wrap: true;
+
+                styles [
+                  "heading",
+                ]
+              }
+
+              Adw.Spinner ai_spinner {}
+            }
+
+            Label ai_result {
+              wrap: true;
+              xalign: 0;
+              selectable: true;
+            }
+
+            Box {
+              spacing: 6;
+              halign: end;
+
+              Button {
+                label: _("_Discard");
+                use-underline: true;
+                clicked => $on_ai_discard();
+              }
+
+              Button ai_accept {
+                label: _("_Apply");
+                use-underline: true;
+                sensitive: false;
+                clicked => $on_ai_accept();
+              }
+            }
+
+            styles [
+              "ai-panel",
+            ]
+          };
+        }
+
         Label hint_label {
           xalign: 0;
           wrap: true;

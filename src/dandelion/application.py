@@ -80,6 +80,8 @@ class DandelionApplication(Adw.Application):
         self.store.purge_deleted_posts()
         self.scheduling = SchedulingService(self)
         self.scheduling.start()
+        from .ai_service import AIService
+        self.ai = AIService(self)
 
     def _on_local_options(self, _app: Gio.Application, options: GLib.VariantDict) -> int:
         if options.contains("background"):

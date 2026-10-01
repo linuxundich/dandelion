@@ -167,3 +167,16 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
 .preview-tile.platform-linkedin { border-top: 3px solid var(--teal-4, #2190a4); }
 .preview-tile.platform-facebook { border-top: 3px solid var(--blue-5); }
 .preview-tile.platform-x { border-top: 3px solid var(--dark-2, #5e5c64); }
+
+/* KI-Vorschläge */
+.ai-panel {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: alpha(var(--accent-bg-color), 0.08);
+  border: 1px solid alpha(var(--accent-bg-color), 0.25);
+}
+.tag-chip {
+  border-radius: 999px;
+  padding: 2px 10px;
+  min-height: 0;
+}

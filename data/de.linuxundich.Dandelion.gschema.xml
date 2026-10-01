@@ -46,5 +46,14 @@
     <key name="default-timezone" type="s"><default>''</default><summary>Default time zone (empty = system)</summary></key>
 
     <key name="ai-enabled" type="b"><default>false</default><summary>Enable AI features</summary></key>
+    <key name="ai-provider" type="s"><default>'gemini'</default><summary>AI provider (gemini, openai, xai)</summary></key>
+    <key name="ai-model-gemini" type="s"><default>'gemini-3.6-flash'</default><summary>Gemini model</summary></key>
+    <key name="ai-model-openai" type="s"><default>'gpt-6-luna'</default><summary>OpenAI model</summary></key>
+    <key name="ai-model-xai" type="s"><default>'grok-4.7'</default><summary>xAI model</summary></key>
+    <key name="ai-privacy-accepted" type="as">
+      <default>[]</default>
+      <summary>Privacy notices already confirmed</summary>
+      <description>Entries like “openai:text” or “gemini:images”.</description>
+    </key>
   </schema>
 </schemalist>

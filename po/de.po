@@ -140,6 +140,30 @@ msgstr "Standard-Zeitzone (leer = System)"
 msgid "Enable AI features"
 msgstr "KI-Funktionen aktivieren"
 
+#: data/de.linuxundich.Dandelion.gschema.xml:49
+msgid "AI provider (gemini, openai, xai)"
+msgstr "KI-Anbieter (gemini, openai, xai)"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:50
+msgid "Gemini model"
+msgstr "Gemini-Modell"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:51
+msgid "OpenAI model"
+msgstr "OpenAI-Modell"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:52
+msgid "xAI model"
+msgstr "xAI-Modell"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:55
+msgid "Privacy notices already confirmed"
+msgstr "Bereits bestätigte Datenschutzhinweise"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:56
+msgid "Entries like “openai:text” or “gemini:images”."
+msgstr "Einträge wie „openai:text“ oder „gemini:images“."
+
 #: src/dandelion/ui/window.blp:21 src/dandelion/ui/composer.blp:22
 #: src/dandelion/ui/preferences.blp:67
 msgid "Drafts"
@@ -157,7 +181,7 @@ msgstr "Hauptmenü"
 msgid "_Publish"
 msgstr "_Veröffentlichen"
 
-#: src/dandelion/ui/window.blp:46 src/dandelion/composer.py:704
+#: src/dandelion/ui/window.blp:46 src/dandelion/composer.py:715
 msgid "Publish to all selected profiles"
 msgstr "Auf allen ausgewählten Profilen veröffentlichen"
 
@@ -182,7 +206,7 @@ msgstr "Geplant"
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: src/dandelion/ui/window.blp:102
+#: src/dandelion/ui/window.blp:102 src/dandelion/ai_service.py:84
 msgid "_Send"
 msgstr "_Senden"
 
@@ -230,8 +254,8 @@ msgstr "Füge deine Mastodon- und Bluesky-Profile hinzu, um einen Beitrag einmal
 msgid "_Add Profile"
 msgstr "Profil _hinzufügen"
 
-#: src/dandelion/ui/composer.blp:132 src/dandelion/ui/composer.blp:456
-#: src/dandelion/composer.py:756
+#: src/dandelion/ui/composer.blp:132 src/dandelion/ui/composer.blp:542
+#: src/dandelion/composer.py:767
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -257,60 +281,80 @@ msgstr "Inhaltswarnung"
 msgid "Post text"
 msgstr "Beitragstext"
 
-#: src/dandelion/ui/composer.blp:332 src/dandelion/ui/shortcuts-dialog.blp:29
-#: src/dandelion/composer.py:980
+#: src/dandelion/ui/composer.blp:359 src/dandelion/ui/alt-text-dialog.blp:145
+msgid "_Discard"
+msgstr "_Verwerfen"
+
+#: src/dandelion/ui/composer.blp:365
+msgid "_Try Again"
+msgstr "_Erneut versuchen"
+
+#: src/dandelion/ui/composer.blp:371 src/dandelion/ui/alt-text-dialog.blp:151
+msgid "_Apply"
+msgstr "_Übernehmen"
+
+#: src/dandelion/ui/composer.blp:404 src/dandelion/ui/shortcuts-dialog.blp:29
+#: src/dandelion/composer.py:991
 msgid "Add Images"
 msgstr "Bilder hinzufügen"
 
-#: src/dandelion/ui/composer.blp:341
+#: src/dandelion/ui/composer.blp:414
+msgid "Writing Assistant"
+msgstr "Schreibassistent"
+
+#: src/dandelion/ui/composer.blp:418
+msgid "Assistant"
+msgstr "Assistent"
+
+#: src/dandelion/ui/composer.blp:427
 msgid "Content Warning"
 msgstr "Inhaltswarnung"
 
-#: src/dandelion/ui/composer.blp:346
+#: src/dandelion/ui/composer.blp:432
 msgid "CW"
 msgstr "CW"
 
-#: src/dandelion/ui/composer.blp:355 src/dandelion/ui/role-page.blp:60
+#: src/dandelion/ui/composer.blp:441 src/dandelion/ui/role-page.blp:60
 msgid "Language"
 msgstr "Sprache"
 
-#: src/dandelion/ui/composer.blp:364 src/dandelion/ui/role-page.blp:65
+#: src/dandelion/ui/composer.blp:450 src/dandelion/ui/role-page.blp:65
 msgid "Visibility on Mastodon"
 msgstr "Sichtbarkeit auf Mastodon"
 
-#: src/dandelion/ui/composer.blp:372
+#: src/dandelion/ui/composer.blp:458
 msgid "Content label for Bluesky"
 msgstr "Inhaltslabel für Bluesky"
 
-#: src/dandelion/ui/composer.blp:380
+#: src/dandelion/ui/composer.blp:466
 msgid "Append the signature of this role"
 msgstr "Signatur dieser Rolle anhängen"
 
-#: src/dandelion/ui/composer.blp:385
+#: src/dandelion/ui/composer.blp:471
 msgid "Signature"
 msgstr "Signatur"
 
-#: src/dandelion/ui/composer.blp:398
+#: src/dandelion/ui/composer.blp:484
 msgid "Problems"
 msgstr "Probleme"
 
-#: src/dandelion/ui/composer.blp:470
+#: src/dandelion/ui/composer.blp:556
 msgid "Compact"
 msgstr "Kompakt"
 
-#: src/dandelion/ui/composer.blp:475
+#: src/dandelion/ui/composer.blp:561
 msgid "Full"
 msgstr "Voll"
 
-#: src/dandelion/ui/composer.blp:490
+#: src/dandelion/ui/composer.blp:576
 msgid "Status of all selected profiles"
 msgstr "Status aller ausgewählten Profile"
 
-#: src/dandelion/ui/composer.blp:510
+#: src/dandelion/ui/composer.blp:596
 msgid "Show _All"
 msgstr "_Alle anzeigen"
 
-#: src/dandelion/ui/composer.blp:564
+#: src/dandelion/ui/composer.blp:650
 msgid "_Manage Roles"
 msgstr "Rollen _verwalten"
 
@@ -454,6 +498,54 @@ msgstr "Zeitzone"
 msgid "Default Time Zone"
 msgstr "Standard-Zeitzone"
 
+#: src/dandelion/ui/preferences.blp:154
+msgid "AI"
+msgstr "KI"
+
+#: src/dandelion/ui/preferences.blp:158
+msgid "AI Assistant"
+msgstr "KI-Assistent"
+
+#: src/dandelion/ui/preferences.blp:159
+msgid "Suggestions for wording, translations, hashtags and alt text. Nothing is changed without your confirmation."
+msgstr "Vorschläge für Formulierungen, Übersetzungen, Hashtags und Alt-Texte. Nichts wird ohne deine Bestätigung geändert."
+
+#: src/dandelion/ui/preferences.blp:162
+msgid "Enable AI Features"
+msgstr "KI-Funktionen aktivieren"
+
+#: src/dandelion/ui/preferences.blp:167 src/dandelion/ui/preferences.blp:170
+msgid "Provider"
+msgstr "Anbieter"
+
+#: src/dandelion/ui/preferences.blp:182
+msgid "API Key"
+msgstr "API-Schlüssel"
+
+#: src/dandelion/ui/preferences.blp:188
+msgid "Get an API Key"
+msgstr "API-Schlüssel erstellen"
+
+#: src/dandelion/ui/preferences.blp:194
+msgid "Model"
+msgstr "Modell"
+
+#: src/dandelion/ui/preferences.blp:199
+msgid "Load Available Models"
+msgstr "Verfügbare Modelle laden"
+
+#: src/dandelion/ui/preferences.blp:206
+msgid "Privacy"
+msgstr "Datenschutz"
+
+#: src/dandelion/ui/preferences.blp:207
+msgid "Before text or images are sent to a provider for the first time, Dandelion asks for confirmation. API keys are stored in the system keyring."
+msgstr "Bevor Text oder Bilder zum ersten Mal an einen Anbieter gehen, fragt Dandelion nach. API-Schlüssel liegen im Schlüsselbund des Systems."
+
+#: src/dandelion/ui/preferences.blp:210
+msgid "Show Privacy Notices Again"
+msgstr "Datenschutzhinweise erneut anzeigen"
+
 #: src/dandelion/ui/role-page.blp:13
 msgid "Appearance"
 msgstr "Darstellung"
@@ -486,7 +578,15 @@ msgstr "Voreinstellungen"
 msgid "Signature or Hashtags"
 msgstr "Signatur oder Hashtags"
 
-#: src/dandelion/ui/role-page.blp:76
+#: src/dandelion/ui/role-page.blp:74
+msgid "Style for the AI Assistant"
+msgstr "Stil für den KI-Assistenten"
+
+#: src/dandelion/ui/role-page.blp:75
+msgid "For example: casual, addresses readers informally, technical but easy to understand"
+msgstr "Zum Beispiel: locker, duzt die Leser, technisch, aber verständlich"
+
+#: src/dandelion/ui/role-page.blp:82
 msgid "Delete Role"
 msgstr "Rolle löschen"
 
@@ -527,7 +627,7 @@ msgid "Remove Profile"
 msgstr "Profil entfernen"
 
 #: src/dandelion/ui/add-profile.blp:5 src/dandelion/ui/add-profile.blp:12
-#: src/dandelion/preferences.py:233
+#: src/dandelion/preferences.py:353
 msgid "Add Profile"
 msgstr "Profil hinzufügen"
 
@@ -660,9 +760,10 @@ msgid "Alt Text"
 msgstr "Alt-Text"
 
 #: src/dandelion/ui/alt-text-dialog.blp:18
-#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1330
-#: src/dandelion/history.py:180 src/dandelion/preferences.py:382
-#: src/dandelion/preferences.py:474 src/dandelion/scheduled.py:220
+#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1589
+#: src/dandelion/history.py:180 src/dandelion/preferences.py:506
+#: src/dandelion/preferences.py:598 src/dandelion/scheduled.py:220
+#: src/dandelion/ai_service.py:83
 msgid "_Cancel"
 msgstr "_Abbrechen"
 
@@ -673,6 +774,10 @@ msgstr "Beschreibe das Bild für Menschen, die es nicht sehen können."
 #: src/dandelion/ui/alt-text-dialog.blp:80
 msgid "Alt text"
 msgstr "Alt-Text"
+
+#: src/dandelion/ui/alt-text-dialog.blp:106
+msgid "_Describe Image"
+msgstr "Bild _beschreiben"
 
 #: src/dandelion/ui/send-dialog.blp:5 src/dandelion/history.py:138
 #: src/dandelion/send_dialog.py:56
@@ -795,13 +900,13 @@ msgstr "Beenden"
 msgid "Run without a window to publish scheduled posts"
 msgstr "Ohne Fenster laufen, um geplante Beiträge zu veröffentlichen"
 
-#: src/dandelion/application.py:167
+#: src/dandelion/application.py:169
 msgid "Write once, post to Mastodon, Bluesky and more."
 msgstr "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen."
 
 #. Translators: Replace "translator-credits" with your name/username,
 #. and optionally an email or URL.
-#: src/dandelion/application.py:170
+#: src/dandelion/application.py:172
 msgid "translator-credits"
 msgstr "Christoph Langner"
 
@@ -828,241 +933,308 @@ msgstr "In _Entwürfe verschieben"
 msgid "_Send Now"
 msgstr "Jetzt _senden"
 
-#: src/dandelion/composer.py:254 src/dandelion/add_profile.py:317
+#: src/dandelion/composer.py:264 src/dandelion/add_profile.py:317
 msgid "Personal"
 msgstr "Privat"
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:282 src/dandelion/composer.py:758
-#: src/dandelion/preferences.py:139
+#: src/dandelion/composer.py:292 src/dandelion/composer.py:769
+#: src/dandelion/preferences.py:259
 #, python-brace-format
 msgid "{n} profile"
 msgid_plural "{n} profiles"
 msgstr[0] "{n} Profil"
 msgstr[1] "{n} Profile"
 
-#: src/dandelion/composer.py:290
+#: src/dandelion/composer.py:300
 msgid "No Role"
 msgstr "Keine Rolle"
 
-#: src/dandelion/composer.py:297
+#: src/dandelion/composer.py:307
 #, python-brace-format
 msgid "Role: {name}"
 msgstr "Rolle: {name}"
 
-#: src/dandelion/composer.py:302
+#: src/dandelion/composer.py:312
 #, python-brace-format
 msgid "Append signature: {signature}"
 msgstr "Signatur anhängen: {signature}"
 
-#: src/dandelion/composer.py:338
+#: src/dandelion/composer.py:348
 msgid "More Profiles"
 msgstr "Weitere Profile"
 
-#: src/dandelion/composer.py:363
+#: src/dandelion/composer.py:373
 msgid "Own Text for This Profile"
 msgstr "Eigener Text für dieses Profil"
 
-#: src/dandelion/composer.py:409
+#: src/dandelion/composer.py:419
 #, python-brace-format
 msgid "Role changed to “{name}”"
 msgstr "Rolle zu „{name}“ gewechselt"
 
-#: src/dandelion/composer.py:409 src/dandelion/composer.py:587
-#: src/dandelion/composer.py:1081 src/dandelion/composer.py:1163
-#: src/dandelion/composer.py:1265 src/dandelion/composer.py:1310
-#: src/dandelion/scheduled.py:256
+#: src/dandelion/composer.py:419 src/dandelion/composer.py:597
+#: src/dandelion/composer.py:1100 src/dandelion/composer.py:1182
+#: src/dandelion/composer.py:1467 src/dandelion/composer.py:1524
+#: src/dandelion/composer.py:1569 src/dandelion/scheduled.py:256
 msgid "_Undo"
 msgstr "_Rückgängig"
 
-#: src/dandelion/composer.py:441
+#: src/dandelion/composer.py:451
 msgid "Main Text"
 msgstr "Haupttext"
 
-#: src/dandelion/composer.py:524
+#: src/dandelion/composer.py:534
 #, python-brace-format
 msgid "{name} uses its own text."
 msgstr "{name} verwendet einen eigenen Text."
 
-#: src/dandelion/composer.py:526
+#: src/dandelion/composer.py:536
 msgid "The main text has changed since."
 msgstr "Der Haupttext wurde seitdem geändert."
 
-#: src/dandelion/composer.py:528
+#: src/dandelion/composer.py:538
 msgid "_Use Main Text"
 msgstr "Haupttext _übernehmen"
 
-#: src/dandelion/composer.py:539
+#: src/dandelion/composer.py:549
 #, python-brace-format
 msgid "{name} uses the main text."
 msgstr "{name} verwendet den Haupttext."
 
-#: src/dandelion/composer.py:540
+#: src/dandelion/composer.py:550
 msgid "_Customize"
 msgstr "_Anpassen"
 
-#: src/dandelion/composer.py:587
+#: src/dandelion/composer.py:597
 msgid "Own text discarded"
 msgstr "Eigener Text verworfen"
 
-#: src/dandelion/composer.py:705
+#: src/dandelion/composer.py:716
 #, python-brace-format
 msgid "Cannot publish: {n} problem"
 msgid_plural "Cannot publish: {n} problems"
 msgstr[0] "Veröffentlichen nicht möglich: {n} Problem"
 msgstr[1] "Veröffentlichen nicht möglich: {n} Probleme"
 
-#: src/dandelion/composer.py:728
+#: src/dandelion/composer.py:739
 msgid "within the limit"
 msgstr "innerhalb des Limits"
 
-#: src/dandelion/composer.py:732
+#: src/dandelion/composer.py:743
 msgid "over the limit"
 msgstr "über dem Limit"
 
-#: src/dandelion/composer.py:736
+#: src/dandelion/composer.py:747
 msgid "close to the limit"
 msgstr "nahe am Limit"
 
-#: src/dandelion/composer.py:745
+#: src/dandelion/composer.py:756
 #, python-brace-format
 msgid "{platform} {handle}: {used} of {limit} characters, {state}"
 msgstr "{platform} {handle}: {used} von {limit} Zeichen, {state}"
 
-#: src/dandelion/composer.py:761
+#: src/dandelion/composer.py:772
 #, python-brace-format
 msgid "{n} over the limit"
 msgid_plural "{n} over the limit"
 msgstr[0] "{n} über dem Limit"
 msgstr[1] "{n} über dem Limit"
 
-#: src/dandelion/composer.py:775
+#: src/dandelion/composer.py:786
 msgid "All Profiles"
 msgstr "Alle Profile"
 
-#: src/dandelion/composer.py:793
+#: src/dandelion/composer.py:804
 #, python-brace-format
 msgid "{n} problem"
 msgid_plural "{n} problems"
 msgstr[0] "{n} Problem"
 msgstr[1] "{n} Probleme"
 
-#: src/dandelion/composer.py:847
+#: src/dandelion/composer.py:858
 #, python-brace-format
 msgid "Strictest limit: {platform} {handle}, {used} of {limit} characters"
 msgstr "Strengstes Limit: {platform} {handle}, {used} von {limit} Zeichen"
 
-#: src/dandelion/composer.py:878
+#: src/dandelion/composer.py:889
 msgid "No Preview"
 msgstr "Keine Vorschau"
 
-#: src/dandelion/composer.py:879
+#: src/dandelion/composer.py:890
 msgid "Select a profile to see how the post will look."
 msgstr "Wähle ein Profil, um zu sehen, wie der Beitrag aussehen wird."
 
-#: src/dandelion/composer.py:894
+#: src/dandelion/composer.py:905
 #, python-brace-format
 msgid "Filtered: {name}"
 msgstr "Gefiltert: {name}"
 
-#: src/dandelion/composer.py:982
+#: src/dandelion/composer.py:993
 msgid "Images and Videos"
 msgstr "Bilder und Videos"
 
-#: src/dandelion/composer.py:1007
+#: src/dandelion/composer.py:1018
 #, python-brace-format
 msgid "Could not add “{name}”"
 msgstr "„{name}“ konnte nicht hinzugefügt werden"
 
-#: src/dandelion/composer.py:1011
+#: src/dandelion/composer.py:1022
 #, python-brace-format
 msgid "“{name}” is not an image or video"
 msgstr "„{name}“ ist kein Bild und kein Video"
 
-#: src/dandelion/composer.py:1063
+#: src/dandelion/composer.py:1074
 msgid "Very tall or wide images are cropped in the timeline preview on most platforms."
 msgstr "Sehr hohe oder breite Bilder werden in der Timeline-Vorschau der meisten Plattformen beschnitten."
 
-#: src/dandelion/composer.py:1081
+#: src/dandelion/composer.py:1100
 msgid "Media removed"
 msgstr "Medium entfernt"
 
 #. type: ignore[attr-defined]
-#: src/dandelion/composer.py:1124
+#: src/dandelion/composer.py:1143
 msgid "Empty Post"
 msgstr "Leerer Beitrag"
 
-#: src/dandelion/composer.py:1131
+#: src/dandelion/composer.py:1150
 msgid "Delete Draft"
 msgstr "Entwurf löschen"
 
-#: src/dandelion/composer.py:1163
+#: src/dandelion/composer.py:1182
 msgid "Draft deleted"
 msgstr "Entwurf gelöscht"
 
 #. Der Hintergrunddienst hat den Beitrag inzwischen gesendet
-#: src/dandelion/composer.py:1218 src/dandelion/composer.py:1299
+#: src/dandelion/composer.py:1237 src/dandelion/composer.py:1558
 msgid "This post has been published in the meantime"
 msgstr "Dieser Beitrag wurde inzwischen veröffentlicht"
 
-#: src/dandelion/composer.py:1224
+#: src/dandelion/composer.py:1243
 msgid "Draft saved"
 msgstr "Entwurf gespeichert"
 
-#: src/dandelion/composer.py:1241
+#. type: ignore[misc]
+#: src/dandelion/composer.py:1276 src/dandelion/composer.py:1329
+msgid "Shorter"
+msgstr "Kürzer"
+
+#: src/dandelion/composer.py:1276 src/dandelion/composer.py:1329
+msgid "Longer"
+msgstr "Länger"
+
+#: src/dandelion/composer.py:1277 src/dandelion/composer.py:1329
+msgid "More Casual"
+msgstr "Lockerer"
+
+#: src/dandelion/composer.py:1277 src/dandelion/composer.py:1330
+msgid "More Factual"
+msgstr "Sachlicher"
+
+#: src/dandelion/composer.py:1281
+msgid "Correct Spelling and Grammar"
+msgstr "Rechtschreibung und Grammatik korrigieren"
+
+#: src/dandelion/composer.py:1285
+msgid "Translate"
+msgstr "Übersetzen"
+
+#: src/dandelion/composer.py:1296
+msgid "Adapt for Platform"
+msgstr "An Plattform anpassen"
+
+#: src/dandelion/composer.py:1297
+msgid "Suggest Hashtags"
+msgstr "Hashtags vorschlagen"
+
+#: src/dandelion/composer.py:1321
+msgid "Write some text first"
+msgstr "Schreibe zuerst einen Text"
+
+#: src/dandelion/composer.py:1330
+msgid "Corrected"
+msgstr "Korrigiert"
+
+#: src/dandelion/composer.py:1334
+#, python-brace-format
+msgid "Translation: {language}"
+msgstr "Übersetzung: {language}"
+
+#: src/dandelion/composer.py:1336
+#, python-brace-format
+msgid "Adapted for {platform}"
+msgstr "Angepasst für {platform}"
+
+#: src/dandelion/composer.py:1338
+msgid "Hashtag Suggestions"
+msgstr "Hashtag-Vorschläge"
+
+#: src/dandelion/composer.py:1341
+msgid "Waiting for the answer"
+msgstr "Warte auf die Antwort"
+
+#: src/dandelion/composer.py:1384
+msgid "No suggestions"
+msgstr "Keine Vorschläge"
+
+#: src/dandelion/composer.py:1467
+msgid "Suggestion applied"
+msgstr "Vorschlag übernommen"
+
+#: src/dandelion/composer.py:1500
 #, python-brace-format
 msgid "Scheduled for {when}. Changes are saved automatically."
 msgstr "Geplant für {when}. Änderungen werden automatisch gespeichert."
 
-#: src/dandelion/composer.py:1242
+#: src/dandelion/composer.py:1501
 #, python-brace-format
 msgid "Paused, planned for {when}."
 msgstr "Pausiert, geplant für {when}."
 
-#: src/dandelion/composer.py:1243
+#: src/dandelion/composer.py:1502
 #, python-brace-format
 msgid "Missed, it was planned for {when}."
 msgstr "Verpasst, geplant war {when}."
 
-#: src/dandelion/composer.py:1265
+#: src/dandelion/composer.py:1524
 msgid "Schedule removed, the post is a draft again"
 msgstr "Planung aufgehoben, der Beitrag ist wieder ein Entwurf"
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:1309
+#: src/dandelion/composer.py:1568
 #, python-brace-format
 msgid "Scheduled for {when}"
 msgstr "Geplant für {when}"
 
-#: src/dandelion/composer.py:1328
+#: src/dandelion/composer.py:1587
 msgid "Publish Despite Warnings?"
 msgstr "Trotz Warnungen veröffentlichen?"
 
-#: src/dandelion/composer.py:1331
+#: src/dandelion/composer.py:1590
 msgid "_Publish Anyway"
 msgstr "_Trotzdem veröffentlichen"
 
-#: src/dandelion/composer.py:1364
+#: src/dandelion/composer.py:1623
 msgid "This post is already being published"
 msgstr "Dieser Beitrag wird bereits veröffentlicht"
 
-#: src/dandelion/composer.py:1371
+#: src/dandelion/composer.py:1630
 msgid "Publishing failed"
 msgstr "Veröffentlichen fehlgeschlagen"
 
-#: src/dandelion/composer.py:1373
+#: src/dandelion/composer.py:1632
 #, python-brace-format
 msgid "Published on {n} profile"
 msgid_plural "Published on {n} profiles"
 msgstr[0] "Auf {n} Profil veröffentlicht"
 msgstr[1] "Auf {n} Profilen veröffentlicht"
 
-#: src/dandelion/composer.py:1376
+#: src/dandelion/composer.py:1635
 #, python-brace-format
 msgid "Published on {ok} of {total} profiles"
 msgstr "Auf {ok} von {total} Profilen veröffentlicht"
 
-#: src/dandelion/composer.py:1377
+#: src/dandelion/composer.py:1636
 msgid "_Details"
 msgstr "_Details"
 
@@ -1133,7 +1305,7 @@ msgstr "Beitrag auf {platform} löschen?"
 msgid "The post will be removed from {handle}. This cannot be undone."
 msgstr "Der Beitrag wird von {handle} entfernt. Das lässt sich nicht rückgängig machen."
 
-#: src/dandelion/history.py:181 src/dandelion/preferences.py:383
+#: src/dandelion/history.py:181 src/dandelion/preferences.py:507
 msgid "_Delete"
 msgstr "_Löschen"
 
@@ -1182,107 +1354,134 @@ msgstr "Lila"
 msgid "Slate"
 msgstr "Schiefer"
 
-#: src/dandelion/preferences.py:83
+#: src/dandelion/preferences.py:137
+msgid "API key saved"
+msgstr "API-Schlüssel gespeichert"
+
+#: src/dandelion/preferences.py:138
+msgid "API key removed"
+msgstr "API-Schlüssel entfernt"
+
+#: src/dandelion/preferences.py:156
+msgid "Enter and save an API key first."
+msgstr "Gib zuerst einen API-Schlüssel ein und speichere ihn."
+
+#: src/dandelion/preferences.py:174
+msgid "The provider returned no suitable models."
+msgstr "Der Anbieter hat keine passenden Modelle geliefert."
+
+#: src/dandelion/preferences.py:182
+#, python-brace-format
+msgid "{n} model available"
+msgid_plural "{n} models available"
+msgstr[0] "{n} Modell verfügbar"
+msgstr[1] "{n} Modelle verfügbar"
+
+#: src/dandelion/preferences.py:188
+msgid "Privacy notices will be shown again"
+msgstr "Datenschutzhinweise werden wieder angezeigt"
+
+#: src/dandelion/preferences.py:203
 #, python-brace-format
 msgid "System ({zone})"
 msgstr "System ({zone})"
 
-#: src/dandelion/preferences.py:104
+#: src/dandelion/preferences.py:224
 msgid "Not available: the systemd user instance cannot be reached."
 msgstr "Nicht verfügbar: Die systemd-Benutzerinstanz ist nicht erreichbar."
 
-#: src/dandelion/preferences.py:107
+#: src/dandelion/preferences.py:227
 msgid "Active"
 msgstr "Aktiv"
 
-#: src/dandelion/preferences.py:109
+#: src/dandelion/preferences.py:229
 msgid "Inactive: posts are only sent while Dandelion is open."
 msgstr "Inaktiv: Beiträge werden nur gesendet, solange Dandelion geöffnet ist."
 
-#: src/dandelion/preferences.py:112
+#: src/dandelion/preferences.py:232
 msgid "Nothing scheduled"
 msgstr "Nichts geplant"
 
-#: src/dandelion/preferences.py:132
+#: src/dandelion/preferences.py:252
 msgid "Add Role"
 msgstr "Rolle hinzufügen"
 
-#: src/dandelion/preferences.py:150
+#: src/dandelion/preferences.py:270
 msgid "Move Up"
 msgstr "Nach oben"
 
-#: src/dandelion/preferences.py:151
+#: src/dandelion/preferences.py:271
 msgid "Move Down"
 msgstr "Nach unten"
 
-#: src/dandelion/preferences.py:160
+#: src/dandelion/preferences.py:280
 msgid "More"
 msgstr "Mehr"
 
-#: src/dandelion/preferences.py:206
+#: src/dandelion/preferences.py:326
 msgid "New Role"
 msgstr "Neue Rolle"
 
-#: src/dandelion/preferences.py:308
+#: src/dandelion/preferences.py:431
 msgid "No profiles yet"
 msgstr "Noch keine Profile"
 
-#: src/dandelion/preferences.py:317
+#: src/dandelion/preferences.py:440
 #, python-brace-format
 msgid "Include {handle} in this role"
 msgstr "{handle} in diese Rolle aufnehmen"
 
-#: src/dandelion/preferences.py:322
+#: src/dandelion/preferences.py:445
 msgid "Preselected for new posts"
 msgstr "Bei neuen Beiträgen vorausgewählt"
 
-#: src/dandelion/preferences.py:324
+#: src/dandelion/preferences.py:447
 #, python-brace-format
 msgid "Preselect {handle}"
 msgstr "{handle} vorauswählen"
 
-#: src/dandelion/preferences.py:380
+#: src/dandelion/preferences.py:504
 #, python-brace-format
 msgid "Delete Role “{name}”?"
 msgstr "Rolle „{name}“ löschen?"
 
-#: src/dandelion/preferences.py:381
+#: src/dandelion/preferences.py:505
 msgid "The profiles stay available in the other roles."
 msgstr "Die Profile bleiben in den anderen Rollen verfügbar."
 
-#: src/dandelion/preferences.py:439
+#: src/dandelion/preferences.py:563
 #, python-brace-format
 msgid "{n} character"
 msgid_plural "{n} characters"
 msgstr[0] "{n} Zeichen"
 msgstr[1] "{n} Zeichen"
 
-#: src/dandelion/preferences.py:441
+#: src/dandelion/preferences.py:565
 #, python-brace-format
 msgid "{n} image"
 msgid_plural "{n} images"
 msgstr[0] "{n} Bild"
 msgstr[1] "{n} Bilder"
 
-#: src/dandelion/preferences.py:443
+#: src/dandelion/preferences.py:567
 #, python-brace-format
 msgid "alt text up to {n}"
 msgstr "Alt-Text bis {n}"
 
-#: src/dandelion/preferences.py:459
+#: src/dandelion/preferences.py:583
 msgid "Connection checked"
 msgstr "Verbindung geprüft"
 
-#: src/dandelion/preferences.py:471
+#: src/dandelion/preferences.py:595
 msgid "Remove Profile?"
 msgstr "Profil entfernen?"
 
-#: src/dandelion/preferences.py:472
+#: src/dandelion/preferences.py:596
 #, python-brace-format
 msgid "{handle} is removed from Dandelion and its login data is deleted from the keyring. Published posts stay online."
 msgstr "{handle} wird aus Dandelion entfernt und die Anmeldedaten werden aus dem Schlüsselbund gelöscht. Veröffentlichte Beiträge bleiben online."
 
-#: src/dandelion/preferences.py:475
+#: src/dandelion/preferences.py:599
 msgid "_Remove"
 msgstr "_Entfernen"
 
@@ -1343,20 +1542,29 @@ msgid_plural "{n} pages added"
 msgstr[0] "{n} Seite hinzugefügt"
 msgstr[1] "{n} Seiten hinzugefügt"
 
-#: src/dandelion/alt_text_dialog.py:54
+#: src/dandelion/alt_text_dialog.py:68
 #, python-brace-format
 msgid "{n} / {max}"
 msgstr "{n} / {max}"
 
-#: src/dandelion/alt_text_dialog.py:56
+#: src/dandelion/alt_text_dialog.py:70
 #, python-brace-format
 msgid "{platform} has the strictest limit"
 msgstr "{platform} hat das strengste Limit"
 
-#: src/dandelion/alt_text_dialog.py:63
+#: src/dandelion/alt_text_dialog.py:77
 #, python-brace-format
 msgid "{n} characters"
 msgstr "{n} Zeichen"
+
+#: src/dandelion/alt_text_dialog.py:98
+#, python-brace-format
+msgid "Suggestion from {provider}"
+msgstr "Vorschlag von {provider}"
+
+#: src/dandelion/alt_text_dialog.py:100
+msgid "Analyzing the image"
+msgstr "Bild wird analysiert"
 
 #: src/dandelion/send_dialog.py:53
 #, python-brace-format
@@ -1522,8 +1730,8 @@ msgstr "Das Profil existiert nicht mehr."
 msgid "An unexpected error occurred."
 msgstr "Ein unerwarteter Fehler ist aufgetreten."
 
-#: src/dandelion/platforms/base.py:113 src/dandelion/platforms/x.py:130
-#: src/dandelion/platforms/x.py:155
+#: src/dandelion/platforms/base.py:113 src/dandelion/platforms/x.py:140
+#: src/dandelion/platforms/x.py:165
 msgid "The login has expired. Please sign in again."
 msgstr "Die Anmeldung ist abgelaufen. Bitte melde dich erneut an."
 
@@ -1912,35 +2120,35 @@ msgstr "Verwerfen"
 msgid "Dandelion publishes scheduled posts even when its window is closed."
 msgstr "Dandelion veröffentlicht geplante Beiträge auch bei geschlossenem Fenster."
 
-#: src/dandelion/platforms/x.py:74
+#: src/dandelion/platforms/x.py:84
 #, python-brace-format
 msgid "X charges your developer account about {cost} for this post because it contains a link."
 msgstr "X berechnet deinem Entwicklerkonto für diesen Beitrag etwa {cost}, weil er einen Link enthält."
 
-#: src/dandelion/platforms/x.py:76
+#: src/dandelion/platforms/x.py:86
 #, python-brace-format
 msgid "X charges your developer account about {cost} for this post."
 msgstr "X berechnet deinem Entwicklerkonto für diesen Beitrag etwa {cost}."
 
-#: src/dandelion/platforms/x.py:149
+#: src/dandelion/platforms/x.py:159
 msgid "Your X developer account has no credits left. Top up credits in the X developer console."
 msgstr "Dein X-Entwicklerkonto hat kein Guthaben mehr. Lade in der X Developer Console Guthaben auf."
 
-#: src/dandelion/platforms/x.py:152
+#: src/dandelion/platforms/x.py:162
 #, python-brace-format
 msgid "X refused the request: {reason}"
 msgstr "X hat die Anfrage abgelehnt: {reason}"
 
-#: src/dandelion/platforms/x.py:153
+#: src/dandelion/platforms/x.py:163
 msgid "not permitted"
 msgstr "nicht erlaubt"
 
-#: src/dandelion/platforms/x.py:159
+#: src/dandelion/platforms/x.py:169
 #, python-brace-format
 msgid "X rejected the post: {reason}"
 msgstr "X hat den Beitrag abgelehnt: {reason}"
 
-#: src/dandelion/platforms/x.py:188
+#: src/dandelion/platforms/x.py:198
 msgid "Videos are not supported for X yet."
 msgstr "Videos werden für X noch nicht unterstützt."
 
@@ -1988,3 +2196,62 @@ msgstr "Facebook hat den Beitrag abgelehnt: {reason}"
 #: src/dandelion/platforms/facebook.py:157
 msgid "Videos are not supported for Facebook yet."
 msgstr "Videos werden für Facebook noch nicht unterstützt."
+
+#: src/dandelion/ai_service.py:61
+#, python-brace-format
+msgid "No API key for {provider} is stored. Add one in the preferences under “AI”."
+msgstr "Für {provider} ist kein API-Schlüssel hinterlegt. Trage einen in den Einstellungen unter „KI“ ein."
+
+#: src/dandelion/ai_service.py:75
+#, python-brace-format
+msgid "Dandelion sends the selected image to {provider} to describe it."
+msgstr "Dandelion sendet das ausgewählte Bild an {provider}, um es beschreiben zu lassen."
+
+#: src/dandelion/ai_service.py:77
+#, python-brace-format
+msgid "Dandelion sends the text of your post to {provider}."
+msgstr "Dandelion sendet den Text deines Beitrags an {provider}."
+
+#: src/dandelion/ai_service.py:78
+msgid "The provider processes the data under its own terms and may store it. Do not send confidential content. Suggestions are never applied without your confirmation."
+msgstr "Der Anbieter verarbeitet die Daten nach seinen eigenen Bedingungen und speichert sie unter Umständen. Sende keine vertraulichen Inhalte. Vorschläge werden nie ohne deine Bestätigung übernommen."
+
+#: src/dandelion/ai_service.py:81
+#, python-brace-format
+msgid "Send to {provider}?"
+msgstr "An {provider} senden?"
+
+#: src/dandelion/ai/base.py:62
+#, python-brace-format
+msgid "{provider} could not be reached. Check your internet connection."
+msgstr "{provider} ist nicht erreichbar. Prüfe deine Internetverbindung."
+
+#: src/dandelion/ai/base.py:68
+#, python-brace-format
+msgid "{provider} did not accept the API key."
+msgstr "{provider} hat den API-Schlüssel nicht akzeptiert."
+
+#: src/dandelion/ai/base.py:71
+#, python-brace-format
+msgid "{provider}: limit reached or no credit left. Please try again later."
+msgstr "{provider}: Limit erreicht oder kein Guthaben mehr. Bitte versuche es später erneut."
+
+#: src/dandelion/ai/base.py:74
+#, python-brace-format
+msgid "{provider} does not know this model. Choose another one in the preferences."
+msgstr "{provider} kennt dieses Modell nicht. Wähle in den Einstellungen ein anderes."
+
+#: src/dandelion/ai/base.py:76
+#, python-brace-format
+msgid "{provider} reported an error (HTTP {status})."
+msgstr "{provider} hat einen Fehler gemeldet (HTTP {status})."
+
+#: src/dandelion/ai/openai.py:47 src/dandelion/ai/xai.py:42
+#, python-brace-format
+msgid "{provider} returned an empty answer."
+msgstr "{provider} hat eine leere Antwort geliefert."
+
+#: src/dandelion/ai/gemini.py:51
+#, python-brace-format
+msgid "{provider} returned no answer. {reason}"
+msgstr "{provider} hat keine Antwort geliefert. {reason}"

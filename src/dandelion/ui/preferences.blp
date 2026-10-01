@@ -148,4 +148,68 @@ template $DandelionPreferences: Adw.PreferencesDialog {
       }
     }
   }
+
+  Adw.PreferencesPage ai_page {
+    name: "ai";
+    title: _("AI");
+    icon-name: "starred-symbolic";
+
+    Adw.PreferencesGroup {
+      title: _("AI Assistant");
+      description: _("Suggestions for wording, translations, hashtags and alt text. Nothing is changed without your confirmation.");
+
+      Adw.SwitchRow ai_enabled_row {
+        title: _("Enable AI Features");
+      }
+    }
+
+    Adw.PreferencesGroup ai_provider_group {
+      title: _("Provider");
+
+      Adw.ComboRow provider_row {
+        title: _("Provider");
+
+        model: StringList {
+          strings [
+            "Google Gemini",
+            "OpenAI",
+            "xAI Grok",
+          ]
+        };
+      }
+
+      Adw.PasswordEntryRow key_row {
+        title: _("API Key");
+        show-apply-button: true;
+        apply => $on_key_apply();
+      }
+
+      Adw.ButtonRow {
+        title: _("Get an API Key");
+        end-icon-name: "adw-external-link-symbolic";
+        activated => $on_key_link();
+      }
+
+      Adw.ComboRow model_row {
+        title: _("Model");
+        enable-search: true;
+      }
+
+      Adw.ButtonRow load_models_row {
+        title: _("Load Available Models");
+        start-icon-name: "view-refresh-symbolic";
+        activated => $on_load_models();
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Privacy");
+      description: _("Before text or images are sent to a provider for the first time, Dandelion asks for confirmation. API keys are stored in the system keyring.");
+
+      Adw.ButtonRow {
+        title: _("Show Privacy Notices Again");
+        activated => $on_reset_privacy();
+      }
+    }
+  }
 }

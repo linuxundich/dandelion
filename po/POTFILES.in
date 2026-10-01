@@ -38,3 +38,8 @@ src/dandelion/core/trigger.py
 src/dandelion/platforms/x.py
 src/dandelion/platforms/linkedin.py
 src/dandelion/platforms/facebook.py
+src/dandelion/ai_service.py
+src/dandelion/ai/base.py
+src/dandelion/ai/openai.py
+src/dandelion/ai/xai.py
+src/dandelion/ai/gemini.py

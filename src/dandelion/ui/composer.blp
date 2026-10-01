@@ -308,6 +308,78 @@ template $DandelionComposer: Adw.BreakpointBin {
                       };
                     }
 
+                    Revealer ai_revealer {
+                      transition-type: slide_down;
+
+                      child: Box {
+                        orientation: vertical;
+                        spacing: 8;
+                        margin-start: 12;
+                        margin-end: 12;
+                        margin-bottom: 10;
+
+                        Box {
+                          spacing: 8;
+
+                          Image {
+                            icon-name: "starred-symbolic";
+                          }
+
+                          Label ai_title {
+                            hexpand: true;
+                            xalign: 0;
+                            ellipsize: end;
+
+                            styles [
+                              "heading",
+                            ]
+                          }
+
+                          Adw.Spinner ai_spinner {}
+                        }
+
+                        Label ai_result {
+                          wrap: true;
+                          wrap-mode: word_char;
+                          xalign: 0;
+                          selectable: true;
+                        }
+
+                        Adw.WrapBox ai_tags {
+                          child-spacing: 6;
+                          line-spacing: 6;
+                          visible: false;
+                        }
+
+                        Box ai_actions {
+                          spacing: 6;
+                          halign: end;
+
+                          Button {
+                            label: _("_Discard");
+                            use-underline: true;
+                            clicked => $on_ai_discard();
+                          }
+
+                          Button ai_retry_button {
+                            label: _("_Try Again");
+                            use-underline: true;
+                            clicked => $on_ai_retry();
+                          }
+
+                          Button ai_accept_button {
+                            label: _("_Apply");
+                            use-underline: true;
+                            clicked => $on_ai_accept();
+                          }
+                        }
+
+                        styles [
+                          "ai-panel",
+                        ]
+                      };
+                    }
+
                     Box media_box {
                       visible: false;
                       margin-start: 12;
@@ -331,6 +403,20 @@ template $DandelionComposer: Adw.BreakpointBin {
                           icon-name: "insert-image-symbolic";
                           tooltip-text: _("Add Images");
                           action-name: "win.add-media";
+
+                          styles [
+                            "flat",
+                          ]
+                        }
+
+                        MenuButton ai_button {
+                          visible: false;
+                          tooltip-text: _("Writing Assistant");
+
+                          child: Adw.ButtonContent {
+                            icon-name: "starred-symbolic";
+                            label: _("Assistant");
+                          };
 
                           styles [
                             "flat",

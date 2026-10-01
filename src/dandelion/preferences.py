@@ -47,6 +47,12 @@ class DandelionPreferences(Adw.PreferencesDialog):
     missed_row: Adw.ComboRow = Gtk.Template.Child()
     grace_row: Adw.SpinRow = Gtk.Template.Child()
     tz_row: Adw.ComboRow = Gtk.Template.Child()
+    ai_enabled_row: Adw.SwitchRow = Gtk.Template.Child()
+    ai_provider_group: Adw.PreferencesGroup = Gtk.Template.Child()
+    provider_row: Adw.ComboRow = Gtk.Template.Child()
+    key_row: Adw.PasswordEntryRow = Gtk.Template.Child()
+    model_row: Adw.ComboRow = Gtk.Template.Child()
+    load_models_row: Adw.ButtonRow = Gtk.Template.Child()
 
     def __init__(self, app: DandelionApplication, win: Gtk.Window) -> None:
         super().__init__()
@@ -65,7 +71,121 @@ class DandelionPreferences(Adw.PreferencesDialog):
         s.bind("notify-failure", self.notify_failure_row, "active", flags)
         s.bind("missed-grace-minutes", self.grace_row, "value", flags)
         self._setup_scheduling()
+        self._setup_ai()
         self.reload()
+
+    # -- KI ---------------------------------------------------------------
+    _PROVIDERS = ("gemini", "openai", "xai")
+
+    def _setup_ai(self) -> None:
+        s = self.app.settings
+        s.bind("ai-enabled", self.ai_enabled_row, "active", Gio.SettingsBindFlags.DEFAULT)
+        s.bind("ai-enabled", self.ai_provider_group, "sensitive", Gio.SettingsBindFlags.GET)
+        self._ai_loading = True
+        pid = self.app.ai.provider_id
+        self.provider_row.set_selected(self._PROVIDERS.index(pid))
+        self.provider_row.connect("notify::selected", self._on_provider_changed)
+        self.model_row.set_expression(Gtk.PropertyExpression.new(Gtk.StringObject, None,
+                                                                 "string"))
+        self.model_row.connect("notify::selected", self._on_model_selected)
+        self._show_provider()
+        self._ai_loading = False
+
+    def _current_provider(self) -> str:
+        return self._PROVIDERS[self.provider_row.get_selected()]
+
+    def _set_models(self, models: list[str], current: str) -> None:
+        if current not in models:
+            models = [current, *models]
+        self._models = models
+        self._ai_loading = True
+        self.model_row.set_model(Gtk.StringList.new(models))
+        self.model_row.set_selected(models.index(current))
+        self._ai_loading = False
+
+    def _show_provider(self) -> None:
+        pid = self._current_provider()
+        self._set_models([], self.app.ai.model(pid))
+        self.key_row.set_text("")
+
+        async def load_key() -> None:
+            key = await self.app.ai.api_key(pid)
+            if pid == self._current_provider():
+                self.key_row.set_text(key or "")
+
+        spawn(load_key())
+
+    def _on_provider_changed(self, *_args: object) -> None:
+        if self._ai_loading:
+            return
+        self.app.settings.set_string("ai-provider", self._current_provider())
+        self._show_provider()
+
+    def _on_model_selected(self, *_args: object) -> None:
+        if self._ai_loading or not getattr(self, "_models", None):
+            return
+        self.app.ai.set_model(self._current_provider(),
+                              self._models[self.model_row.get_selected()])
+
+    @Gtk.Template.Callback()
+    def on_key_apply(self, *_args: object) -> None:
+        pid = self._current_provider()
+        key = self.key_row.get_text()
+
+        async def run() -> None:
+            await self.app.ai.set_api_key(pid, key)
+            self.add_toast(Adw.Toast(title=_("API key saved") if key.strip()
+                                     else _("API key removed")))
+            if key.strip():
+                await self._load_models(pid, key.strip())
+
+        spawn(run(), on_error=lambda e: self.add_toast(Adw.Toast(title=str(e))))
+
+    @Gtk.Template.Callback()
+    def on_key_link(self, *_args: object) -> None:
+        url = self.app.ai.provider(self._current_provider()).key_url
+        Gtk.UriLauncher.new(url).launch(self.win, None, None)
+
+    @Gtk.Template.Callback()
+    def on_load_models(self, *_args: object) -> None:
+        pid = self._current_provider()
+
+        async def run() -> None:
+            key = await self.app.ai.api_key(pid)
+            if not key:
+                self.add_toast(Adw.Toast(title=_("Enter and save an API key first.")))
+                return
+            await self._load_models(pid, key)
+
+        spawn(run())
+
+    async def _load_models(self, pid: str, key: str) -> None:
+        from .ai import AIError
+        provider = self.app.ai.provider(pid)
+        self.load_models_row.set_sensitive(False)
+        try:
+            models = await provider.list_models(key)
+        except AIError as e:
+            self.add_toast(Adw.Toast(title=e.message, timeout=8))
+            return
+        finally:
+            self.load_models_row.set_sensitive(True)
+        if not models:
+            self.add_toast(Adw.Toast(title=_("The provider returned no suitable models.")))
+            return
+        current = self.app.ai.model(pid)
+        if current not in models:
+            current = provider.pick_default(models)
+            self.app.ai.set_model(pid, current)
+        if pid == self._current_provider():
+            self._set_models(models, current)
+        self.add_toast(Adw.Toast(title=ngettext("{n} model available", "{n} models available",
+                                                len(models)).format(n=len(models))))
+
+    @Gtk.Template.Callback()
+    def on_reset_privacy(self, *_args: object) -> None:
+        self.app.settings.set_strv("ai-privacy-accepted", [])
+        self.add_toast(Adw.Toast(title=_("Privacy notices will be shown again")))
 
     # -- Planung -------------------------------------------------------------
     _POLICIES = ("ask", "send", "discard")
@@ -255,6 +375,7 @@ class DandelionRolePage(Adw.NavigationPage):
     language_row: Adw.ComboRow = Gtk.Template.Child()
     visibility_row: Adw.ComboRow = Gtk.Template.Child()
     signature_row: Adw.EntryRow = Gtk.Template.Child()
+    ai_style_row: Adw.EntryRow = Gtk.Template.Child()
 
     def __init__(self, prefs: DandelionPreferences, role: Role) -> None:
         super().__init__()
@@ -267,6 +388,8 @@ class DandelionRolePage(Adw.NavigationPage):
         self.name_row.set_text(role.name)
         self.emoji_button.set_label(role.emoji or "💬")
         self.signature_row.set_text(role.signature)
+        self.ai_style_row.set_text(role.ai_style)
+        self.ai_style_row.set_visible(prefs.app.settings.get_boolean("ai-enabled"))
 
         first: Gtk.ToggleButton | None = None
         for color in ROLE_COLORS:
@@ -368,6 +491,7 @@ class DandelionRolePage(Adw.NavigationPage):
             self.role.name = name
             self.set_title(name)
         self.role.signature = self.signature_row.get_text()
+        self.role.ai_style = self.ai_style_row.get_text()
         i = self.language_row.get_selected()
         self.role.language = self._lang_codes[i] if i < len(self._lang_codes) else None
         i = self.visibility_row.get_selected()
