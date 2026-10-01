@@ -1,0 +1,47 @@
+# Maintainer: Christoph Langner <mail@christoph-langner.de>
+pkgname=dandelion
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Write once, post to Mastodon, Bluesky, LinkedIn, Facebook pages and X"
+arch=('any')
+url="https://github.com/linuxundich/dandelion"
+license=('GPL-3.0-or-later')
+depends=(
+  'gdk-pixbuf2'
+  'glib2'
+  'gtk4'
+  'gtksourceview5'
+  'hicolor-icon-theme'
+  'libadwaita'
+  'libportal-gtk4'
+  'libsecret'
+  'libsoup3'
+  'libspelling'
+  'python'
+  'python-gobject'
+)
+makedepends=('blueprint-compiler' 'meson')
+checkdepends=('appstream' 'desktop-file-utils' 'python-pytest')
+optdepends=(
+  'hunspell-de: German spell checking'
+  'hunspell-en_us: English spell checking'
+)
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+# Nach dem Taggen von v$pkgver mit `updpkgsums` eintragen
+sha256sums=('SKIP')
+
+build() {
+  arch-meson "$pkgname-$pkgver" build
+  meson compile -C build
+}
+
+check() {
+  meson test -C build --print-errorlogs
+  cd "$pkgname-$pkgver"
+  # kein Bytecode im Quellbaum, sonst landet er mit Build-Pfaden im Paket
+  PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+}

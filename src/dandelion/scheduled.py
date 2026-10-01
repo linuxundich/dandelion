@@ -12,7 +12,7 @@ from gi.repository import Adw, Gio, GLib, Gtk
 from .core.models import Media, Post, PostState, Target, Variant
 from .core.scheduler import to_utc_iso
 from .schedule_dialog import DandelionScheduleDialog
-from .util import day_label, first_line
+from .util import label_widget, day_label, first_line
 
 if TYPE_CHECKING:
     from .application import DandelionApplication
@@ -178,6 +178,7 @@ class DandelionScheduledView(Adw.Bin):
         more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=menu,
                               valign=Gtk.Align.CENTER, tooltip_text=_("Actions"))
         more.add_css_class("flat")
+        label_widget(more, more.get_tooltip_text() or "")
         row.add_suffix(more)
         row.connect("activated", lambda *_: self._edit(post))
         return row

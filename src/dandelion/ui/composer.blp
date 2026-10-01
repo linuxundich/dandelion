@@ -402,6 +402,10 @@ template $DandelionComposer: Adw.BreakpointBin {
                         Button add_media_button {
                           icon-name: "insert-image-symbolic";
                           tooltip-text: _("Add Images");
+
+                          accessibility {
+                            label: _("Add Images");
+                          }
                           action-name: "win.add-media";
 
                           styles [

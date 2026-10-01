@@ -120,3 +120,17 @@ CONTENT_LABEL_NAMES = {
     "porn": _("Adult Content"),
     "graphic-media": _("Graphic Media"),
 }
+
+
+def icon_button(icon: str, label: str, **kwargs: object) -> "Gtk.Button":
+    """Symbolknopf mit Tooltip und Accessible-Label (Screenreader lesen sonst nichts)."""
+    from gi.repository import Gtk
+    button = Gtk.Button(icon_name=icon, tooltip_text=label, **kwargs)
+    button.update_property([Gtk.AccessibleProperty.LABEL], [label])
+    return button
+
+
+def label_widget(widget: "Gtk.Widget", label: str) -> None:
+    from gi.repository import Gtk
+    widget.set_tooltip_text(label)
+    widget.update_property([Gtk.AccessibleProperty.LABEL], [label])

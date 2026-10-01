@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from gi.repository import Adw, Gdk, GLib, Gtk
 
 from .core.models import PostState, TargetState
-from .util import day_label, first_line, format_time, spawn
+from .util import label_widget, day_label, first_line, format_time, spawn
 
 if TYPE_CHECKING:
     from .application import DandelionApplication
@@ -117,17 +117,20 @@ class DandelionHistoryView(Adw.Bin):
                     open_btn = Gtk.Button(icon_name="adw-external-link-symbolic",
                                           valign=Gtk.Align.CENTER, tooltip_text=_("Open Post"))
                     open_btn.add_css_class("flat")
+                    label_widget(open_btn, open_btn.get_tooltip_text() or "")
                     open_btn.connect("clicked", lambda _b, u=t.remote_url: Gtk.UriLauncher.new(
                         u).launch(self.get_root(), None, None))
                     sub.add_suffix(open_btn)
                     copy_btn = Gtk.Button(icon_name="edit-copy-symbolic", valign=Gtk.Align.CENTER,
                                           tooltip_text=_("Copy Link"))
                     copy_btn.add_css_class("flat")
+                    label_widget(copy_btn, copy_btn.get_tooltip_text() or "")
                     copy_btn.connect("clicked", lambda _b, u=t.remote_url: self._copy(u))
                     sub.add_suffix(copy_btn)
                 delete = Gtk.Button(icon_name="user-trash-symbolic", valign=Gtk.Align.CENTER,
                                     tooltip_text=_("Delete on {platform}").format(platform=platform))
                 delete.add_css_class("flat")
+                label_widget(delete, delete.get_tooltip_text() or "")
                 delete.connect("clicked", lambda _b, pp=post, prof=p, name=platform:
                                self._confirm_delete(pp.id, prof, name))
                 sub.add_suffix(delete)

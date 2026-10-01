@@ -307,6 +307,10 @@ template $DandelionAddProfileDialog: Adw.Dialog {
               Button {
                 icon-name: "edit-copy-symbolic";
                 tooltip-text: _("Copy");
+
+                accessibility {
+                  label: _("Copy redirect address");
+                }
                 valign: center;
                 clicked => $on_copy_redirect();
 

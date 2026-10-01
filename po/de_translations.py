@@ -635,6 +635,45 @@ DE: dict[str, str | tuple[str, str]] = {
     "{provider} reported an error (HTTP {status}).": "{provider} hat einen Fehler gemeldet (HTTP {status}).",
     "{provider} returned an empty answer.": "{provider} hat eine leere Antwort geliefert.",
     "{provider} returned no answer. {reason}": "{provider} hat keine Antwort geliefert. {reason}",
+    # Phase 8: Metadaten und Barrierefreiheit
+    "Dandelion lets you write a post once and publish it to several social networks at the same time or at a planned time: Mastodon, Bluesky, LinkedIn, Facebook pages and X.":
+        "Mit Dandelion schreibst du einen Beitrag einmal und veröffentlichst ihn gleichzeitig oder zu einem geplanten Zeitpunkt in mehreren sozialen Netzwerken: Mastodon, Bluesky, LinkedIn, Facebook-Seiten und X.",
+    "Features:": "Funktionen:",
+    "Roles group your profiles, for example private, blog and project accounts":
+        "Rollen bündeln deine Profile, etwa private, Blog- und Projektkonten",
+    "Exact character counters for every network and a preview for every profile":
+        "Exakte Zeichenzähler für jedes Netzwerk und eine Vorschau für jedes Profil",
+    "Own wording per network or profile where needed":
+        "Bei Bedarf eigene Formulierungen pro Netzwerk oder Profil",
+    "Alt text is required for Mastodon and suggested everywhere else":
+        "Alt-Texte sind für Mastodon Pflicht und werden überall sonst empfohlen",
+    "Scheduled posts are sent even when the window is closed":
+        "Geplante Beiträge werden auch bei geschlossenem Fenster gesendet",
+    "Optional writing assistant with Google Gemini, OpenAI or xAI that only makes suggestions":
+        "Optionaler Schreibassistent mit Google Gemini, OpenAI oder xAI, der nur Vorschläge macht",
+    "Login data is stored in the system keyring": "Anmeldedaten liegen im Schlüsselbund des Systems",
+    "LinkedIn, Facebook and X only allow posting through a developer app that you register yourself. X charges per post.":
+        "LinkedIn, Facebook und X erlauben das Posten nur über eine selbst registrierte Entwickler-App. X berechnet Gebühren pro Beitrag.",
+    "Mastodon": "Mastodon",
+    "Bluesky": "Bluesky",
+    "Fediverse": "Fediverse",
+    "Crossposting": "Crossposting",
+    "Social Media": "Soziale Medien",
+    "Scheduler": "Planer",
+    "Write a post once and see a preview for every profile":
+        "Einen Beitrag einmal schreiben und für jedes Profil die Vorschau sehen",
+    "Plan posts and manage everything that is scheduled":
+        "Beiträge planen und alles Geplante verwalten",
+    "Optional writing assistant that only makes suggestions":
+        "Optionaler Schreibassistent, der nur Vorschläge macht",
+    "Dark style": "Dunkler Stil",
+    "First release.": "Erste Veröffentlichung.",
+    "Mastodon, Bluesky, LinkedIn, Facebook pages and X": "Mastodon, Bluesky, LinkedIn, Facebook-Seiten und X",
+    "Roles, profiles, previews and exact character counters":
+        "Rollen, Profile, Vorschauen und exakte Zeichenzähler",
+    "Scheduled posts with a background service": "Geplante Beiträge mit Hintergrunddienst",
+    "Optional writing assistant": "Optionaler Schreibassistent",
+    "Copy redirect address": "Redirect-Adresse kopieren",
 }
 
 

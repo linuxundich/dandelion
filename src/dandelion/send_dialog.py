@@ -9,6 +9,7 @@ from gettext import ngettext
 from gi.repository import Adw, Gdk, GLib, Gtk
 
 from .core.models import Post, Profile, Target, TargetState
+from .util import label_widget
 
 
 class TargetRow(Adw.ActionRow):
@@ -33,6 +34,7 @@ class TargetRow(Adw.ActionRow):
         self.open_button = Gtk.Button(icon_name="adw-external-link-symbolic", valign=Gtk.Align.CENTER,
                                       tooltip_text=_("Open Post"), visible=False)
         self.open_button.add_css_class("flat")
+        label_widget(self.open_button, self.open_button.get_tooltip_text() or "")
         self.open_button.connect("clicked", self._open)
         self.add_suffix(self.open_button)
         self.retry_button = Gtk.Button(label=_("_Retry"), use_underline=True,

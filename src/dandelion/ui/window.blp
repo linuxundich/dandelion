@@ -19,6 +19,10 @@ template $DandelionWindow: Adw.ApplicationWindow {
         ToggleButton drafts_button {
           icon-name: "sidebar-show-symbolic";
           tooltip-text: _("Drafts");
+
+          accessibility {
+            label: _("Drafts");
+          }
           action-name: "win.toggle-drafts";
         }
 
@@ -26,6 +30,10 @@ template $DandelionWindow: Adw.ApplicationWindow {
         Button {
           icon-name: "document-new-symbolic";
           tooltip-text: _("New Post");
+
+          accessibility {
+            label: _("New Post");
+          }
           action-name: "win.new-post";
         }
 
@@ -34,6 +42,10 @@ template $DandelionWindow: Adw.ApplicationWindow {
           primary: true;
           icon-name: "open-menu-symbolic";
           tooltip-text: _("Main Menu");
+
+          accessibility {
+            label: _("Main Menu");
+          }
           menu-model: primary_menu;
         }
 
@@ -55,6 +67,10 @@ template $DandelionWindow: Adw.ApplicationWindow {
         ToggleButton search_button {
           icon-name: "system-search-symbolic";
           tooltip-text: _("Search");
+
+          accessibility {
+            label: _("Search");
+          }
           visible: false;
           action-name: "win.search";
         }

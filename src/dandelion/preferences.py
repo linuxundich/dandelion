@@ -11,7 +11,7 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk
 
 from .schedule_dialog import all_timezones, format_when, system_timezone
 from .core.models import ROLE_COLORS, Profile, ProfileStatus, Role
-from .util import LANGUAGES, VISIBILITY_LABELS, Debouncer, spawn, system_language
+from .util import label_widget, LANGUAGES, VISIBILITY_LABELS, Debouncer, spawn, system_language
 from .widgets.avatars import AvatarCache
 from .widgets.profile_chip import STATUS_TEXT
 
@@ -279,6 +279,7 @@ class DandelionPreferences(Adw.PreferencesDialog):
         more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=menu,
                               valign=Gtk.Align.CENTER, tooltip_text=_("More"))
         more.add_css_class("flat")
+        label_widget(more, more.get_tooltip_text() or "")
         row.add_suffix(more)
         row.add_suffix(Gtk.Image(icon_name="go-next-symbolic"))
         row.connect("activated", lambda *_: self._open_role(role))

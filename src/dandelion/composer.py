@@ -28,6 +28,7 @@ from .core.validation import Report, validate
 from .net.linkcard import LinkCard, fetch_card
 from .send_dialog import DandelionSendDialog
 from .util import (
+    label_widget,
     CONTENT_LABEL_NAMES,
     LANGUAGES,
     VISIBILITY_LABELS,
@@ -347,6 +348,7 @@ class DandelionComposer(Adw.BreakpointBin):
             menu_button = Gtk.MenuButton(icon_name="list-add-symbolic",
                                          tooltip_text=_("More Profiles"))
             menu_button.add_css_class("flat")
+            label_widget(menu_button, menu_button.get_tooltip_text() or "")
             menu_button.add_css_class("circular")
             pop = Gtk.Popover()
             box = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE)
@@ -1154,6 +1156,7 @@ class DandelionComposer(Adw.BreakpointBin):
             delete = Gtk.Button(icon_name="user-trash-symbolic", valign=Gtk.Align.CENTER,
                                 tooltip_text=_("Delete Draft"))
             delete.add_css_class("flat")
+            label_widget(delete, delete.get_tooltip_text() or "")
             delete.connect("clicked", lambda _b, p=pid: self._delete_draft(p))
             row.add_suffix(delete)
             self.drafts_list.append(row)

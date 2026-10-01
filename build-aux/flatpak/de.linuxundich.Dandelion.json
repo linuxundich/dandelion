@@ -1,0 +1,60 @@
+{
+  "id": "de.linuxundich.Dandelion",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "50",
+  "sdk": "org.gnome.Sdk",
+  "command": "dandelion",
+  "finish-args": [
+    "--share=network",
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--device=dri"
+  ],
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/share/pkgconfig",
+    "/share/gtk-doc",
+    "/share/doc",
+    "/share/man",
+    "*.la",
+    "*.a"
+  ],
+  "modules": [
+    {
+      "name": "blueprint-compiler",
+      "buildsystem": "meson",
+      "cleanup": ["*"],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/blueprint-compiler.git",
+          "tag": "v0.22.2"
+        }
+      ]
+    },
+    {
+      "name": "libspelling",
+      "buildsystem": "meson",
+      "config-opts": ["-Ddocs=false", "-Dvapi=false", "-Dintrospection=enabled"],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/libspelling.git",
+          "tag": "0.4.10"
+        }
+      ]
+    },
+    {
+      "name": "dandelion",
+      "buildsystem": "meson",
+      "sources": [
+        {
+          "type": "dir",
+          "path": "../.."
+        }
+      ]
+    }
+  ]
+}
