@@ -35,3 +35,6 @@ src/dandelion/schedule_dialog.py
 src/dandelion/scheduled.py
 src/dandelion/notify.py
 src/dandelion/core/trigger.py
+src/dandelion/platforms/x.py
+src/dandelion/platforms/linkedin.py
+src/dandelion/platforms/facebook.py

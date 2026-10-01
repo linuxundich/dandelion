@@ -78,6 +78,10 @@ def validate_target(post: Post, profile: Profile, role: Role | None, platform: P
         add(Issue("error", "too_many_bytes", _("The text uses too many bytes (emoji and special "
                                                "characters count more).")))
 
+    cost = platform.cost_notice(comp)
+    if cost:
+        add(Issue("warning", "cost", cost))
+
     images = [m for m in comp.media if m.is_image]
     videos = [m for m in comp.media if m.is_video]
     if len(images) > limits.max_images:

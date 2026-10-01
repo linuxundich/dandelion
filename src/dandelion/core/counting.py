@@ -137,3 +137,54 @@ def bluesky_count(text: str) -> tuple[int, int]:
 
 def generic_count(text: str) -> int:
     return count_graphemes(text)
+
+
+# --------------------------------------------------------------------------
+# X (twitter-text, Konfiguration v3)
+# --------------------------------------------------------------------------
+
+# Bereiche mit Gewicht 1 (= 100); alles andere zählt 2 (= 200). Emoji-Sequenzen
+# zählen als Ganzes 2, URLs pauschal 23. Text wird vorher NFC-normalisiert.
+_X_LIGHT_RANGES = ((0x0000, 0x10FF), (0x2000, 0x200D), (0x2010, 0x201F), (0x2032, 0x2037))
+X_URL_LENGTH = 23
+
+
+def _x_is_emoji(grapheme: str) -> bool:
+    from .graphemes import _is_picto
+    for ch in grapheme:
+        cp = ord(ch)
+        if _is_picto(cp) or 0x1F1E6 <= cp <= 0x1F1FF or cp in (0x20E3, 0xFE0F):
+            return True
+    return False
+
+
+def x_count(text: str) -> int:
+    """Gewichtete Länge wie bei X: Latein 1, CJK/Emoji 2, URL 23."""
+    import unicodedata
+
+    from .graphemes import iter_graphemes
+
+    text = unicodedata.normalize("NFC", text)
+    weight = 0
+    last = 0
+    pieces: list[str] = []
+    for span in find_urls(text):
+        pieces.append(text[last:span.start])
+        weight += X_URL_LENGTH * 100
+        last = span.end
+    pieces.append(text[last:])
+    for piece in pieces:
+        for g in iter_graphemes(piece):
+            if _x_is_emoji(g):
+                weight += 200
+                continue
+            for ch in g:
+                cp = ord(ch)
+                light = any(lo <= cp <= hi for lo, hi in _X_LIGHT_RANGES)
+                weight += 100 if light else 200
+    return weight // 100
+
+
+def utf16_length(text: str) -> int:
+    """Länge in UTF-16-Codeeinheiten (konservative Zählung, z. B. LinkedIn)."""
+    return len(text.encode("utf-16-le")) // 2

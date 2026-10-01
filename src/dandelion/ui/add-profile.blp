@@ -69,21 +69,79 @@ template $DandelionAddProfileDialog: Adw.Dialog {
           }
 
           Adw.PreferencesGroup {
-            title: _("Coming Later");
+            title: _("With Your Own Developer App");
+            description: _("These networks only allow posting through an app that you register yourself.");
 
             Adw.ActionRow {
               title: "LinkedIn";
-              sensitive: false;
+              subtitle: _("Personal profile");
+              activatable: true;
+              activated => $on_linkedin();
+
+              [prefix]
+              Box {
+                width-request: 14;
+                height-request: 14;
+                valign: center;
+
+                styles [
+                  "platform-dot",
+                  "platform-linkedin",
+                ]
+              }
+
+              [suffix]
+              Image {
+                icon-name: "go-next-symbolic";
+              }
             }
 
             Adw.ActionRow {
               title: _("Facebook Page");
-              sensitive: false;
+              subtitle: _("Pages you manage, not personal profiles");
+              activatable: true;
+              activated => $on_facebook();
+
+              [prefix]
+              Box {
+                width-request: 14;
+                height-request: 14;
+                valign: center;
+
+                styles [
+                  "platform-dot",
+                  "platform-facebook",
+                ]
+              }
+
+              [suffix]
+              Image {
+                icon-name: "go-next-symbolic";
+              }
             }
 
             Adw.ActionRow {
               title: "X";
-              sensitive: false;
+              subtitle: _("Costs per post apply");
+              activatable: true;
+              activated => $on_x();
+
+              [prefix]
+              Box {
+                width-request: 14;
+                height-request: 14;
+                valign: center;
+
+                styles [
+                  "platform-dot",
+                  "platform-x",
+                ]
+              }
+
+              [suffix]
+              Image {
+                icon-name: "go-next-symbolic";
+              }
             }
           }
         };
@@ -210,6 +268,90 @@ template $DandelionAddProfileDialog: Adw.Dialog {
 
             Adw.Spinner {
               halign: center;
+            }
+          }
+        };
+      };
+    }
+
+    Adw.NavigationPage app_page {
+      tag: "app";
+      title: "";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {}
+
+        content: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            Label app_intro {
+              wrap: true;
+              xalign: 0;
+            }
+          }
+
+          Adw.PreferencesGroup {
+            title: _("Your Developer App");
+
+            Adw.ButtonRow {
+              title: _("Open Developer Portal");
+              end-icon-name: "adw-external-link-symbolic";
+              activated => $on_open_portal();
+            }
+
+            Adw.ActionRow redirect_row {
+              title: _("Redirect Address");
+              subtitle-selectable: true;
+
+              [suffix]
+              Button {
+                icon-name: "edit-copy-symbolic";
+                tooltip-text: _("Copy");
+                valign: center;
+                clicked => $on_copy_redirect();
+
+                styles [
+                  "flat",
+                ]
+              }
+            }
+
+            Adw.EntryRow client_id_row {
+              title: _("Client ID");
+            }
+
+            Adw.PasswordEntryRow client_secret_row {
+              title: _("Client Secret");
+              entry-activated => $on_app_login();
+            }
+          }
+
+          Adw.PreferencesGroup {
+            Button app_login_button {
+              label: _("_Sign In With Browser");
+              use-underline: true;
+              halign: center;
+              clicked => $on_app_login();
+
+              styles [
+                "pill",
+                "suggested-action",
+              ]
+            }
+          }
+
+          Adw.PreferencesGroup app_wait_group {
+            visible: false;
+
+            Box {
+              spacing: 12;
+              halign: center;
+
+              Adw.Spinner {}
+
+              Label {
+                label: _("Waiting for the browser");
+              }
             }
           }
         };

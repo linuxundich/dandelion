@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dandelion\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-01 22:39+0200\n"
+"POT-Creation-Date: 2026-10-01 22:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -169,7 +169,7 @@ msgstr ""
 msgid "_Publish"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:46 src/dandelion/composer.py:700
+#: src/dandelion/ui/window.blp:46 src/dandelion/composer.py:704
 msgid "Publish to all selected profiles"
 msgstr ""
 
@@ -244,8 +244,8 @@ msgstr ""
 msgid "_Add Profile"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:132 src/dandelion/ui/composer.blp:467
-#: src/dandelion/composer.py:752
+#: src/dandelion/ui/composer.blp:132 src/dandelion/ui/composer.blp:456
+#: src/dandelion/composer.py:756
 msgid "Preview"
 msgstr ""
 
@@ -253,78 +253,78 @@ msgstr ""
 msgid "_Unschedule"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:171 src/dandelion/ui/role-page.blp:5
+#: src/dandelion/ui/composer.blp:172 src/dandelion/ui/role-page.blp:5
 msgid "Role"
 msgstr ""
 
 #. Translators: "Role to profiles", like "From … to …" in an e-mail
-#: src/dandelion/ui/composer.blp:200
+#: src/dandelion/ui/composer.blp:202
 msgctxt "recipients"
 msgid "to"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:223
-msgid "Problems"
-msgstr ""
-
-#: src/dandelion/ui/composer.blp:305 src/dandelion/ui/composer.blp:310
+#: src/dandelion/ui/composer.blp:274 src/dandelion/ui/composer.blp:279
 msgid "Content warning"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:333
+#: src/dandelion/ui/composer.blp:302
 msgid "Post text"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:363 src/dandelion/ui/shortcuts-dialog.blp:29
-#: src/dandelion/composer.py:974
+#: src/dandelion/ui/composer.blp:332 src/dandelion/ui/shortcuts-dialog.blp:29
+#: src/dandelion/composer.py:980
 msgid "Add Images"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:372
+#: src/dandelion/ui/composer.blp:341
 msgid "Content Warning"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:377
+#: src/dandelion/ui/composer.blp:346
 msgid "CW"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:386 src/dandelion/ui/role-page.blp:60
+#: src/dandelion/ui/composer.blp:355 src/dandelion/ui/role-page.blp:60
 msgid "Language"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:395 src/dandelion/ui/role-page.blp:65
+#: src/dandelion/ui/composer.blp:364 src/dandelion/ui/role-page.blp:65
 msgid "Visibility on Mastodon"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:403
+#: src/dandelion/ui/composer.blp:372
 msgid "Content label for Bluesky"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:411
+#: src/dandelion/ui/composer.blp:380
 msgid "Append the signature of this role"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:416
+#: src/dandelion/ui/composer.blp:385
 msgid "Signature"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:481
+#: src/dandelion/ui/composer.blp:398
+msgid "Problems"
+msgstr ""
+
+#: src/dandelion/ui/composer.blp:470
 msgid "Compact"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:486
+#: src/dandelion/ui/composer.blp:475
 msgid "Full"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:501
+#: src/dandelion/ui/composer.blp:490
 msgid "Status of all selected profiles"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:521
+#: src/dandelion/ui/composer.blp:510
 msgid "Show _All"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:574
+#: src/dandelion/ui/composer.blp:564
 msgid "_Manage Roles"
 msgstr ""
 
@@ -564,78 +564,119 @@ msgid "Sign in with an app password"
 msgstr ""
 
 #: src/dandelion/ui/add-profile.blp:72
-msgid "Coming Later"
+msgid "With Your Own Developer App"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:80
+#: src/dandelion/ui/add-profile.blp:73
+msgid ""
+"These networks only allow posting through an app that you register yourself."
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:77
+msgid "Personal profile"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:100 src/dandelion/add_profile.py:213
 msgid "Facebook Page"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:103
+#: src/dandelion/ui/add-profile.blp:101
+msgid "Pages you manage, not personal profiles"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:125
+msgid "Costs per post apply"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:161
 msgid ""
 "Enter the address of your server. Dandelion opens the login page in your "
 "browser."
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:106
+#: src/dandelion/ui/add-profile.blp:164
 msgid "Server"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:114
+#: src/dandelion/ui/add-profile.blp:172 src/dandelion/ui/add-profile.blp:331
 msgid "_Sign In With Browser"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:136
+#: src/dandelion/ui/add-profile.blp:194 src/dandelion/ui/add-profile.blp:353
 msgid "Waiting for the browser"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:145
+#: src/dandelion/ui/add-profile.blp:203
 msgid "Enter Code Manually"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:146
+#: src/dandelion/ui/add-profile.blp:204
 msgid "If the browser cannot return to Dandelion"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:149
+#: src/dandelion/ui/add-profile.blp:207
 msgid "Code or address from the browser"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:155
+#: src/dandelion/ui/add-profile.blp:213
 msgid "Open Login Page Again"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:175
+#: src/dandelion/ui/add-profile.blp:233
 msgid ""
 "Use an app password instead of your main password. You can revoke it at any "
 "time in the Bluesky settings."
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:178
+#: src/dandelion/ui/add-profile.blp:236
 msgid "Handle or profile address"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:183
+#: src/dandelion/ui/add-profile.blp:241
 msgid "App Password"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:188
+#: src/dandelion/ui/add-profile.blp:246
 msgid "Create App Password"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:196
+#: src/dandelion/ui/add-profile.blp:254
 msgid "_Sign In"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:221
+#: src/dandelion/ui/add-profile.blp:294
+msgid "Your Developer App"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:297
+msgid "Open Developer Portal"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:303
+msgid "Redirect Address"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:309
+msgid "Copy"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:320 src/dandelion/add_profile.py:223
+msgid "Client ID"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:324 src/dandelion/add_profile.py:221
+msgid "Client Secret"
+msgstr ""
+
+#: src/dandelion/ui/add-profile.blp:363
 msgid "Profile Added"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:255
+#: src/dandelion/ui/add-profile.blp:397
 msgid "Use in Roles"
 msgstr ""
 
-#: src/dandelion/ui/add-profile.blp:260 src/dandelion/ui/alt-text-dialog.blp:25
+#: src/dandelion/ui/add-profile.blp:402 src/dandelion/ui/alt-text-dialog.blp:25
 msgid "_Done"
 msgstr ""
 
@@ -644,7 +685,7 @@ msgid "Alt Text"
 msgstr ""
 
 #: src/dandelion/ui/alt-text-dialog.blp:18
-#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1324
+#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1330
 #: src/dandelion/history.py:180 src/dandelion/preferences.py:382
 #: src/dandelion/preferences.py:474 src/dandelion/scheduled.py:220
 msgid "_Cancel"
@@ -813,12 +854,12 @@ msgstr ""
 msgid "_Send Now"
 msgstr ""
 
-#: src/dandelion/composer.py:254 src/dandelion/add_profile.py:186
+#: src/dandelion/composer.py:254 src/dandelion/add_profile.py:317
 msgid "Personal"
 msgstr ""
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:282 src/dandelion/composer.py:754
+#: src/dandelion/composer.py:282 src/dandelion/composer.py:758
 #: src/dandelion/preferences.py:139
 #, python-brace-format
 msgid "{n} profile"
@@ -840,216 +881,216 @@ msgstr ""
 msgid "Append signature: {signature}"
 msgstr ""
 
-#: src/dandelion/composer.py:335
+#: src/dandelion/composer.py:338
 msgid "More Profiles"
 msgstr ""
 
-#: src/dandelion/composer.py:359
+#: src/dandelion/composer.py:363
 msgid "Own Text for This Profile"
 msgstr ""
 
-#: src/dandelion/composer.py:405
+#: src/dandelion/composer.py:409
 #, python-brace-format
 msgid "Role changed to “{name}”"
 msgstr ""
 
-#: src/dandelion/composer.py:405 src/dandelion/composer.py:583
-#: src/dandelion/composer.py:1075 src/dandelion/composer.py:1157
-#: src/dandelion/composer.py:1259 src/dandelion/composer.py:1304
+#: src/dandelion/composer.py:409 src/dandelion/composer.py:587
+#: src/dandelion/composer.py:1081 src/dandelion/composer.py:1163
+#: src/dandelion/composer.py:1265 src/dandelion/composer.py:1310
 #: src/dandelion/scheduled.py:256
 msgid "_Undo"
 msgstr ""
 
-#: src/dandelion/composer.py:437
+#: src/dandelion/composer.py:441
 msgid "Main Text"
 msgstr ""
 
-#: src/dandelion/composer.py:520
+#: src/dandelion/composer.py:524
 #, python-brace-format
 msgid "{name} uses its own text."
 msgstr ""
 
-#: src/dandelion/composer.py:522
+#: src/dandelion/composer.py:526
 msgid "The main text has changed since."
 msgstr ""
 
-#: src/dandelion/composer.py:524
+#: src/dandelion/composer.py:528
 msgid "_Use Main Text"
 msgstr ""
 
-#: src/dandelion/composer.py:535
+#: src/dandelion/composer.py:539
 #, python-brace-format
 msgid "{name} uses the main text."
 msgstr ""
 
-#: src/dandelion/composer.py:536
+#: src/dandelion/composer.py:540
 msgid "_Customize"
 msgstr ""
 
-#: src/dandelion/composer.py:583
+#: src/dandelion/composer.py:587
 msgid "Own text discarded"
 msgstr ""
 
-#: src/dandelion/composer.py:701
+#: src/dandelion/composer.py:705
 #, python-brace-format
 msgid "Cannot publish: {n} problem"
 msgid_plural "Cannot publish: {n} problems"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/composer.py:724
+#: src/dandelion/composer.py:728
 msgid "within the limit"
 msgstr ""
 
-#: src/dandelion/composer.py:728
+#: src/dandelion/composer.py:732
 msgid "over the limit"
 msgstr ""
 
-#: src/dandelion/composer.py:732
+#: src/dandelion/composer.py:736
 msgid "close to the limit"
 msgstr ""
 
-#: src/dandelion/composer.py:741
+#: src/dandelion/composer.py:745
 #, python-brace-format
 msgid "{platform} {handle}: {used} of {limit} characters, {state}"
 msgstr ""
 
-#: src/dandelion/composer.py:757
+#: src/dandelion/composer.py:761
 #, python-brace-format
 msgid "{n} over the limit"
 msgid_plural "{n} over the limit"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/composer.py:771
+#: src/dandelion/composer.py:775
 msgid "All Profiles"
 msgstr ""
 
-#: src/dandelion/composer.py:789
+#: src/dandelion/composer.py:793
 #, python-brace-format
 msgid "{n} problem"
 msgid_plural "{n} problems"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/composer.py:841
+#: src/dandelion/composer.py:847
 #, python-brace-format
 msgid "Strictest limit: {platform} {handle}, {used} of {limit} characters"
 msgstr ""
 
-#: src/dandelion/composer.py:872
+#: src/dandelion/composer.py:878
 msgid "No Preview"
 msgstr ""
 
-#: src/dandelion/composer.py:873
+#: src/dandelion/composer.py:879
 msgid "Select a profile to see how the post will look."
 msgstr ""
 
-#: src/dandelion/composer.py:888
+#: src/dandelion/composer.py:894
 #, python-brace-format
 msgid "Filtered: {name}"
 msgstr ""
 
-#: src/dandelion/composer.py:976
+#: src/dandelion/composer.py:982
 msgid "Images and Videos"
 msgstr ""
 
-#: src/dandelion/composer.py:1001
+#: src/dandelion/composer.py:1007
 #, python-brace-format
 msgid "Could not add “{name}”"
 msgstr ""
 
-#: src/dandelion/composer.py:1005
+#: src/dandelion/composer.py:1011
 #, python-brace-format
 msgid "“{name}” is not an image or video"
 msgstr ""
 
-#: src/dandelion/composer.py:1057
+#: src/dandelion/composer.py:1063
 msgid ""
 "Very tall or wide images are cropped in the timeline preview on most "
 "platforms."
 msgstr ""
 
-#: src/dandelion/composer.py:1075
+#: src/dandelion/composer.py:1081
 msgid "Media removed"
 msgstr ""
 
 #. type: ignore[attr-defined]
-#: src/dandelion/composer.py:1118
+#: src/dandelion/composer.py:1124
 msgid "Empty Post"
 msgstr ""
 
-#: src/dandelion/composer.py:1125
+#: src/dandelion/composer.py:1131
 msgid "Delete Draft"
 msgstr ""
 
-#: src/dandelion/composer.py:1157
+#: src/dandelion/composer.py:1163
 msgid "Draft deleted"
 msgstr ""
 
 #. Der Hintergrunddienst hat den Beitrag inzwischen gesendet
-#: src/dandelion/composer.py:1212 src/dandelion/composer.py:1293
+#: src/dandelion/composer.py:1218 src/dandelion/composer.py:1299
 msgid "This post has been published in the meantime"
 msgstr ""
 
-#: src/dandelion/composer.py:1218
+#: src/dandelion/composer.py:1224
 msgid "Draft saved"
 msgstr ""
 
-#: src/dandelion/composer.py:1235
+#: src/dandelion/composer.py:1241
 #, python-brace-format
 msgid "Scheduled for {when}. Changes are saved automatically."
 msgstr ""
 
-#: src/dandelion/composer.py:1236
+#: src/dandelion/composer.py:1242
 #, python-brace-format
 msgid "Paused, planned for {when}."
 msgstr ""
 
-#: src/dandelion/composer.py:1237
+#: src/dandelion/composer.py:1243
 #, python-brace-format
 msgid "Missed, it was planned for {when}."
 msgstr ""
 
-#: src/dandelion/composer.py:1259
+#: src/dandelion/composer.py:1265
 msgid "Schedule removed, the post is a draft again"
 msgstr ""
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:1303
+#: src/dandelion/composer.py:1309
 #, python-brace-format
 msgid "Scheduled for {when}"
 msgstr ""
 
-#: src/dandelion/composer.py:1322
+#: src/dandelion/composer.py:1328
 msgid "Publish Despite Warnings?"
 msgstr ""
 
-#: src/dandelion/composer.py:1325
+#: src/dandelion/composer.py:1331
 msgid "_Publish Anyway"
 msgstr ""
 
-#: src/dandelion/composer.py:1358
+#: src/dandelion/composer.py:1364
 msgid "This post is already being published"
 msgstr ""
 
-#: src/dandelion/composer.py:1365
+#: src/dandelion/composer.py:1371
 msgid "Publishing failed"
 msgstr ""
 
-#: src/dandelion/composer.py:1367
+#: src/dandelion/composer.py:1373
 #, python-brace-format
 msgid "Published on {n} profile"
 msgid_plural "Published on {n} profiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/composer.py:1370
+#: src/dandelion/composer.py:1376
 #, python-brace-format
 msgid "Published on {ok} of {total} profiles"
 msgstr ""
 
-#: src/dandelion/composer.py:1371
+#: src/dandelion/composer.py:1377
 msgid "_Details"
 msgstr ""
 
@@ -1275,18 +1316,74 @@ msgstr ""
 msgid "_Remove"
 msgstr ""
 
-#: src/dandelion/add_profile.py:68
+#: src/dandelion/add_profile.py:85
+msgid "The sign-in took too long. Please try again."
+msgstr ""
+
+#: src/dandelion/add_profile.py:87
 msgid "Sign-in failed."
 msgstr ""
 
-#: src/dandelion/add_profile.py:106
+#: src/dandelion/add_profile.py:127
 #, python-brace-format
 msgid "The server denied the sign-in: {reason}"
 msgstr ""
 
-#: src/dandelion/add_profile.py:109
+#: src/dandelion/add_profile.py:130 src/dandelion/add_profile.py:274
 msgid "The sign-in response did not match. Please try again."
 msgstr ""
+
+#: src/dandelion/add_profile.py:183
+msgid ""
+"Create an app in the LinkedIn developer portal and add the products “Share "
+"on LinkedIn” and “Sign In with LinkedIn using OpenID Connect”. Enter the "
+"redirect address below under “Authorized redirect URLs”. Dandelion can only "
+"post to your personal profile. A sign-in is valid for 60 days."
+msgstr ""
+
+#: src/dandelion/add_profile.py:188
+msgid ""
+"Create an app of the type “Business” at developers.facebook.com, keep it in "
+"development mode and add “Facebook Login”. Enter the redirect address below "
+"under “Valid OAuth Redirect URIs”. Dandelion can only post to pages you "
+"manage, not to your personal profile."
+msgstr ""
+
+#: src/dandelion/add_profile.py:192
+msgid ""
+"Create an app of the type “Native App” with read and write permissions in "
+"the X developer portal and enter the redirect address below as callback. X "
+"charges your developer account for every post: about $0.015, or $0.20 if the "
+"post contains a link."
+msgstr ""
+
+#: src/dandelion/add_profile.py:219
+msgid "Client Secret (optional)"
+msgstr ""
+
+#: src/dandelion/add_profile.py:220
+msgid "App Secret"
+msgstr ""
+
+#: src/dandelion/add_profile.py:222
+msgid "App ID"
+msgstr ""
+
+#: src/dandelion/add_profile.py:243
+msgid "Redirect address copied"
+msgstr ""
+
+#: src/dandelion/add_profile.py:271
+#, python-brace-format
+msgid "The sign-in was cancelled: {reason}"
+msgstr ""
+
+#: src/dandelion/add_profile.py:311
+#, python-brace-format
+msgid "{n} page added"
+msgid_plural "{n} pages added"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/dandelion/alt_text_dialog.py:54
 #, python-brace-format
@@ -1371,19 +1468,25 @@ msgstr ""
 msgid "Graphic Media"
 msgstr ""
 
-#: src/dandelion/auth/oauth.py:72
+#. GLib.Error: Port belegt
+#: src/dandelion/auth/oauth.py:70
+#, python-brace-format
+msgid "Port {port} is already in use. Close the other program and try again."
+msgstr ""
+
+#: src/dandelion/auth/oauth.py:81
 msgid "Signed in"
 msgstr ""
 
-#: src/dandelion/auth/oauth.py:72
+#: src/dandelion/auth/oauth.py:81
 msgid "Sign-in failed"
 msgstr ""
 
-#: src/dandelion/auth/oauth.py:73
+#: src/dandelion/auth/oauth.py:82
 msgid "You can close this tab and return to Dandelion."
 msgstr ""
 
-#: src/dandelion/auth/oauth.py:74
+#: src/dandelion/auth/oauth.py:83
 msgid "Return to Dandelion and try again."
 msgstr ""
 
@@ -1406,50 +1509,50 @@ msgstr[1] ""
 msgid "The text uses too many bytes (emoji and special characters count more)."
 msgstr ""
 
-#: src/dandelion/core/validation.py:85
+#: src/dandelion/core/validation.py:89
 #, python-brace-format
 msgid "At most {n} image is allowed."
 msgid_plural "At most {n} images are allowed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/core/validation.py:89
+#: src/dandelion/core/validation.py:93
 #, python-brace-format
 msgid "Videos are not supported for {platform} yet."
 msgstr ""
 
-#: src/dandelion/core/validation.py:92
+#: src/dandelion/core/validation.py:96
 #, python-brace-format
 msgid "At most {n} video is allowed."
 msgid_plural "At most {n} videos are allowed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/core/validation.py:95
+#: src/dandelion/core/validation.py:99
 msgid "Images and videos cannot be combined."
-msgstr ""
-
-#: src/dandelion/core/validation.py:100
-#, python-brace-format
-msgid "The file format of media {n} is not supported."
 msgstr ""
 
 #: src/dandelion/core/validation.py:104
 #, python-brace-format
+msgid "The file format of media {n} is not supported."
+msgstr ""
+
+#: src/dandelion/core/validation.py:108
+#, python-brace-format
 msgid "Media {n} is larger than {size}."
 msgstr ""
 
-#: src/dandelion/core/validation.py:109 src/dandelion/core/validation.py:112
+#: src/dandelion/core/validation.py:113 src/dandelion/core/validation.py:116
 #, python-brace-format
 msgid "Media {n} has no alt text."
 msgstr ""
 
-#: src/dandelion/core/validation.py:116
+#: src/dandelion/core/validation.py:120
 #, python-brace-format
 msgid "The alt text of media {n} is longer than {max} characters."
 msgstr ""
 
-#: src/dandelion/core/validation.py:127
+#: src/dandelion/core/validation.py:131
 msgid "Select at least one profile."
 msgstr ""
 
@@ -1461,7 +1564,8 @@ msgstr ""
 msgid "An unexpected error occurred."
 msgstr ""
 
-#: src/dandelion/platforms/base.py:113
+#: src/dandelion/platforms/base.py:113 src/dandelion/platforms/x.py:130
+#: src/dandelion/platforms/x.py:155
 msgid "The login has expired. Please sign in again."
 msgstr ""
 
@@ -1478,6 +1582,7 @@ msgid "The server rejected the post."
 msgstr ""
 
 #: src/dandelion/platforms/base.py:121 src/dandelion/platforms/bluesky.py:150
+#: src/dandelion/platforms/facebook.py:122
 msgid "Too many requests. Please try again later."
 msgstr ""
 
@@ -1490,6 +1595,16 @@ msgstr ""
 msgid "Unexpected answer from the server (HTTP {status})."
 msgstr ""
 
+#: src/dandelion/platforms/base.py:244 src/dandelion/platforms/mastodon.py:148
+#: src/dandelion/platforms/bluesky.py:229
+msgid "No login data found. Please sign in again."
+msgstr ""
+
+#: src/dandelion/platforms/base.py:251
+#, python-brace-format
+msgid "{platform} could not be reached. Check your internet connection."
+msgstr ""
+
 #: src/dandelion/platforms/mastodon.py:108
 msgid ""
 "Please enter the address of your Mastodon server, for example "
@@ -1499,11 +1614,6 @@ msgstr ""
 #: src/dandelion/platforms/mastodon.py:114
 #, python-brace-format
 msgid "No Mastodon server was found at {instance}."
-msgstr ""
-
-#: src/dandelion/platforms/mastodon.py:148
-#: src/dandelion/platforms/bluesky.py:229
-msgid "No login data found. Please sign in again."
 msgstr ""
 
 #: src/dandelion/platforms/mastodon.py:155
@@ -1596,34 +1706,35 @@ msgstr ""
 msgid "Move Right"
 msgstr ""
 
-#: src/dandelion/widgets/preview_tile.py:64
+#: src/dandelion/widgets/preview_tile.py:78
 #, python-brace-format
 msgid "Preview for {handle} on {platform}"
 msgstr ""
 
-#: src/dandelion/widgets/preview_tile.py:77
+#: src/dandelion/widgets/preview_tile.py:91
 #, python-brace-format
 msgid "{platform} · {n} profile"
 msgid_plural "{platform} · {n} profiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/widgets/preview_tile.py:100
-#: src/dandelion/widgets/preview_tile.py:107
-#: src/dandelion/widgets/preview_tile.py:228
+#: src/dandelion/widgets/preview_tile.py:114
+#: src/dandelion/widgets/preview_tile.py:124
+#: src/dandelion/widgets/preview_tile.py:243
 msgid "Show more"
 msgstr ""
 
-#: src/dandelion/widgets/preview_tile.py:126
-#: src/dandelion/widgets/preview_tile.py:133
+#: src/dandelion/widgets/preview_tile.py:142
+#: src/dandelion/widgets/preview_tile.py:149
 msgid "Show"
 msgstr ""
 
-#: src/dandelion/widgets/preview_tile.py:132
+#: src/dandelion/widgets/preview_tile.py:148
 msgid "Hide"
 msgstr ""
 
-#: src/dandelion/widgets/preview_tile.py:228
+#: src/dandelion/widgets/preview_tile.py:241
+#: src/dandelion/widgets/preview_tile.py:243
 msgid "Show less"
 msgstr ""
 
@@ -1643,15 +1754,15 @@ msgstr ""
 msgid "connection error"
 msgstr ""
 
-#: src/dandelion/widgets/profile_chip.py:62
+#: src/dandelion/widgets/profile_chip.py:61
 msgid "selected"
 msgstr ""
 
-#: src/dandelion/widgets/profile_chip.py:62
+#: src/dandelion/widgets/profile_chip.py:61
 msgid "not selected"
 msgstr ""
 
-#: src/dandelion/widgets/profile_chip.py:63
+#: src/dandelion/widgets/profile_chip.py:62
 #, python-brace-format
 msgid "Profile {handle} on {platform}, {status}, {state}"
 msgstr ""
@@ -1852,4 +1963,88 @@ msgstr ""
 
 #: src/dandelion/core/trigger.py:235
 msgid "Dandelion publishes scheduled posts even when its window is closed."
+msgstr ""
+
+#: src/dandelion/platforms/x.py:74
+#, python-brace-format
+msgid ""
+"X charges your developer account about {cost} for this post because it "
+"contains a link."
+msgstr ""
+
+#: src/dandelion/platforms/x.py:76
+#, python-brace-format
+msgid "X charges your developer account about {cost} for this post."
+msgstr ""
+
+#: src/dandelion/platforms/x.py:149
+msgid ""
+"Your X developer account has no credits left. Top up credits in the X "
+"developer console."
+msgstr ""
+
+#: src/dandelion/platforms/x.py:152
+#, python-brace-format
+msgid "X refused the request: {reason}"
+msgstr ""
+
+#: src/dandelion/platforms/x.py:153
+msgid "not permitted"
+msgstr ""
+
+#: src/dandelion/platforms/x.py:159
+#, python-brace-format
+msgid "X rejected the post: {reason}"
+msgstr ""
+
+#: src/dandelion/platforms/x.py:188
+msgid "Videos are not supported for X yet."
+msgstr ""
+
+#: src/dandelion/platforms/linkedin.py:129
+#: src/dandelion/platforms/linkedin.py:142
+msgid "The LinkedIn login has expired. Please sign in again."
+msgstr ""
+
+#: src/dandelion/platforms/linkedin.py:132
+msgid ""
+"LinkedIn no longer supports this version of the API. Please update Dandelion."
+msgstr ""
+
+#: src/dandelion/platforms/linkedin.py:136
+#, python-brace-format
+msgid "LinkedIn rejected the post: {reason}"
+msgstr ""
+
+#: src/dandelion/platforms/linkedin.py:170
+#, python-brace-format
+msgid "The login expires in {days} days."
+msgstr ""
+
+#: src/dandelion/platforms/linkedin.py:189
+msgid "Videos are not supported for LinkedIn yet."
+msgstr ""
+
+#: src/dandelion/platforms/facebook.py:103
+msgid ""
+"No Facebook page was found that you are allowed to post to. Posting to "
+"personal profiles is not possible."
+msgstr ""
+
+#: src/dandelion/platforms/facebook.py:116
+msgid "The Facebook login is no longer valid. Please sign in again."
+msgstr ""
+
+#: src/dandelion/platforms/facebook.py:119
+#, python-brace-format
+msgid "Facebook denied the permission: {reason}"
+msgstr ""
+
+#: src/dandelion/platforms/facebook.py:126
+#, python-brace-format
+msgid "Facebook rejected the post: {reason}"
+msgstr ""
+
+#: src/dandelion/platforms/facebook.py:157
+msgid "Videos are not supported for Facebook yet."
 msgstr ""

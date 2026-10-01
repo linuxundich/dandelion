@@ -7,11 +7,17 @@ from ..core.secrets import SecretStore
 from ..net.http import HttpClient
 from .base import Platform
 from .bluesky import Bluesky
+from .facebook import Facebook
+from .linkedin import LinkedIn
 from .mastodon import Mastodon
+from .x import X
 
 PLATFORM_CLASSES: dict[str, type[Platform]] = {
     Mastodon.id: Mastodon,
     Bluesky.id: Bluesky,
+    LinkedIn.id: LinkedIn,
+    Facebook.id: Facebook,
+    X.id: X,
 }
 
 

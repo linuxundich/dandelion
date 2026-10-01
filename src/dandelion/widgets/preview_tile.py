@@ -130,8 +130,7 @@ class PreviewTile(Gtk.Box):
         images = [m for m in comp.media if m.is_image]
         if images:
             content.append(self._grid(images, limits.max_images))
-        elif card and (card.title or card.description) and \
-                (limits.client_link_card or platform.id == "mastodon"):
+        elif card and (card.title or card.description):
             content.append(self._card(card))
 
         if comp.content_warning and limits.supports_content_warning:

@@ -59,3 +59,21 @@ def test_bluesky_count_uses_short_url():
 
 def test_bluesky_bytes():
     assert bluesky_count("ä👍🏽") == (2, 2 + 8)
+
+
+def test_x_weighted_count():
+    from dandelion.core.counting import x_count
+    assert x_count("Hallo Welt") == 10
+    assert x_count("Grüße") == 5                       # Latin-1/Latin Extended zählen 1
+    assert x_count("日本語") == 6                        # CJK zählt 2
+    assert x_count("👍") == 2
+    assert x_count("👨‍👩‍👧‍👦") == 2                         # ganze Sequenz zählt 2
+    assert x_count("🇩🇪") == 2
+    assert x_count("Lies https://linuxundich.de/ein/sehr/langer/pfad") == 5 + 23
+    assert x_count("é") == 1                     # NFC: é
+
+
+def test_utf16_length():
+    from dandelion.core.counting import utf16_length
+    assert utf16_length("abc") == 3
+    assert utf16_length("👍") == 2

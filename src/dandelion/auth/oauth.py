@@ -54,14 +54,23 @@ class LoopbackServer:
         self._future: asyncio.Future[dict[str, str]] | None = None
         self.port = 0
 
-    def start(self) -> str:
+    def start(self, port: int = 0, host: str = "127.0.0.1") -> str:
+        """Startet den Server. Mit festem `port` (für Plattformen, die die
+        Redirect-Adresse exakt registriert verlangen) auf IPv4 und IPv6,
+        damit auch „localhost“ funktioniert, das Browser oft als ::1 auflösen."""
         Soup = self._Soup
         self._future = asyncio.get_running_loop().create_future()
         self.server.add_handler("/callback", self._handle)
-        self.server.listen_local(0, Soup.ServerListenOptions.IPV4_ONLY)
-        uri = self.server.get_uris()[0]
-        self.port = uri.get_port()
-        return f"http://127.0.0.1:{self.port}/callback"
+        try:
+            if port:
+                self.server.listen_local(port, 0)
+            else:
+                self.server.listen_local(0, Soup.ServerListenOptions.IPV4_ONLY)
+        except Exception as e:  # GLib.Error: Port belegt
+            raise OAuthError(_("Port {port} is already in use. Close the other program and "
+                               "try again.").format(port=port)) from e
+        self.port = self.server.get_uris()[0].get_port()
+        return f"http://{host}:{self.port}/callback"
 
     def _handle(self, server, msg, path, query, *args):  # type: ignore[no-untyped-def]
         params = dict(query) if query else {}

@@ -507,6 +507,61 @@ DE: dict[str, str | tuple[str, str]] = {
     "Show compact preview tiles": "Kompakte Vorschaukacheln anzeigen",
     "Strictest limit: {platform} {handle}, {used} of {limit} characters":
         "Strengstes Limit: {platform} {handle}, {used} von {limit} Zeichen",
+    # Phase 6: LinkedIn, Facebook, X
+    "With Your Own Developer App": "Mit eigener Entwickler-App",
+    "These networks only allow posting through an app that you register yourself.":
+        "Diese Netzwerke erlauben das Posten nur über eine App, die du selbst registrierst.",
+    "Personal profile": "Persönliches Profil",
+    "Pages you manage, not personal profiles": "Seiten, die du verwaltest, keine privaten Profile",
+    "Costs per post apply": "Kosten pro Beitrag",
+    "Your Developer App": "Deine Entwickler-App",
+    "Open Developer Portal": "Entwicklerportal öffnen",
+    "Redirect Address": "Redirect-Adresse",
+    "Copy": "Kopieren",
+    "Client ID": "Client-ID",
+    "Client Secret": "Client-Secret",
+    "Client Secret (optional)": "Client-Secret (optional)",
+    "App Secret": "App-Geheimnis",
+    "App ID": "App-ID",
+    "The sign-in took too long. Please try again.":
+        "Die Anmeldung hat zu lange gedauert. Bitte versuche es erneut.",
+    "Create an app in the LinkedIn developer portal and add the products “Share on LinkedIn” and “Sign In with LinkedIn using OpenID Connect”. Enter the redirect address below under “Authorized redirect URLs”. Dandelion can only post to your personal profile. A sign-in is valid for 60 days.":
+        "Lege im LinkedIn-Entwicklerportal eine App an und füge die Produkte „Share on LinkedIn“ und „Sign In with LinkedIn using OpenID Connect“ hinzu. Trage die Redirect-Adresse unten unter „Authorized redirect URLs“ ein. Dandelion kann nur auf dein persönliches Profil posten. Eine Anmeldung gilt 60 Tage.",
+    "Create an app of the type “Business” at developers.facebook.com, keep it in development mode and add “Facebook Login”. Enter the redirect address below under “Valid OAuth Redirect URIs”. Dandelion can only post to pages you manage, not to your personal profile.":
+        "Lege unter developers.facebook.com eine App vom Typ „Business“ an, belasse sie im Entwicklungsmodus und füge „Facebook Login“ hinzu. Trage die Redirect-Adresse unten unter „Gültige OAuth-Redirect-URIs“ ein. Dandelion kann nur auf Seiten posten, die du verwaltest, nicht auf dein privates Profil.",
+    "Create an app of the type “Native App” with read and write permissions in the X developer portal and enter the redirect address below as callback. X charges your developer account for every post: about $0.015, or $0.20 if the post contains a link.":
+        "Lege im X-Entwicklerportal eine App vom Typ „Native App“ mit Lese- und Schreibrechten an und trage die Redirect-Adresse unten als Callback ein. X berechnet deinem Entwicklerkonto jeden Beitrag: etwa 0,015 $, mit Link 0,20 $.",
+    "Redirect address copied": "Redirect-Adresse kopiert",
+    "The sign-in was cancelled: {reason}": "Die Anmeldung wurde abgebrochen: {reason}",
+    "{n} page added": ("{n} Seite hinzugefügt", "{n} Seiten hinzugefügt"),
+    "Port {port} is already in use. Close the other program and try again.":
+        "Port {port} ist bereits belegt. Schließe das andere Programm und versuche es erneut.",
+    "{platform} could not be reached. Check your internet connection.":
+        "{platform} ist nicht erreichbar. Prüfe deine Internetverbindung.",
+    "X charges your developer account about {cost} for this post because it contains a link.":
+        "X berechnet deinem Entwicklerkonto für diesen Beitrag etwa {cost}, weil er einen Link enthält.",
+    "X charges your developer account about {cost} for this post.":
+        "X berechnet deinem Entwicklerkonto für diesen Beitrag etwa {cost}.",
+    "Your X developer account has no credits left. Top up credits in the X developer console.":
+        "Dein X-Entwicklerkonto hat kein Guthaben mehr. Lade in der X Developer Console Guthaben auf.",
+    "X refused the request: {reason}": "X hat die Anfrage abgelehnt: {reason}",
+    "not permitted": "nicht erlaubt",
+    "X rejected the post: {reason}": "X hat den Beitrag abgelehnt: {reason}",
+    "Videos are not supported for X yet.": "Videos werden für X noch nicht unterstützt.",
+    "The LinkedIn login has expired. Please sign in again.":
+        "Die LinkedIn-Anmeldung ist abgelaufen. Bitte melde dich erneut an.",
+    "LinkedIn no longer supports this version of the API. Please update Dandelion.":
+        "LinkedIn unterstützt diese API-Version nicht mehr. Bitte aktualisiere Dandelion.",
+    "LinkedIn rejected the post: {reason}": "LinkedIn hat den Beitrag abgelehnt: {reason}",
+    "The login expires in {days} days.": "Die Anmeldung läuft in {days} Tagen ab.",
+    "Videos are not supported for LinkedIn yet.": "Videos werden für LinkedIn noch nicht unterstützt.",
+    "No Facebook page was found that you are allowed to post to. Posting to personal profiles is not possible.":
+        "Es wurde keine Facebook-Seite gefunden, auf der du posten darfst. Auf private Profile kann nicht gepostet werden.",
+    "The Facebook login is no longer valid. Please sign in again.":
+        "Die Facebook-Anmeldung ist nicht mehr gültig. Bitte melde dich erneut an.",
+    "Facebook denied the permission: {reason}": "Facebook hat die Berechtigung verweigert: {reason}",
+    "Facebook rejected the post: {reason}": "Facebook hat den Beitrag abgelehnt: {reason}",
+    "Videos are not supported for Facebook yet.": "Videos werden für Facebook noch nicht unterstützt.",
 }
 
 

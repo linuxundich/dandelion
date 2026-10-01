@@ -159,3 +159,11 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
   padding: 0 8px;
   font-size: 0.85em;
 }
+
+/* Weitere Plattformen (stilisiert, keine Logos) */
+.platform-dot.platform-linkedin { background: var(--teal-4, #2190a4); }
+.platform-dot.platform-facebook { background: var(--blue-5); }
+.platform-dot.platform-x { background: var(--dark-2, #5e5c64); }
+.preview-tile.platform-linkedin { border-top: 3px solid var(--teal-4, #2190a4); }
+.preview-tile.platform-facebook { border-top: 3px solid var(--blue-5); }
+.preview-tile.platform-x { border-top: 3px solid var(--dark-2, #5e5c64); }

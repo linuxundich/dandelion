@@ -17,7 +17,7 @@ from typing import Any
 
 from ..core.models import Media, Profile, TargetPart
 from ..core.secrets import SecretStore
-from ..net.http import HttpClient
+from ..net.http import HttpClient, NetworkError, Request, Response
 
 
 @dataclass
@@ -151,6 +151,10 @@ class Platform(ABC):
     @abstractmethod
     def count(self, comp: Composition, limits: PlatformLimits) -> Count: ...
 
+    def cost_notice(self, comp: Composition) -> str | None:
+        """Hinweis auf Kosten pro Beitrag (nur X), sonst None."""
+        return None
+
     def display_text(self, text: str) -> str:
         """Text so, wie er auf der Plattform erscheint (für die Vorschau)."""
         return text
@@ -177,6 +181,83 @@ class Platform(ABC):
 
     async def logout(self, profile: Profile) -> None:
         await self.secrets.delete(profile.uuid)
+
+
+@dataclass
+class AppLogin:
+    """Laufender Login über eine eigene Entwickler-App (X, LinkedIn, Facebook)."""
+
+    platform_id: str
+    url: str
+    redirect_uri: str
+    state: str
+    client_id: str
+    client_secret: str = ""
+    verifier: str = ""
+
+
+class AppPlatform(Platform):
+    """Plattform, für die Nutzer eine eigene Entwickler-App anlegen.
+
+    Ein Client-Secret ist in einer Desktop-App nicht geheim; deshalb trägt
+    jeder Nutzer die Zugangsdaten seiner eigenen App ein (libsecret).
+    """
+
+    #: "none", "optional" oder "required"
+    client_secret_mode: str = "required"
+    redirect_port: int = 8742
+    redirect_host: str = "127.0.0.1"
+    portal_url: str = ""
+    scopes: str = ""
+
+    @property
+    def redirect_uri(self) -> str:
+        return f"http://{self.redirect_host}:{self.redirect_port}/callback"
+
+    def _app_owner(self) -> str:
+        return f"app:{self.id}"
+
+    async def client_credentials(self) -> dict[str, str] | None:
+        data = await self.secrets.get(self._app_owner(), "client-credentials")
+        return {k: str(v) for k, v in data.items()} if data else None
+
+    async def set_client_credentials(self, client_id: str, client_secret: str) -> None:
+        await self.secrets.set(self._app_owner(), "client-credentials",
+                               f"Dandelion: {self.name} App", {
+                                   "client_id": client_id.strip(),
+                                   "client_secret": client_secret.strip()})
+
+    @abstractmethod
+    def begin_app_login(self, client_id: str, client_secret: str) -> AppLogin: ...
+
+    @abstractmethod
+    async def complete_app_login(self, login: AppLogin,
+                                 code: str) -> list[tuple[Profile, dict[str, Any]]]:
+        """Tauscht den Code und liefert ein oder mehrere Profile (Facebook: Seiten)."""
+
+    async def store_credentials(self, profile: Profile, secret: dict[str, Any]) -> None:
+        await self.secrets.set(profile.uuid, "oauth", secret_label(self, profile), secret)
+
+    async def _token_data(self, profile: Profile) -> dict[str, Any]:
+        data = await self.secrets.get(profile.uuid, "oauth")
+        if not data or not data.get("access_token"):
+            raise PlatformError(_("No login data found. Please sign in again."), auth=True)
+        return data
+
+    async def _send(self, req: Request) -> Response:
+        try:
+            resp = await self.http.send(req)
+        except NetworkError as e:
+            raise PlatformError(_("{platform} could not be reached. Check your internet "
+                                  "connection.").format(platform=self.name), str(e),
+                                retryable=True) from e
+        if resp.ok:
+            return resp
+        raise self._error(resp)
+
+    def _error(self, resp: Response) -> PlatformError:
+        detail = resp.text()[:400]
+        return error_from_status(resp.status, detail)
 
 
 def secret_label(platform: Platform, profile: Profile) -> str:

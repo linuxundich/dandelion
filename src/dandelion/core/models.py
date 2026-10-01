@@ -90,6 +90,8 @@ class Profile:
     def full_handle(self) -> str:
         if self.platform == "mastodon" and self.server:
             return f"@{self.handle}@{self.server}"
+        if self.platform in ("linkedin", "facebook"):
+            return self.handle          # Name bzw. Seitenname, kein @-Handle
         return f"@{self.handle}"
 
 
