@@ -1,0 +1,92 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionProfilePage: Adw.NavigationPage {
+  title: _("Profile");
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Adw.PreferencesPage {
+      Adw.PreferencesGroup {
+        Box {
+          orientation: vertical;
+          spacing: 6;
+          halign: center;
+
+          Adw.Avatar avatar {
+            size: 96;
+            show-initials: true;
+          }
+
+          Label name_label {
+            wrap: true;
+            justify: center;
+
+            styles [
+              "title-2",
+            ]
+          }
+
+          Label handle_label {
+            selectable: true;
+            wrap: true;
+            justify: center;
+
+            styles [
+              "dim-label",
+            ]
+          }
+        }
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Connection");
+
+        Adw.ActionRow status_row {
+          title: _("Status");
+
+          [prefix]
+          Image status_icon {}
+        }
+
+        Adw.ActionRow limits_row {
+          title: _("Limits");
+        }
+
+        Adw.ButtonRow refresh_row {
+          title: _("Check Connection");
+          start-icon-name: "view-refresh-symbolic";
+          activated => $on_refresh();
+        }
+
+        Adw.ButtonRow relogin_row {
+          title: _("Sign In Again");
+          start-icon-name: "system-log-out-symbolic";
+          activated => $on_relogin();
+        }
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Display");
+
+        Adw.EntryRow label_row {
+          title: _("Name in Dandelion");
+          changed => $on_label_changed();
+        }
+      }
+
+      Adw.PreferencesGroup {
+        Adw.ButtonRow remove_row {
+          title: _("Remove Profile");
+          activated => $on_remove();
+
+          styles [
+            "destructive-action",
+          ]
+        }
+      }
+    };
+  };
+}

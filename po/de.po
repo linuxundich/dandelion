@@ -1,0 +1,1331 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: dandelion\n"
+"Last-Translator: Christoph Langner <mail@christoph-langner.de>\n"
+"Language-Team: German\n"
+"PO-Revision-Date: 2026-10-01 18:00+0200\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: data/de.linuxundich.Dandelion.desktop.in:2
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:6
+msgid "Dandelion"
+msgstr "Dandelion"
+
+#: data/de.linuxundich.Dandelion.desktop.in:3
+msgid "Social Media Poster"
+msgstr "Social-Media-Poster"
+
+#: data/de.linuxundich.Dandelion.desktop.in:4
+msgid "Write once, post to Mastodon, Bluesky and more"
+msgstr "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen"
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/de.linuxundich.Dandelion.desktop.in:11
+msgid "Mastodon;Bluesky;Fediverse;Social;Post;Crosspost;Toot;"
+msgstr "Mastodon;Bluesky;Fediverse;Social;Post;Beitrag;Crossposting;Tröt;"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:7
+msgid "Write once, post everywhere"
+msgstr "Einmal schreiben, überall veröffentlichen"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:9
+msgid "Dandelion lets you write a post once and publish it to several social networks at the same time."
+msgstr "Mit Dandelion schreibst du einen Beitrag einmal und veröffentlichst ihn gleichzeitig in mehreren sozialen Netzwerken."
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:11
+msgid "Roles group your profiles, for example private and work accounts"
+msgstr "Rollen bündeln deine Profile, etwa private und berufliche Konten"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:12
+msgid "Several accounts per network, such as two Mastodon instances"
+msgstr "Mehrere Konten pro Netzwerk, zum Beispiel zwei Mastodon-Instanzen"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:13
+msgid "Exact character counters and a preview for every profile"
+msgstr "Exakte Zeichenzähler und eine Vorschau für jedes Profil"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:14
+msgid "Alt text for images is required where it matters"
+msgstr "Alt-Texte für Bilder sind Pflicht, wo es darauf ankommt"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:15
+msgid "Credentials are stored in the system keyring"
+msgstr "Zugangsdaten liegen im Schlüsselbund des Systems"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:19
+msgid "Christoph Langner"
+msgstr "Christoph Langner"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:35
+msgid "First preview with Mastodon and Bluesky."
+msgstr "Erste Vorschau mit Mastodon und Bluesky."
+
+#: data/de.linuxundich.Dandelion.gschema.xml:14
+msgid "Window width"
+msgstr "Fensterbreite"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:15
+msgid "Window height"
+msgstr "Fensterhöhe"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:16
+msgid "Window maximized"
+msgstr "Fenster maximiert"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:17
+msgid "Show the drafts sidebar"
+msgstr "Seitenleiste mit Entwürfen anzeigen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:18
+msgid "Show the preview column"
+msgstr "Vorschauspalte anzeigen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:19
+msgid "UUID of the last used role"
+msgstr "UUID der zuletzt verwendeten Rolle"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:23
+msgid "Require alt text on every platform"
+msgstr "Alt-Text auf allen Plattformen verlangen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:24
+msgid "Mastodon always requires alt text. If enabled, missing alt text blocks posting on all platforms instead of only showing a warning."
+msgstr "Mastodon verlangt immer einen Alt-Text. Wenn aktiviert, blockiert ein fehlender Alt-Text das Senden auf allen Plattformen, statt nur zu warnen."
+
+#: data/de.linuxundich.Dandelion.gschema.xml:26
+msgid "Check spelling"
+msgstr "Rechtschreibung prüfen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:27
+msgid "Append the role signature to new posts"
+msgstr "Signatur der Rolle an neue Beiträge anhängen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:29
+msgid "Numbering of thread parts"
+msgstr "Nummerierung der Thread-Teile"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:33
+msgid "Delete empty drafts after this many days (0 = never)"
+msgstr "Leere Entwürfe nach so vielen Tagen löschen (0 = nie)"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:36
+msgid "Notify on successful scheduled posts"
+msgstr "Bei erfolgreich geplanten Beiträgen benachrichtigen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:37
+msgid "Notify on failed scheduled posts"
+msgstr "Bei fehlgeschlagenen geplanten Beiträgen benachrichtigen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:39
+msgid "What to do with missed scheduled posts"
+msgstr "Umgang mit verpassten geplanten Beiträgen"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:43
+msgid "Minutes after which a scheduled post counts as missed"
+msgstr "Minuten, nach denen ein geplanter Beitrag als verpasst gilt"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:45
+msgid "Default time zone (empty = system)"
+msgstr "Standard-Zeitzone (leer = System)"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:47
+msgid "Enable AI features"
+msgstr "KI-Funktionen aktivieren"
+
+#: src/dandelion/ui/window.blp:21 src/dandelion/ui/composer.blp:22
+#: src/dandelion/ui/preferences.blp:67
+msgid "Drafts"
+msgstr "Entwürfe"
+
+#: src/dandelion/ui/window.blp:28 src/dandelion/ui/shortcuts-dialog.blp:9
+msgid "New Post"
+msgstr "Neuer Beitrag"
+
+#: src/dandelion/ui/window.blp:36
+msgid "Main Menu"
+msgstr "Hauptmenü"
+
+#: src/dandelion/ui/window.blp:42
+msgid "_Publish"
+msgstr "_Veröffentlichen"
+
+#: src/dandelion/ui/window.blp:45 src/dandelion/composer.py:674
+msgid "Publish to all selected profiles"
+msgstr "Auf allen ausgewählten Profilen veröffentlichen"
+
+#: src/dandelion/ui/window.blp:55 src/dandelion/ui/shortcuts-dialog.blp:68
+msgid "Search"
+msgstr "Suchen"
+
+#: src/dandelion/ui/window.blp:64 src/dandelion/ui/shortcuts-dialog.blp:48
+msgid "Compose"
+msgstr "Verfassen"
+
+#: src/dandelion/ui/window.blp:72 src/dandelion/ui/shortcuts-dialog.blp:53
+#: src/dandelion/send_dialog.py:60
+msgid "Published"
+msgstr "Veröffentlicht"
+
+#: src/dandelion/ui/window.blp:92
+msgid "_Send"
+msgstr "_Senden"
+
+#: src/dandelion/ui/window.blp:100
+msgid "_New Post"
+msgstr "_Neuer Beitrag"
+
+#: src/dandelion/ui/window.blp:107
+msgid "_Roles and Profiles"
+msgstr "_Rollen und Profile"
+
+#: src/dandelion/ui/window.blp:112
+msgid "_Preferences"
+msgstr "_Einstellungen"
+
+#: src/dandelion/ui/window.blp:117
+msgid "_Keyboard Shortcuts"
+msgstr "_Tastenkürzel"
+
+#: src/dandelion/ui/window.blp:122
+msgid "_About Dandelion"
+msgstr "_Info zu Dandelion"
+
+#: src/dandelion/ui/composer.blp:32
+msgid "No Drafts"
+msgstr "Keine Entwürfe"
+
+#: src/dandelion/ui/composer.blp:33
+msgid "Posts you start writing are saved here automatically."
+msgstr "Beiträge, die du zu schreiben beginnst, werden hier automatisch gespeichert."
+
+#: src/dandelion/ui/composer.blp:68
+msgid "Welcome to Dandelion"
+msgstr "Willkommen bei Dandelion"
+
+#: src/dandelion/ui/composer.blp:69
+msgid "Add your Mastodon and Bluesky profiles to write a post once and publish it everywhere."
+msgstr "Füge deine Mastodon- und Bluesky-Profile hinzu, um einen Beitrag einmal zu schreiben und überall zu veröffentlichen."
+
+#: src/dandelion/ui/composer.blp:72
+msgid "_Add Profile"
+msgstr "Profil _hinzufügen"
+
+#: src/dandelion/ui/composer.blp:132 src/dandelion/ui/composer.blp:385
+#: src/dandelion/composer.py:700
+msgid "Preview"
+msgstr "Vorschau"
+
+#: src/dandelion/ui/composer.blp:162 src/dandelion/ui/role-page.blp:5
+msgid "Role"
+msgstr "Rolle"
+
+#: src/dandelion/ui/composer.blp:196
+msgid "Problems"
+msgstr "Probleme"
+
+#: src/dandelion/ui/composer.blp:244 src/dandelion/ui/composer.blp:249
+msgid "Content warning"
+msgstr "Inhaltswarnung"
+
+#: src/dandelion/ui/composer.blp:269
+msgid "Post text"
+msgstr "Beitragstext"
+
+#: src/dandelion/ui/composer.blp:292 src/dandelion/ui/shortcuts-dialog.blp:24
+#: src/dandelion/composer.py:794
+msgid "Add Images"
+msgstr "Bilder hinzufügen"
+
+#: src/dandelion/ui/composer.blp:308
+msgid "Content Warning"
+msgstr "Inhaltswarnung"
+
+#: src/dandelion/ui/composer.blp:313
+msgid "CW"
+msgstr "CW"
+
+#: src/dandelion/ui/composer.blp:322 src/dandelion/ui/role-page.blp:60
+msgid "Language"
+msgstr "Sprache"
+
+#: src/dandelion/ui/composer.blp:331 src/dandelion/ui/role-page.blp:65
+msgid "Visibility on Mastodon"
+msgstr "Sichtbarkeit auf Mastodon"
+
+#: src/dandelion/ui/composer.blp:339
+msgid "Content label for Bluesky"
+msgstr "Inhaltslabel für Bluesky"
+
+#: src/dandelion/ui/composer.blp:347
+msgid "Append the signature of this role"
+msgstr "Signatur dieser Rolle anhängen"
+
+#: src/dandelion/ui/composer.blp:352
+msgid "Signature"
+msgstr "Signatur"
+
+#: src/dandelion/ui/composer.blp:435
+msgid "_Manage Roles"
+msgstr "Rollen _verwalten"
+
+#: src/dandelion/ui/history.blp:16
+msgid "Search published posts"
+msgstr "Veröffentlichte Beiträge durchsuchen"
+
+#: src/dandelion/ui/history.blp:30 src/dandelion/history.py:80
+msgid "Nothing Published Yet"
+msgstr "Noch nichts veröffentlicht"
+
+#: src/dandelion/ui/history.blp:31 src/dandelion/history.py:82
+msgid "Published posts appear here with links to every platform."
+msgstr "Veröffentlichte Beiträge erscheinen hier mit Links zu jeder Plattform."
+
+#: src/dandelion/ui/preferences.blp:9 src/dandelion/ui/preferences.blp:13
+msgid "Roles"
+msgstr "Rollen"
+
+#: src/dandelion/ui/preferences.blp:14
+msgid "A role bundles profiles, language, visibility and a signature, for example “Private” or “Blog”."
+msgstr "Eine Rolle bündelt Profile, Sprache, Sichtbarkeit und eine Signatur, zum Beispiel „Privat“ oder „Blog“."
+
+#: src/dandelion/ui/preferences.blp:26 src/dandelion/ui/role-page.blp:52
+msgid "Profiles"
+msgstr "Profile"
+
+#: src/dandelion/ui/preferences.blp:27
+msgid "Login data is stored in the system keyring."
+msgstr "Anmeldedaten liegen im Schlüsselbund des Systems."
+
+#: src/dandelion/ui/preferences.blp:41 src/dandelion/ui/shortcuts-dialog.blp:74
+msgid "General"
+msgstr "Allgemein"
+
+#: src/dandelion/ui/preferences.blp:45 src/dandelion/ui/shortcuts-dialog.blp:6
+msgid "Writing"
+msgstr "Schreiben"
+
+#: src/dandelion/ui/preferences.blp:48
+msgid "Require Alt Text Everywhere"
+msgstr "Alt-Text überall verlangen"
+
+#: src/dandelion/ui/preferences.blp:49
+msgid "Mastodon always requires alt text. Other platforms only show a warning unless this is enabled."
+msgstr "Mastodon verlangt immer einen Alt-Text. Andere Plattformen zeigen nur eine Warnung, solange dies nicht aktiviert ist."
+
+#: src/dandelion/ui/preferences.blp:53
+msgid "Check Spelling"
+msgstr "Rechtschreibung prüfen"
+
+#: src/dandelion/ui/preferences.blp:57
+msgid "Append Role Signature"
+msgstr "Signatur der Rolle anhängen"
+
+#: src/dandelion/ui/preferences.blp:58
+msgid "Can be turned off for each post"
+msgstr "Lässt sich für jeden Beitrag abschalten"
+
+#: src/dandelion/ui/preferences.blp:62 src/dandelion/ui/shortcuts-dialog.blp:63
+msgid "Show Preview"
+msgstr "Vorschau anzeigen"
+
+#: src/dandelion/ui/preferences.blp:70
+msgid "Delete Empty Drafts After"
+msgstr "Leere Entwürfe löschen nach"
+
+#: src/dandelion/ui/preferences.blp:71
+msgid "Days, 0 keeps them forever"
+msgstr "Tagen, 0 behält sie für immer"
+
+#: src/dandelion/ui/role-page.blp:13
+msgid "Appearance"
+msgstr "Darstellung"
+
+#: src/dandelion/ui/role-page.blp:16
+msgid "Name"
+msgstr "Name"
+
+#: src/dandelion/ui/role-page.blp:21
+msgid "Symbol"
+msgstr "Symbol"
+
+#: src/dandelion/ui/role-page.blp:27
+msgid "Choose Emoji"
+msgstr "Emoji wählen"
+
+#: src/dandelion/ui/role-page.blp:41
+msgid "Color"
+msgstr "Farbe"
+
+#: src/dandelion/ui/role-page.blp:53
+msgid "Profiles in this role. Preselected profiles are switched on for every new post."
+msgstr "Profile in dieser Rolle. Vorausgewählte Profile sind bei jedem neuen Beitrag eingeschaltet."
+
+#: src/dandelion/ui/role-page.blp:57
+msgid "Defaults"
+msgstr "Voreinstellungen"
+
+#: src/dandelion/ui/role-page.blp:69
+msgid "Signature or Hashtags"
+msgstr "Signatur oder Hashtags"
+
+#: src/dandelion/ui/role-page.blp:76
+msgid "Delete Role"
+msgstr "Rolle löschen"
+
+#: src/dandelion/ui/profile-page.blp:5
+msgid "Profile"
+msgstr "Profil"
+
+#: src/dandelion/ui/profile-page.blp:45
+msgid "Connection"
+msgstr "Verbindung"
+
+#: src/dandelion/ui/profile-page.blp:48
+msgid "Status"
+msgstr "Status"
+
+#: src/dandelion/ui/profile-page.blp:55
+msgid "Limits"
+msgstr "Limits"
+
+#: src/dandelion/ui/profile-page.blp:59
+msgid "Check Connection"
+msgstr "Verbindung prüfen"
+
+#: src/dandelion/ui/profile-page.blp:65
+msgid "Sign In Again"
+msgstr "Erneut anmelden"
+
+#: src/dandelion/ui/profile-page.blp:72
+msgid "Display"
+msgstr "Anzeige"
+
+#: src/dandelion/ui/profile-page.blp:75
+msgid "Name in Dandelion"
+msgstr "Name in Dandelion"
+
+#: src/dandelion/ui/profile-page.blp:82
+msgid "Remove Profile"
+msgstr "Profil entfernen"
+
+#: src/dandelion/ui/add-profile.blp:5 src/dandelion/ui/add-profile.blp:12
+#: src/dandelion/preferences.py:169
+msgid "Add Profile"
+msgstr "Profil hinzufügen"
+
+#: src/dandelion/ui/add-profile.blp:20
+msgid "Choose the network of the profile."
+msgstr "Wähle das Netzwerk des Profils."
+
+#: src/dandelion/ui/add-profile.blp:24
+msgid "And other Fediverse servers"
+msgstr "Und andere Fediverse-Server"
+
+#: src/dandelion/ui/add-profile.blp:48
+msgid "Sign in with an app password"
+msgstr "Anmeldung mit App-Passwort"
+
+#: src/dandelion/ui/add-profile.blp:72
+msgid "Coming Later"
+msgstr "Folgt später"
+
+#: src/dandelion/ui/add-profile.blp:80
+msgid "Facebook Page"
+msgstr "Facebook-Seite"
+
+#: src/dandelion/ui/add-profile.blp:103
+msgid "Enter the address of your server. Dandelion opens the login page in your browser."
+msgstr "Gib die Adresse deines Servers ein. Dandelion öffnet die Anmeldeseite in deinem Browser."
+
+#: src/dandelion/ui/add-profile.blp:106
+msgid "Server"
+msgstr "Server"
+
+#: src/dandelion/ui/add-profile.blp:114
+msgid "_Sign In With Browser"
+msgstr "Im Browser _anmelden"
+
+#: src/dandelion/ui/add-profile.blp:136
+msgid "Waiting for the browser"
+msgstr "Warte auf den Browser"
+
+#: src/dandelion/ui/add-profile.blp:145
+msgid "Enter Code Manually"
+msgstr "Code manuell eingeben"
+
+#: src/dandelion/ui/add-profile.blp:146
+msgid "If the browser cannot return to Dandelion"
+msgstr "Falls der Browser nicht zu Dandelion zurückkehren kann"
+
+#: src/dandelion/ui/add-profile.blp:149
+msgid "Code or address from the browser"
+msgstr "Code oder Adresse aus dem Browser"
+
+#: src/dandelion/ui/add-profile.blp:155
+msgid "Open Login Page Again"
+msgstr "Anmeldeseite erneut öffnen"
+
+#: src/dandelion/ui/add-profile.blp:175
+msgid "Use an app password instead of your main password. You can revoke it at any time in the Bluesky settings."
+msgstr "Verwende ein App-Passwort statt deines Hauptpassworts. Du kannst es jederzeit in den Bluesky-Einstellungen widerrufen."
+
+#: src/dandelion/ui/add-profile.blp:178
+msgid "Handle, e.g. name.bsky.social"
+msgstr "Handle, z. B. name.bsky.social"
+
+#: src/dandelion/ui/add-profile.blp:183
+msgid "App Password"
+msgstr "App-Passwort"
+
+#: src/dandelion/ui/add-profile.blp:188
+msgid "Create App Password"
+msgstr "App-Passwort erstellen"
+
+#: src/dandelion/ui/add-profile.blp:196
+msgid "_Sign In"
+msgstr "_Anmelden"
+
+#: src/dandelion/ui/add-profile.blp:221
+msgid "Profile Added"
+msgstr "Profil hinzugefügt"
+
+#: src/dandelion/ui/add-profile.blp:255
+msgid "Use in Roles"
+msgstr "In Rollen verwenden"
+
+#: src/dandelion/ui/add-profile.blp:260 src/dandelion/ui/alt-text-dialog.blp:25
+msgid "_Done"
+msgstr "_Fertig"
+
+#: src/dandelion/ui/alt-text-dialog.blp:5
+msgid "Alt Text"
+msgstr "Alt-Text"
+
+#: src/dandelion/ui/alt-text-dialog.blp:18 src/dandelion/composer.py:1056
+#: src/dandelion/history.py:180 src/dandelion/preferences.py:318
+#: src/dandelion/preferences.py:410
+msgid "_Cancel"
+msgstr "_Abbrechen"
+
+#: src/dandelion/ui/alt-text-dialog.blp:57
+msgid "Describe the image for people who cannot see it."
+msgstr "Beschreibe das Bild für Menschen, die es nicht sehen können."
+
+#: src/dandelion/ui/alt-text-dialog.blp:80
+msgid "Alt text"
+msgstr "Alt-Text"
+
+#: src/dandelion/ui/send-dialog.blp:5 src/dandelion/history.py:138
+#: src/dandelion/send_dialog.py:56
+msgid "Publishing"
+msgstr "Veröffentlichen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:14
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:19
+msgid "Save Draft"
+msgstr "Entwurf speichern"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:29
+msgid "Choose Role"
+msgstr "Rolle wählen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:34
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:39
+msgid "Redo"
+msgstr "Wiederholen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:45
+msgid "View"
+msgstr "Ansicht"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:58
+msgid "Show Drafts"
+msgstr "Entwürfe anzeigen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:77
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:82
+msgid "Keyboard Shortcuts"
+msgstr "Tastenkürzel"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:87
+msgid "Close Window"
+msgstr "Fenster schließen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:92
+msgid "Quit"
+msgstr "Beenden"
+
+#: src/dandelion/application.py:93
+msgid "Write once, post to Mastodon, Bluesky and more."
+msgstr "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen."
+
+#. Translators: Replace "translator-credits" with your name/username,
+#. and optionally an email or URL.
+#: src/dandelion/application.py:96
+msgid "translator-credits"
+msgstr "Christoph Langner"
+
+#: src/dandelion/composer.py:232 src/dandelion/add_profile.py:186
+msgid "Personal"
+msgstr "Privat"
+
+#. type: ignore[arg-type]
+#: src/dandelion/composer.py:260 src/dandelion/preferences.py:75
+#, python-brace-format
+msgid "{n} profile"
+msgid_plural "{n} profiles"
+msgstr[0] "{n} Profil"
+msgstr[1] "{n} Profile"
+
+#: src/dandelion/composer.py:268
+msgid "No Role"
+msgstr "Keine Rolle"
+
+#: src/dandelion/composer.py:275
+#, python-brace-format
+msgid "Role: {name}"
+msgstr "Rolle: {name}"
+
+#: src/dandelion/composer.py:280
+#, python-brace-format
+msgid "Append signature: {signature}"
+msgstr "Signatur anhängen: {signature}"
+
+#: src/dandelion/composer.py:312
+msgid "More Profiles"
+msgstr "Weitere Profile"
+
+#: src/dandelion/composer.py:336
+msgid "Own Text for This Profile"
+msgstr "Eigener Text für dieses Profil"
+
+#: src/dandelion/composer.py:382
+#, python-brace-format
+msgid "Role changed to “{name}”"
+msgstr "Rolle zu „{name}“ gewechselt"
+
+#: src/dandelion/composer.py:382 src/dandelion/composer.py:557
+#: src/dandelion/composer.py:895 src/dandelion/composer.py:977
+msgid "_Undo"
+msgstr "_Rückgängig"
+
+#: src/dandelion/composer.py:414
+msgid "Main Text"
+msgstr "Haupttext"
+
+#: src/dandelion/composer.py:494
+#, python-brace-format
+msgid "{name} uses its own text."
+msgstr "{name} verwendet einen eigenen Text."
+
+#: src/dandelion/composer.py:496
+msgid "The main text has changed since."
+msgstr "Der Haupttext wurde seitdem geändert."
+
+#: src/dandelion/composer.py:498
+msgid "_Use Main Text"
+msgstr "Haupttext _übernehmen"
+
+#: src/dandelion/composer.py:509
+#, python-brace-format
+msgid "{name} uses the main text."
+msgstr "{name} verwendet den Haupttext."
+
+#: src/dandelion/composer.py:510
+msgid "_Customize"
+msgstr "_Anpassen"
+
+#: src/dandelion/composer.py:557
+msgid "Own text discarded"
+msgstr "Eigener Text verworfen"
+
+#: src/dandelion/composer.py:675
+#, python-brace-format
+msgid "Cannot publish: {n} problem"
+msgid_plural "Cannot publish: {n} problems"
+msgstr[0] "Veröffentlichen nicht möglich: {n} Problem"
+msgstr[1] "Veröffentlichen nicht möglich: {n} Probleme"
+
+#: src/dandelion/composer.py:687
+msgid "within the limit"
+msgstr "innerhalb des Limits"
+
+#: src/dandelion/composer.py:690
+msgid "over the limit"
+msgstr "über dem Limit"
+
+#: src/dandelion/composer.py:693
+msgid "close to the limit"
+msgstr "nahe am Limit"
+
+#: src/dandelion/composer.py:695
+#, python-brace-format
+msgid "{platform} {handle}: {used} of {limit} characters, {state}"
+msgstr "{platform} {handle}: {used} von {limit} Zeichen, {state}"
+
+#: src/dandelion/composer.py:713
+msgid "All Profiles"
+msgstr "Alle Profile"
+
+#: src/dandelion/composer.py:731
+#, python-brace-format
+msgid "{n} problem"
+msgid_plural "{n} problems"
+msgstr[0] "{n} Problem"
+msgstr[1] "{n} Probleme"
+
+#: src/dandelion/composer.py:761
+msgid "No Preview"
+msgstr "Keine Vorschau"
+
+#: src/dandelion/composer.py:762
+msgid "Select a profile to see how the post will look."
+msgstr "Wähle ein Profil, um zu sehen, wie der Beitrag aussehen wird."
+
+#: src/dandelion/composer.py:796
+msgid "Images and Videos"
+msgstr "Bilder und Videos"
+
+#: src/dandelion/composer.py:821
+#, python-brace-format
+msgid "Could not add “{name}”"
+msgstr "„{name}“ konnte nicht hinzugefügt werden"
+
+#: src/dandelion/composer.py:825
+#, python-brace-format
+msgid "“{name}” is not an image or video"
+msgstr "„{name}“ ist kein Bild und kein Video"
+
+#: src/dandelion/composer.py:877
+msgid "Very tall or wide images are cropped in the timeline preview on most platforms."
+msgstr "Sehr hohe oder breite Bilder werden in der Timeline-Vorschau der meisten Plattformen beschnitten."
+
+#: src/dandelion/composer.py:895
+msgid "Media removed"
+msgstr "Medium entfernt"
+
+#. type: ignore[attr-defined]
+#: src/dandelion/composer.py:938
+msgid "Empty Post"
+msgstr "Leerer Beitrag"
+
+#: src/dandelion/composer.py:945
+msgid "Delete Draft"
+msgstr "Entwurf löschen"
+
+#: src/dandelion/composer.py:977
+msgid "Draft deleted"
+msgstr "Entwurf gelöscht"
+
+#: src/dandelion/composer.py:1031
+msgid "Draft saved"
+msgstr "Entwurf gespeichert"
+
+#: src/dandelion/composer.py:1054
+msgid "Publish Despite Warnings?"
+msgstr "Trotz Warnungen veröffentlichen?"
+
+#: src/dandelion/composer.py:1057
+msgid "_Publish Anyway"
+msgstr "_Trotzdem veröffentlichen"
+
+#: src/dandelion/composer.py:1090
+msgid "This post is already being published"
+msgstr "Dieser Beitrag wird bereits veröffentlicht"
+
+#: src/dandelion/composer.py:1097
+msgid "Publishing failed"
+msgstr "Veröffentlichen fehlgeschlagen"
+
+#: src/dandelion/composer.py:1099
+#, python-brace-format
+msgid "Published on {n} profile"
+msgid_plural "Published on {n} profiles"
+msgstr[0] "Auf {n} Profil veröffentlicht"
+msgstr[1] "Auf {n} Profilen veröffentlicht"
+
+#: src/dandelion/composer.py:1102
+#, python-brace-format
+msgid "Published on {ok} of {total} profiles"
+msgstr "Auf {ok} von {total} Profilen veröffentlicht"
+
+#: src/dandelion/composer.py:1103
+msgid "_Details"
+msgstr "_Details"
+
+#: src/dandelion/history.py:76
+msgid "No Results"
+msgstr "Keine Ergebnisse"
+
+#: src/dandelion/history.py:77
+msgid "Try a different search."
+msgstr "Versuche eine andere Suche."
+
+#. type: ignore[no-untyped-def]
+#: src/dandelion/history.py:85
+msgid "Post"
+msgstr "Beitrag"
+
+#: src/dandelion/history.py:93
+#, python-brace-format
+msgid "{n} published"
+msgstr "{n} veröffentlicht"
+
+#: src/dandelion/history.py:95
+#, python-brace-format
+msgid "{n} failed"
+msgstr "{n} fehlgeschlagen"
+
+#: src/dandelion/history.py:118 src/dandelion/send_dialog.py:34
+msgid "Open Post"
+msgstr "Beitrag öffnen"
+
+#: src/dandelion/history.py:124
+msgid "Copy Link"
+msgstr "Link kopieren"
+
+#: src/dandelion/history.py:129
+#, python-brace-format
+msgid "Delete on {platform}"
+msgstr "Auf {platform} löschen"
+
+#: src/dandelion/history.py:135
+#, python-brace-format
+msgid "{platform} · deleted"
+msgstr "{platform} · gelöscht"
+
+#: src/dandelion/history.py:142
+msgid "Not published"
+msgstr "Nicht veröffentlicht"
+
+#: src/dandelion/history.py:146 src/dandelion/send_dialog.py:38
+msgid "_Retry"
+msgstr "_Erneut versuchen"
+
+#: src/dandelion/history.py:152
+msgid "Use as New Draft"
+msgstr "Als neuen Entwurf verwenden"
+
+#: src/dandelion/history.py:159
+msgid "Link copied"
+msgstr "Link kopiert"
+
+#: src/dandelion/history.py:177
+#, python-brace-format
+msgid "Delete Post on {platform}?"
+msgstr "Beitrag auf {platform} löschen?"
+
+#: src/dandelion/history.py:178
+#, python-brace-format
+msgid "The post will be removed from {handle}. This cannot be undone."
+msgstr "Der Beitrag wird von {handle} entfernt. Das lässt sich nicht rückgängig machen."
+
+#: src/dandelion/history.py:181 src/dandelion/preferences.py:319
+msgid "_Delete"
+msgstr "_Löschen"
+
+#: src/dandelion/history.py:191
+#, python-brace-format
+msgid "Post deleted on {platform}"
+msgstr "Beitrag auf {platform} gelöscht"
+
+#: src/dandelion/history.py:195
+msgid "The post could not be deleted"
+msgstr "Der Beitrag konnte nicht gelöscht werden"
+
+#: src/dandelion/preferences.py:21
+msgid "Blue"
+msgstr "Blau"
+
+#: src/dandelion/preferences.py:21
+msgid "Teal"
+msgstr "Blaugrün"
+
+#: src/dandelion/preferences.py:21
+msgid "Green"
+msgstr "Grün"
+
+#: src/dandelion/preferences.py:21
+msgid "Yellow"
+msgstr "Gelb"
+
+#: src/dandelion/preferences.py:22
+msgid "Orange"
+msgstr "Orange"
+
+#: src/dandelion/preferences.py:22
+msgid "Red"
+msgstr "Rot"
+
+#: src/dandelion/preferences.py:22
+msgid "Pink"
+msgstr "Pink"
+
+#: src/dandelion/preferences.py:22
+msgid "Purple"
+msgstr "Lila"
+
+#: src/dandelion/preferences.py:23
+msgid "Slate"
+msgstr "Schiefer"
+
+#: src/dandelion/preferences.py:68
+msgid "Add Role"
+msgstr "Rolle hinzufügen"
+
+#: src/dandelion/preferences.py:86
+msgid "Move Up"
+msgstr "Nach oben"
+
+#: src/dandelion/preferences.py:87
+msgid "Move Down"
+msgstr "Nach unten"
+
+#: src/dandelion/preferences.py:96
+msgid "More"
+msgstr "Mehr"
+
+#: src/dandelion/preferences.py:142
+msgid "New Role"
+msgstr "Neue Rolle"
+
+#: src/dandelion/preferences.py:244
+msgid "No profiles yet"
+msgstr "Noch keine Profile"
+
+#: src/dandelion/preferences.py:253
+#, python-brace-format
+msgid "Include {handle} in this role"
+msgstr "{handle} in diese Rolle aufnehmen"
+
+#: src/dandelion/preferences.py:258
+msgid "Preselected for new posts"
+msgstr "Bei neuen Beiträgen vorausgewählt"
+
+#: src/dandelion/preferences.py:260
+#, python-brace-format
+msgid "Preselect {handle}"
+msgstr "{handle} vorauswählen"
+
+#: src/dandelion/preferences.py:316
+#, python-brace-format
+msgid "Delete Role “{name}”?"
+msgstr "Rolle „{name}“ löschen?"
+
+#: src/dandelion/preferences.py:317
+msgid "The profiles stay available in the other roles."
+msgstr "Die Profile bleiben in den anderen Rollen verfügbar."
+
+#: src/dandelion/preferences.py:375
+#, python-brace-format
+msgid "{n} character"
+msgid_plural "{n} characters"
+msgstr[0] "{n} Zeichen"
+msgstr[1] "{n} Zeichen"
+
+#: src/dandelion/preferences.py:377
+#, python-brace-format
+msgid "{n} image"
+msgid_plural "{n} images"
+msgstr[0] "{n} Bild"
+msgstr[1] "{n} Bilder"
+
+#: src/dandelion/preferences.py:379
+#, python-brace-format
+msgid "alt text up to {n}"
+msgstr "Alt-Text bis {n}"
+
+#: src/dandelion/preferences.py:395
+msgid "Connection checked"
+msgstr "Verbindung geprüft"
+
+#: src/dandelion/preferences.py:407
+msgid "Remove Profile?"
+msgstr "Profil entfernen?"
+
+#: src/dandelion/preferences.py:408
+#, python-brace-format
+msgid "{handle} is removed from Dandelion and its login data is deleted from the keyring. Published posts stay online."
+msgstr "{handle} wird aus Dandelion entfernt und die Anmeldedaten werden aus dem Schlüsselbund gelöscht. Veröffentlichte Beiträge bleiben online."
+
+#: src/dandelion/preferences.py:411
+msgid "_Remove"
+msgstr "_Entfernen"
+
+#: src/dandelion/add_profile.py:68
+msgid "Sign-in failed."
+msgstr "Anmeldung fehlgeschlagen."
+
+#: src/dandelion/add_profile.py:106
+#, python-brace-format
+msgid "The server denied the sign-in: {reason}"
+msgstr "Der Server hat die Anmeldung abgelehnt: {reason}"
+
+#: src/dandelion/add_profile.py:109
+msgid "The sign-in response did not match. Please try again."
+msgstr "Die Antwort auf die Anmeldung passte nicht. Bitte versuche es erneut."
+
+#: src/dandelion/alt_text_dialog.py:54
+#, python-brace-format
+msgid "{n} / {max}"
+msgstr "{n} / {max}"
+
+#: src/dandelion/alt_text_dialog.py:56
+#, python-brace-format
+msgid "{platform} has the strictest limit"
+msgstr "{platform} hat das strengste Limit"
+
+#: src/dandelion/alt_text_dialog.py:63
+#, python-brace-format
+msgid "{n} characters"
+msgstr "{n} Zeichen"
+
+#: src/dandelion/send_dialog.py:53
+#, python-brace-format
+msgid "Uploading media {i} of {n}"
+msgstr "Lade Medium {i} von {n} hoch"
+
+#: src/dandelion/send_dialog.py:56
+msgid "Preparing"
+msgstr "Wird vorbereitet"
+
+#: src/dandelion/send_dialog.py:66
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+#: src/dandelion/send_dialog.py:92
+msgid "Waiting"
+msgstr "Wartet"
+
+#: src/dandelion/send_dialog.py:103
+#, python-brace-format
+msgid "Published on {ok} of {total} profile."
+msgid_plural "Published on {ok} of {total} profiles."
+msgstr[0] "Auf {ok} von {total} Profil veröffentlicht."
+msgstr[1] "Auf {ok} von {total} Profilen veröffentlicht."
+
+#: src/dandelion/util.py:71 src/dandelion/util.py:82
+msgid "Yesterday"
+msgstr "Gestern"
+
+#: src/dandelion/util.py:80
+msgid "Today"
+msgstr "Heute"
+
+#: src/dandelion/util.py:110
+msgid "Public"
+msgstr "Öffentlich"
+
+#: src/dandelion/util.py:111
+msgid "Quiet Public"
+msgstr "Still öffentlich"
+
+#: src/dandelion/util.py:112
+msgid "Followers Only"
+msgstr "Nur Follower"
+
+#: src/dandelion/util.py:113
+msgid "Mentioned Only"
+msgstr "Nur Erwähnte"
+
+#: src/dandelion/util.py:117
+msgid "No Label"
+msgstr "Kein Label"
+
+#: src/dandelion/util.py:118
+msgid "Suggestive"
+msgstr "Anzüglich"
+
+#: src/dandelion/util.py:119
+msgid "Nudity"
+msgstr "Nacktheit"
+
+#: src/dandelion/util.py:120
+msgid "Adult Content"
+msgstr "Inhalte für Erwachsene"
+
+#: src/dandelion/util.py:121
+msgid "Graphic Media"
+msgstr "Drastische Darstellungen"
+
+#: src/dandelion/auth/oauth.py:72
+msgid "Signed in"
+msgstr "Angemeldet"
+
+#: src/dandelion/auth/oauth.py:72
+msgid "Sign-in failed"
+msgstr "Anmeldung fehlgeschlagen"
+
+#: src/dandelion/auth/oauth.py:73
+msgid "You can close this tab and return to Dandelion."
+msgstr "Du kannst diesen Tab schließen und zu Dandelion zurückkehren."
+
+#: src/dandelion/auth/oauth.py:74
+msgid "Return to Dandelion and try again."
+msgstr "Kehre zu Dandelion zurück und versuche es erneut."
+
+#: src/dandelion/core/validation.py:67
+msgid "Not signed in. Please sign in again in the preferences."
+msgstr "Nicht angemeldet. Bitte melde dich in den Einstellungen erneut an."
+
+#: src/dandelion/core/validation.py:71
+msgid "The post is empty."
+msgstr "Der Beitrag ist leer."
+
+#: src/dandelion/core/validation.py:75
+#, python-brace-format
+msgid "The text is {n} character too long."
+msgid_plural "The text is {n} characters too long."
+msgstr[0] "Der Text ist {n} Zeichen zu lang."
+msgstr[1] "Der Text ist {n} Zeichen zu lang."
+
+#: src/dandelion/core/validation.py:78
+msgid "The text uses too many bytes (emoji and special characters count more)."
+msgstr "Der Text belegt zu viele Bytes (Emoji und Sonderzeichen zählen mehr)."
+
+#: src/dandelion/core/validation.py:85
+#, python-brace-format
+msgid "At most {n} image is allowed."
+msgid_plural "At most {n} images are allowed."
+msgstr[0] "Höchstens {n} Bild ist erlaubt."
+msgstr[1] "Höchstens {n} Bilder sind erlaubt."
+
+#: src/dandelion/core/validation.py:89
+#, python-brace-format
+msgid "Videos are not supported for {platform} yet."
+msgstr "Videos werden für {platform} noch nicht unterstützt."
+
+#: src/dandelion/core/validation.py:92
+#, python-brace-format
+msgid "At most {n} video is allowed."
+msgid_plural "At most {n} videos are allowed."
+msgstr[0] "Höchstens {n} Video ist erlaubt."
+msgstr[1] "Höchstens {n} Videos sind erlaubt."
+
+#: src/dandelion/core/validation.py:95
+msgid "Images and videos cannot be combined."
+msgstr "Bilder und Videos lassen sich nicht kombinieren."
+
+#: src/dandelion/core/validation.py:100
+#, python-brace-format
+msgid "The file format of media {n} is not supported."
+msgstr "Das Dateiformat von Medium {n} wird nicht unterstützt."
+
+#: src/dandelion/core/validation.py:104
+#, python-brace-format
+msgid "Media {n} is larger than {size}."
+msgstr "Medium {n} ist größer als {size}."
+
+#: src/dandelion/core/validation.py:109 src/dandelion/core/validation.py:112
+#, python-brace-format
+msgid "Media {n} has no alt text."
+msgstr "Medium {n} hat keinen Alt-Text."
+
+#: src/dandelion/core/validation.py:116
+#, python-brace-format
+msgid "The alt text of media {n} is longer than {max} characters."
+msgstr "Der Alt-Text von Medium {n} ist länger als {max} Zeichen."
+
+#: src/dandelion/core/validation.py:127
+msgid "Select at least one profile."
+msgstr "Wähle mindestens ein Profil."
+
+#: src/dandelion/core/publisher.py:88
+msgid "The profile no longer exists."
+msgstr "Das Profil existiert nicht mehr."
+
+#: src/dandelion/core/publisher.py:142
+msgid "An unexpected error occurred."
+msgstr "Ein unerwarteter Fehler ist aufgetreten."
+
+#: src/dandelion/platforms/base.py:113
+msgid "The login has expired. Please sign in again."
+msgstr "Die Anmeldung ist abgelaufen. Bitte melde dich erneut an."
+
+#: src/dandelion/platforms/base.py:115
+msgid "The server could not find the requested resource."
+msgstr "Der Server konnte die angeforderte Ressource nicht finden."
+
+#: src/dandelion/platforms/base.py:117
+msgid "The file is too large for this server."
+msgstr "Die Datei ist zu groß für diesen Server."
+
+#: src/dandelion/platforms/base.py:119
+msgid "The server rejected the post."
+msgstr "Der Server hat den Beitrag abgelehnt."
+
+#: src/dandelion/platforms/base.py:121 src/dandelion/platforms/bluesky.py:133
+msgid "Too many requests. Please try again later."
+msgstr "Zu viele Anfragen. Bitte versuche es später erneut."
+
+#: src/dandelion/platforms/base.py:124
+msgid "The server is currently unavailable."
+msgstr "Der Server ist derzeit nicht erreichbar."
+
+#: src/dandelion/platforms/base.py:125
+#, python-brace-format
+msgid "Unexpected answer from the server (HTTP {status})."
+msgstr "Unerwartete Antwort vom Server (HTTP {status})."
+
+#: src/dandelion/platforms/mastodon.py:108
+msgid "Please enter the address of your Mastodon server, for example mastodon.social."
+msgstr "Bitte gib die Adresse deines Mastodon-Servers ein, zum Beispiel mastodon.social."
+
+#: src/dandelion/platforms/mastodon.py:114
+#, python-brace-format
+msgid "No Mastodon server was found at {instance}."
+msgstr "Unter {instance} wurde kein Mastodon-Server gefunden."
+
+#: src/dandelion/platforms/mastodon.py:148
+#: src/dandelion/platforms/bluesky.py:187
+msgid "No login data found. Please sign in again."
+msgstr "Keine Anmeldedaten gefunden. Bitte melde dich erneut an."
+
+#: src/dandelion/platforms/mastodon.py:155
+msgid "The server could not be reached. Check your internet connection."
+msgstr "Der Server ist nicht erreichbar. Prüfe deine Internetverbindung."
+
+#: src/dandelion/platforms/mastodon.py:169
+#, python-brace-format
+msgid "The server rejected the post: {reason}"
+msgstr "Der Server hat den Beitrag abgelehnt: {reason}"
+
+#: src/dandelion/platforms/bluesky.py:115
+msgid "Bluesky could not be reached. Check your internet connection."
+msgstr "Bluesky ist nicht erreichbar. Prüfe deine Internetverbindung."
+
+#: src/dandelion/platforms/bluesky.py:126
+msgid "Bluesky did not accept the login. Check the handle and the app password."
+msgstr "Bluesky hat die Anmeldung nicht akzeptiert. Prüfe Handle und App-Passwort."
+
+#: src/dandelion/platforms/bluesky.py:131
+msgid "This Bluesky account has been suspended."
+msgstr "Dieses Bluesky-Konto wurde gesperrt."
+
+#: src/dandelion/platforms/bluesky.py:136
+msgid "A file is too large for Bluesky."
+msgstr "Eine Datei ist zu groß für Bluesky."
+
+#: src/dandelion/platforms/bluesky.py:139
+#, python-brace-format
+msgid "Bluesky rejected the post: {reason}"
+msgstr "Bluesky hat den Beitrag abgelehnt: {reason}"
+
+#: src/dandelion/platforms/bluesky.py:151
+#, python-brace-format
+msgid "The handle {handle} was not found on Bluesky."
+msgstr "Das Handle {handle} wurde auf Bluesky nicht gefunden."
+
+#: src/dandelion/platforms/bluesky.py:160
+#, python-brace-format
+msgid "Unsupported identity: {did}"
+msgstr "Nicht unterstützte Identität: {did}"
+
+#: src/dandelion/platforms/bluesky.py:164
+msgid "No Bluesky server (PDS) was found for this account."
+msgstr "Für dieses Konto wurde kein Bluesky-Server (PDS) gefunden."
+
+#: src/dandelion/platforms/bluesky.py:252
+msgid "Videos are not supported for Bluesky yet."
+msgstr "Videos werden für Bluesky noch nicht unterstützt."
+
+#: src/dandelion/widgets/media_tile.py:33
+msgid "Edit alt text"
+msgstr "Alt-Text bearbeiten"
+
+#: src/dandelion/widgets/media_tile.py:37
+#, python-brace-format
+msgid "Media {n}, edit alt text"
+msgstr "Medium {n}, Alt-Text bearbeiten"
+
+#: src/dandelion/widgets/media_tile.py:52
+#, python-brace-format
+msgid "Alt text present for media {n}"
+msgstr "Alt-Text für Medium {n} vorhanden"
+
+#: src/dandelion/widgets/media_tile.py:53
+#, python-brace-format
+msgid "Alt text missing for media {n}"
+msgstr "Alt-Text für Medium {n} fehlt"
+
+#: src/dandelion/widgets/media_tile.py:60
+#: src/dandelion/widgets/media_tile.py:89
+msgid "Remove"
+msgstr "Entfernen"
+
+#: src/dandelion/widgets/media_tile.py:64
+#, python-brace-format
+msgid "Remove media {n}"
+msgstr "Medium {n} entfernen"
+
+#: src/dandelion/widgets/media_tile.py:83
+msgid "Edit Alt Text"
+msgstr "Alt-Text bearbeiten"
+
+#: src/dandelion/widgets/media_tile.py:85
+msgid "Move Left"
+msgstr "Nach links"
+
+#: src/dandelion/widgets/media_tile.py:86
+msgid "Move Right"
+msgstr "Nach rechts"
+
+#: src/dandelion/widgets/preview_tile.py:57
+#, python-brace-format
+msgid "Preview for {handle} on {platform}"
+msgstr "Vorschau für {handle} auf {platform}"
+
+#: src/dandelion/widgets/preview_tile.py:89
+msgid "Show more"
+msgstr "Mehr anzeigen"
+
+#: src/dandelion/widgets/preview_tile.py:106
+#: src/dandelion/widgets/preview_tile.py:113
+msgid "Show"
+msgstr "Anzeigen"
+
+#: src/dandelion/widgets/preview_tile.py:112
+msgid "Hide"
+msgstr "Verbergen"
+
+#: src/dandelion/widgets/profile_chip.py:13
+msgid "signed in"
+msgstr "angemeldet"
+
+#: src/dandelion/widgets/profile_chip.py:14
+msgid "login expires soon"
+msgstr "Anmeldung läuft bald ab"
+
+#: src/dandelion/widgets/profile_chip.py:15
+msgid "signed out"
+msgstr "abgemeldet"
+
+#: src/dandelion/widgets/profile_chip.py:16
+msgid "connection error"
+msgstr "Verbindungsfehler"
+
+#: src/dandelion/widgets/profile_chip.py:62
+msgid "selected"
+msgstr "ausgewählt"
+
+#: src/dandelion/widgets/profile_chip.py:62
+msgid "not selected"
+msgstr "nicht ausgewählt"
+
+#: src/dandelion/widgets/profile_chip.py:63
+#, python-brace-format
+msgid "Profile {handle} on {platform}, {status}, {state}"
+msgstr "Profil {handle} auf {platform}, {status}, {state}"

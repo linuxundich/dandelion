@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/de/linuxundich/Dandelion">
+    <file preprocess="xml-stripblanks">ui/window.ui</file>
+    <file preprocess="xml-stripblanks">ui/composer.ui</file>
+    <file preprocess="xml-stripblanks">ui/history.ui</file>
+    <file preprocess="xml-stripblanks">ui/preferences.ui</file>
+    <file preprocess="xml-stripblanks">ui/role-page.ui</file>
+    <file preprocess="xml-stripblanks">ui/profile-page.ui</file>
+    <file preprocess="xml-stripblanks">ui/add-profile.ui</file>
+    <file preprocess="xml-stripblanks">ui/alt-text-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/send-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/shortcuts-dialog.ui</file>
+    <file>style.css</file>
+  </gresource>
+</gresources>

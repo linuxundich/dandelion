@@ -1,0 +1,275 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionAddProfileDialog: Adw.Dialog {
+  title: _("Add Profile");
+  content-width: 460;
+  content-height: 560;
+
+  child: Adw.NavigationView nav {
+    Adw.NavigationPage {
+      tag: "platform";
+      title: _("Add Profile");
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {}
+
+        content: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            description: _("Choose the network of the profile.");
+
+            Adw.ActionRow {
+              title: "Mastodon";
+              subtitle: _("And other Fediverse servers");
+              activatable: true;
+              activated => $on_mastodon();
+
+              [prefix]
+              Box {
+                width-request: 14;
+                height-request: 14;
+                valign: center;
+
+                styles [
+                  "platform-dot",
+                  "platform-mastodon",
+                ]
+              }
+
+              [suffix]
+              Image {
+                icon-name: "go-next-symbolic";
+              }
+            }
+
+            Adw.ActionRow {
+              title: "Bluesky";
+              subtitle: _("Sign in with an app password");
+              activatable: true;
+              activated => $on_bluesky();
+
+              [prefix]
+              Box {
+                width-request: 14;
+                height-request: 14;
+                valign: center;
+
+                styles [
+                  "platform-dot",
+                  "platform-bluesky",
+                ]
+              }
+
+              [suffix]
+              Image {
+                icon-name: "go-next-symbolic";
+              }
+            }
+          }
+
+          Adw.PreferencesGroup {
+            title: _("Coming Later");
+
+            Adw.ActionRow {
+              title: "LinkedIn";
+              sensitive: false;
+            }
+
+            Adw.ActionRow {
+              title: _("Facebook Page");
+              sensitive: false;
+            }
+
+            Adw.ActionRow {
+              title: "X";
+              sensitive: false;
+            }
+          }
+        };
+      };
+    }
+
+    Adw.NavigationPage {
+      tag: "mastodon";
+      title: "Mastodon";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {}
+
+        content: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            description: _("Enter the address of your server. Dandelion opens the login page in your browser.");
+
+            Adw.EntryRow instance_row {
+              title: _("Server");
+              input-purpose: url;
+              entry-activated => $on_mastodon_login();
+            }
+          }
+
+          Adw.PreferencesGroup {
+            Button mastodon_button {
+              label: _("_Sign In With Browser");
+              use-underline: true;
+              halign: center;
+              clicked => $on_mastodon_login();
+
+              styles [
+                "pill",
+                "suggested-action",
+              ]
+            }
+          }
+
+          Adw.PreferencesGroup mastodon_wait_group {
+            visible: false;
+
+            Box {
+              spacing: 12;
+              halign: center;
+
+              Adw.Spinner {}
+
+              Label {
+                label: _("Waiting for the browser");
+              }
+            }
+          }
+
+          Adw.PreferencesGroup mastodon_code_group {
+            visible: false;
+
+            Adw.ExpanderRow {
+              title: _("Enter Code Manually");
+              subtitle: _("If the browser cannot return to Dandelion");
+
+              Adw.EntryRow code_row {
+                title: _("Code or address from the browser");
+                show-apply-button: true;
+                apply => $on_code_entered();
+              }
+
+              Adw.ButtonRow {
+                title: _("Open Login Page Again");
+                start-icon-name: "adw-external-link-symbolic";
+                activated => $on_open_again();
+              }
+            }
+          }
+        };
+      };
+    }
+
+    Adw.NavigationPage {
+      tag: "bluesky";
+      title: "Bluesky";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {}
+
+        content: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            description: _("Use an app password instead of your main password. You can revoke it at any time in the Bluesky settings.");
+
+            Adw.EntryRow handle_row {
+              title: _("Handle, e.g. name.bsky.social");
+              input-purpose: email;
+            }
+
+            Adw.PasswordEntryRow password_row {
+              title: _("App Password");
+              entry-activated => $on_bluesky_login();
+            }
+
+            Adw.ButtonRow {
+              title: _("Create App Password");
+              end-icon-name: "adw-external-link-symbolic";
+              activated => $on_create_app_password();
+            }
+          }
+
+          Adw.PreferencesGroup {
+            Button bluesky_button {
+              label: _("_Sign In");
+              use-underline: true;
+              halign: center;
+              clicked => $on_bluesky_login();
+
+              styles [
+                "pill",
+                "suggested-action",
+              ]
+            }
+          }
+
+          Adw.PreferencesGroup bluesky_wait_group {
+            visible: false;
+
+            Adw.Spinner {
+              halign: center;
+            }
+          }
+        };
+      };
+    }
+
+    Adw.NavigationPage {
+      tag: "done";
+      title: _("Profile Added");
+      can-pop: false;
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {}
+
+        content: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            Box {
+              orientation: vertical;
+              spacing: 6;
+              halign: center;
+
+              Adw.Avatar done_avatar {
+                size: 80;
+                show-initials: true;
+              }
+
+              Label done_name {
+                styles [
+                  "title-2",
+                ]
+              }
+
+              Label done_handle {
+                styles [
+                  "dim-label",
+                ]
+              }
+            }
+          }
+
+          Adw.PreferencesGroup done_roles_group {
+            title: _("Use in Roles");
+          }
+
+          Adw.PreferencesGroup {
+            Button {
+              label: _("_Done");
+              use-underline: true;
+              halign: center;
+              clicked => $on_done();
+
+              styles [
+                "pill",
+                "suggested-action",
+              ]
+            }
+          }
+        };
+      };
+    }
+  };
+}

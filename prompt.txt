@@ -1,0 +1,212 @@
+# Auftrag: Entwicklung eines nativen GNOME-Social-Media-Posters
+
+Du bist ein erfahrener GNOME-Entwickler mit sehr guter Kenntnis von GTK4,
+libadwaita, den GNOME Human Interface Guidelines und den APIs gängiger
+Social-Media-Plattformen. Entwickle eine native Desktop-Anwendung, mit der ich
+einen Text (plus Medien) einmal schreibe und gleichzeitig oder zeitgesteuert
+auf mehreren Plattformen veröffentliche.
+
+Arbeite in Phasen (siehe unten). Lege nach jeder Phase die Ergebnisse vor und
+warte auf meine Freigabe, bevor du weitermachst.
+
+---
+
+## 1. Zielplattform & Technik
+
+- Arch Linux, GNOME 50, Wayland
+- GTK4 + libadwaita in der neuesten Version, die GNOME 50 mitbringt. Nutze
+  strikt die aktuellen Widgets und Muster, keine veralteten APIs:
+  AdwApplicationWindow, AdwToolbarView, AdwHeaderBar, AdwNavigationSplitView /
+  AdwOverlaySplitView, AdwNavigationView, AdwDialog / AdwAlertDialog,
+  AdwPreferencesDialog, AdwBottomSheet, AdwToastOverlay, AdwBanner,
+  AdwStatusPage, AdwSpinner, AdwEntryRow / AdwPasswordEntryRow, AdwSwitchRow,
+  AdwSpinRow, AdwComboRow, AdwExpanderRow, AdwButtonRow, AdwBreakpoint,
+  AdwAboutDialog. Kein GtkDialog, kein GtkMessageDialog, kein
+  GtkFileChooserDialog (stattdessen GtkFileDialog).
+- UI-Definition in Blueprint (.blp)
+- Sprache: Schlage Python/PyGObject oder Rust/gtk-rs vor, begründe die Wahl
+  kurz (Wartbarkeit, Async-HTTP, Paketierung) und warte auf meine Entscheidung.
+- Build: Meson. Paketierung als PKGBUILD (AUR-tauglich), zusätzlich ein
+  Flatpak-Manifest
+- Zugangsdaten und API-Keys ausschließlich über libsecret / Secret Service,
+  niemals im Klartext in Konfigurationsdateien
+- Einstellungen über GSettings, Daten (Rollen, Profile, Entwürfe, geplante
+  Posts) in SQLite unter $XDG_DATA_HOME
+- Mehrsprachigkeit über gettext, UI zuerst auf Deutsch und Englisch
+- Barrierefreiheit: Tastaturbedienung, Accessible-Labels, ausreichende
+  Kontraste, Hell-/Dunkelmodus und Akzentfarbe des Systems respektieren
+- Adaptives Layout bis hinunter zu Smartphone-Breite (360 px) mit AdwBreakpoint
+
+## 2. Plattformen
+
+Unterstützt werden müssen Mastodon, Bluesky, X (Twitter), Facebook und LinkedIn.
+
+Recherchiere für jede Plattform den **aktuellen** Stand und dokumentiere ihn
+in `docs/platforms.md`:
+- Authentifizierung (OAuth2/PKCE, App-Passwort, AT Protocol Sessions …)
+- Was ist per API überhaupt erlaubt? Achte insbesondere auf diese Punkte:
+  - X: Kosten und Limits der API-Stufen für das Schreiben
+  - Facebook: Posten nur auf Seiten über die Graph API, nicht auf private
+    Profile; App-Review-Pflicht
+  - LinkedIn: persönliches Profil (w_member_social) vs. Unternehmensseite
+- Textlänge und Zählweise:
+  - Mastodon: Limit pro Instanz über /api/v2/instance abfragen, Standard 500;
+    URLs zählen 23 Zeichen
+  - Bluesky: 300 Grapheme; Links und Mentions als Facets
+  - X: 280 gewichtete Zeichen; URLs 23; CJK/Emoji doppelt; Premium-Limits
+  - LinkedIn: 3000 Zeichen
+  - Facebook: sehr hohes Limit, aber Kürzung in der Vorschau
+- Medien: maximale Anzahl, Formate, Dateigrößen, Seitenverhältnisse, Video
+- Alt-Texte: Unterstützung und Maximallänge je Plattform
+- Link-Vorschauen (Link-Cards): wer generiert sie (Server vs. Client)?
+- Threads/Antwortketten, Content-Warnings (Mastodon), Sichtbarkeit,
+  Sprache des Beitrags, Hashtag-Konventionen
+
+Kapsle jede Plattform als Plugin/Backend hinter einer gemeinsamen
+Schnittstelle (authenticate, validate, upload_media, post, delete,
+get_limits), damit weitere Netzwerke (z. B. Threads, Pixelfed) später leicht
+ergänzt werden können.
+
+## 3. Rollen & Profile
+
+- Rollen: z. B. „Privat“, „linuxundich“, „tuxsucht“. Rollen anlegen,
+  umbenennen, löschen und sortieren; jede Rolle mit Farbe/Emoji/Avatar
+- Jede Rolle enthält beliebig viele Profile, auch **mehrere Profile derselben
+  Plattform** (z. B. zwei Mastodon-Accounts auf unterschiedlichen Instanzen)
+- Beim Verfassen: Rolle wählen, dann sind deren Profile vorausgewählt;
+  einzelne Profile per Toggle an- oder abwählbar
+- Profilverwaltung im AdwPreferencesDialog, Account-Login per OAuth über den
+  Systembrowser (xdg-desktop-portal OpenURI) mit lokalem Redirect bzw.
+  Custom-URI-Scheme
+- Verbindungsstatus pro Profil anzeigen (gültig, abgelaufen, Fehler) und
+  Token automatisch erneuern
+
+## 4. Composer & Vorschau
+
+- Ein Haupttext, optional **plattformspezifische Varianten**: für einzelne
+  Plattformen abweichend formulieren, ansonsten den Haupttext erben
+- Live-Zeichenzähler pro Plattform mit korrekter Zählweise (siehe oben),
+  farbliche Warnung (warning/error-Styleklassen), Posten bei
+  Überschreitung blockieren
+- Optional automatisches Aufteilen in Threads mit Nummerierung (1/n)
+- Medien per Drag & Drop, Einfügen aus der Zwischenablage und GtkFileDialog;
+  Zuschnitt- und Seitenverhältnis-Hinweise je Plattform
+- **Alt-Texte**: Pflichtfeld pro Bild. Mastodon (und optional alle anderen)
+  verlangt einen Alt-Text, bevor gepostet werden darf. Fehlende Alt-Texte
+  sichtbar markieren, Längenlimit pro Plattform prüfen
+- **Vorschaukacheln**: Für jedes gewählte Profil eine Kachel, die das
+  Erscheinungsbild auf der jeweiligen Plattform annähert (Avatar, Name,
+  Handle, Text mit Kürzung/„mehr anzeigen“, Bildraster, Link-Card,
+  Content-Warning). Keine Markenlogos nachbauen, die Darstellung nur
+  stilisieren. Die Kacheln liegen in einer scrollbaren Spalte neben dem
+  Editor bzw. auf schmalen Fenstern in einem eigenen Tab oder Bottom-Sheet
+- Validierung vor dem Absenden: zusammenfassende Liste aller Probleme pro
+  Plattform
+- Entwürfe automatisch speichern
+- Nach dem Posten: Ergebnis pro Profil (Erfolg mit Link zum Beitrag bzw.
+  Fehlermeldung) und erneuter Versuch für einzelne fehlgeschlagene Profile
+
+## 5. Zeitgesteuertes Posten
+
+- Datum/Uhrzeit per Kalender- und Zeitauswahl (AdwDialog), Zeitzone
+  berücksichtigen
+- Geplante Posts müssen auch dann veröffentlicht werden, wenn die GUI
+  geschlossen ist. Entwirf dafür einen schlanken Hintergrunddienst als
+  systemd --user Service bzw. Timer; unter Flatpak über das Background-Portal
+  und Autostart. Begründe den gewählten Ansatz.
+- Verhalten nach Suspend/Ausschalten: verpasste Posts beim nächsten Start
+  melden und nachfragen statt sie stillschweigend zu senden (konfigurierbar)
+- Verwaltungsansicht „Geplant“: Liste/Kalender aller geplanten Posts mit
+  Filter nach Rolle und Plattform. Aktionen: bearbeiten, Zeit ändern,
+  pausieren/deaktivieren, sofort posten, duplizieren, löschen (mit
+  AdwAlertDialog-Bestätigung bzw. Rückgängig-Toast)
+- Verlauf „Veröffentlicht“ mit Links zu den Beiträgen und optional
+  Löschen auf der Plattform
+- Desktop-Benachrichtigungen (GNotification) bei Erfolg und Fehler
+
+## 6. KI-Assistent
+
+Integriere Google Gemini, OpenAI ChatGPT und xAI Grok als austauschbare
+Backends hinter einer gemeinsamen Schnittstelle. Nutze jeweils die aktuellen
+Modelle, die Modellauswahl ist in den Einstellungen konfigurierbar. Die
+API-Keys liegen in libsecret.
+
+Funktionen:
+- Umformulieren (kürzer, länger, lockerer, sachlicher), Korrektur,
+  Übersetzen
+- Text automatisch an eine Plattform anpassen (Länge, Ton, Hashtag-Stil)
+- Hashtags vorschlagen, auswählbar als Chips
+- Alt-Texte aus Bildern generieren (Vision-Modelle) mit Längenvorgabe der
+  Zielplattform
+- Pro Rolle ein eigener Stil-Prompt bzw. eine Tonalität
+
+UX-Regeln: KI schlägt nur vor und überschreibt nie ungefragt. Ergebnisse
+erscheinen als Vorschlag mit „Übernehmen“/„Verwerfen“, alles ist rückgängig
+zu machen. Vor dem ersten Senden von Bildern oder Texten an einen
+KI-Anbieter weist ein Hinweis auf den Datenschutz hin. Die KI-Funktionen
+sind komplett abschaltbar.
+
+## 7. Marktanalyse (Phase 1)
+
+Analysiere bestehende Lösungen und erstelle `docs/market.md` mit einer
+Funktionstabelle, Stärken/Schwächen und konkreten Übernahmen für Funktionen
+und Design. Mindestens:
+- Kommerziell: Buffer, Hootsuite, Typefully, Fedica, Publer
+- Open Source / selbst gehostet: Postiz, Mixpost
+- GNOME/Linux-Clients als Design-Vorbild: Tuba, Tokodon (KDE), Fractal,
+  Newsflash, Apostrophe sowie aktuelle GNOME-Circle-Apps
+Leite daraus eine priorisierte Feature-Liste (MVP vs. später) ab.
+
+## 8. Name (Phase 1)
+
+Schlage 8 bis 10 Namen vor, gerne aus dem Wortfeld Social Media, open,
+Linux, GNOME, posten, senden, verbreiten. Die Namen sollen kurz,
+aussprechbar, international verständlich und GNOME-typisch sein (vgl.
+Fragments, Tuba, Amberol, Foliate). Prüfe für jeden Kandidaten und
+dokumentiere es:
+- Kollisionen mit Projekten auf GitHub/GitLab/GNOME GitLab/Flathub/AUR
+- Kollisionen mit bekannten Marken/Produkten
+- verfügbare Domains (.app/.org) und App-ID (z. B. io.github.<user>.<Name>)
+Empfiehl einen Favoriten mit Begründung.
+
+## 9. App-Icon (nach Namenswahl)
+
+Entwirf ein Anwendungsicon als SVG nach
+https://developer.gnome.org/hig/guidelines/app-icons.html:
+- Hauptsymbol im 128×128-Raster, GNOME-Icon-Stil mit vereinfachter
+  Perspektive, gedecktem Volumen, Palette des GNOME-Farbschemas und
+  dezentem Schatten
+- zusätzlich das symbolische Icon (16×16, einfarbig, -symbolic.svg)
+- Motiv passend zum Namen; Idee: ein Beitrag verteilt sich auf mehrere
+  Ziele. Keine Plattform-Logos verwenden.
+- Prüfe die Lesbarkeit in 32 und 64 px sowie auf hellem und dunklem
+  Hintergrund und liefere eine Vorschau-PNG
+- Ablage nach freedesktop-Konvention unter data/icons/hicolor/
+
+## 10. HIG-Konformität
+
+Beachte https://developer.gnome.org/hig/ konsequent: Sprache und
+Schreibweise (Header Capitalization, keine Ellipsen ohne Grund), primäres
+Menü, Tastenkürzel inkl. Shortcuts-Dialog, Leerzustände mit AdwStatusPage,
+Toasts statt modaler Erfolgsmeldungen, destruktive Aktionen mit
+destructive-action, Suggested-Action nur einmal pro Ansicht.
+
+## 11. Phasen & Lieferumfang
+
+1. Recherche: Marktanalyse, Plattform-Recherche, Namensvorschläge,
+   Sprachentscheidung → Freigabe
+2. Konzept: Informationsarchitektur, Wireframes der Hauptansichten
+   (Composer, Geplant, Verlauf, Rollen/Profile, Einstellungen),
+   Datenmodell, Architektur des Hintergrunddienstes → Freigabe
+3. Icon
+4. MVP: Rollen/Profile, Composer mit Vorschau und Validierung, Mastodon +
+   Bluesky (frei zugängliche APIs zuerst), sofortiges Posten
+5. Scheduler und Verwaltung geplanter Posts
+6. LinkedIn, Facebook, X
+7. KI-Assistent
+8. Feinschliff: Barrierefreiheit, Übersetzungen, PKGBUILD, Flatpak,
+   AppStream-Metadaten (metainfo.xml mit Screenshots), README
+
+Qualität: Unit-Tests für Zeichenzählung, Validierung und Scheduler;
+gemockte Plattform-APIs; Logging ohne Tokens/Secrets; saubere
+Fehlermeldungen in verständlichem Deutsch. Lizenz: GPL-3.0-or-later.

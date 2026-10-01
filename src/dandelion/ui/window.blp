@@ -1,0 +1,126 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionWindow: Adw.ApplicationWindow {
+  width-request: 360;
+  height-request: 294;
+  title: "Dandelion";
+
+  content: Adw.ToastOverlay toast_overlay {
+    child: Adw.ToolbarView {
+      [top]
+      Adw.HeaderBar header_bar {
+        title-widget: Adw.ViewSwitcher switcher {
+          stack: stack;
+          policy: wide;
+        };
+
+        [start]
+        ToggleButton drafts_button {
+          icon-name: "sidebar-show-symbolic";
+          tooltip-text: _("Drafts");
+          action-name: "win.toggle-drafts";
+        }
+
+        [start]
+        Button {
+          icon-name: "document-new-symbolic";
+          tooltip-text: _("New Post");
+          action-name: "win.new-post";
+        }
+
+        [end]
+        MenuButton {
+          primary: true;
+          icon-name: "open-menu-symbolic";
+          tooltip-text: _("Main Menu");
+          menu-model: primary_menu;
+        }
+
+        [end]
+        Button publish_button {
+          label: _("_Publish");
+          use-underline: true;
+          action-name: "win.publish";
+          tooltip-text: _("Publish to all selected profiles");
+
+          styles [
+            "suggested-action",
+          ]
+        }
+
+        [end]
+        ToggleButton search_button {
+          icon-name: "system-search-symbolic";
+          tooltip-text: _("Search");
+          visible: false;
+          action-name: "win.search";
+        }
+      }
+
+      content: Adw.ViewStack stack {
+        Adw.ViewStackPage {
+          name: "composer";
+          title: _("Compose");
+          icon-name: "document-edit-symbolic";
+
+          child: $DandelionComposer composer {};
+        }
+
+        Adw.ViewStackPage {
+          name: "history";
+          title: _("Published");
+          icon-name: "mail-send-symbolic";
+
+          child: $DandelionHistoryView history {};
+        }
+      };
+
+      [bottom]
+      Adw.ViewSwitcherBar switcher_bar {
+        stack: stack;
+      }
+    };
+  };
+
+  Adw.Breakpoint {
+    condition ("max-width: 550sp")
+
+    setters {
+      switcher_bar.reveal: true;
+      header_bar.show-title: false;
+      publish_button.label: _("_Send");
+    }
+  }
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_New Post");
+      action: "win.new-post";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Roles and Profiles");
+      action: "win.manage-roles";
+    }
+
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Dandelion");
+      action: "app.about";
+    }
+  }
+}

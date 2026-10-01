@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="dandelion">
+  <enum id="de.linuxundich.Dandelion.ThreadNumbering">
+    <value nick="off" value="0"/>
+    <value nick="fraction" value="1"/>
+    <value nick="thread-fraction" value="2"/>
+  </enum>
+  <enum id="de.linuxundich.Dandelion.MissedPolicy">
+    <value nick="ask" value="0"/>
+    <value nick="send" value="1"/>
+    <value nick="discard" value="2"/>
+  </enum>
+  <schema id="de.linuxundich.Dandelion" path="/de/linuxundich/Dandelion/">
+    <key name="window-width" type="i"><default>1100</default><summary>Window width</summary></key>
+    <key name="window-height" type="i"><default>760</default><summary>Window height</summary></key>
+    <key name="window-maximized" type="b"><default>false</default><summary>Window maximized</summary></key>
+    <key name="drafts-sidebar-visible" type="b"><default>false</default><summary>Show the drafts sidebar</summary></key>
+    <key name="show-preview" type="b"><default>true</default><summary>Show the preview column</summary></key>
+    <key name="last-role" type="s"><default>''</default><summary>UUID of the last used role</summary></key>
+
+    <key name="require-alt-text-everywhere" type="b">
+      <default>false</default>
+      <summary>Require alt text on every platform</summary>
+      <description>Mastodon always requires alt text. If enabled, missing alt text blocks posting on all platforms instead of only showing a warning.</description>
+    </key>
+    <key name="spellcheck" type="b"><default>true</default><summary>Check spelling</summary></key>
+    <key name="append-signature" type="b"><default>true</default><summary>Append the role signature to new posts</summary></key>
+    <key name="thread-numbering" enum="de.linuxundich.Dandelion.ThreadNumbering">
+      <default>'fraction'</default><summary>Numbering of thread parts</summary>
+    </key>
+    <key name="draft-retention-days" type="i">
+      <range min="0" max="365"/><default>30</default>
+      <summary>Delete empty drafts after this many days (0 = never)</summary>
+    </key>
+
+    <key name="notify-success" type="b"><default>true</default><summary>Notify on successful scheduled posts</summary></key>
+    <key name="notify-failure" type="b"><default>true</default><summary>Notify on failed scheduled posts</summary></key>
+    <key name="missed-policy" enum="de.linuxundich.Dandelion.MissedPolicy">
+      <default>'ask'</default><summary>What to do with missed scheduled posts</summary>
+    </key>
+    <key name="missed-grace-minutes" type="i">
+      <range min="1" max="1440"/><default>15</default>
+      <summary>Minutes after which a scheduled post counts as missed</summary>
+    </key>
+    <key name="default-timezone" type="s"><default>''</default><summary>Default time zone (empty = system)</summary></key>
+
+    <key name="ai-enabled" type="b"><default>false</default><summary>Enable AI features</summary></key>
+  </schema>
+</schemalist>

@@ -1,0 +1,57 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionHistoryView: Adw.Bin {
+  child: Box {
+    orientation: vertical;
+
+    SearchBar search_bar {
+      key-capture-widget: template;
+
+      child: Adw.Clamp {
+        maximum-size: 500;
+
+        child: SearchEntry search_entry {
+          hexpand: true;
+          placeholder-text: _("Search published posts");
+          search-changed => $on_search_changed();
+        };
+      };
+    }
+
+    Stack stack {
+      vexpand: true;
+
+      StackPage {
+        name: "empty";
+
+        child: Adw.StatusPage empty_page {
+          icon-name: "mail-send-symbolic";
+          title: _("Nothing Published Yet");
+          description: _("Published posts appear here with links to every platform.");
+        };
+      }
+
+      StackPage {
+        name: "list";
+
+        child: ScrolledWindow {
+          hscrollbar-policy: never;
+
+          child: Adw.Clamp {
+            maximum-size: 760;
+
+            child: Box list_box {
+              orientation: vertical;
+              spacing: 18;
+              margin-top: 18;
+              margin-bottom: 18;
+              margin-start: 12;
+              margin-end: 12;
+            };
+          };
+        };
+      }
+    }
+  };
+}

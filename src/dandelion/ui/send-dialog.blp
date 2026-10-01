@@ -1,0 +1,46 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionSendDialog: Adw.Dialog {
+  title: _("Publishing");
+  content-width: 480;
+  content-height: 420;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: ScrolledWindow {
+      hscrollbar-policy: never;
+      propagate-natural-height: true;
+
+      child: Adw.Clamp {
+        child: Box {
+          orientation: vertical;
+          spacing: 12;
+          margin-top: 12;
+          margin-bottom: 18;
+          margin-start: 12;
+          margin-end: 12;
+
+          ListBox target_list {
+            selection-mode: none;
+
+            styles [
+              "boxed-list",
+            ]
+          }
+
+          Label summary_label {
+            wrap: true;
+            visible: false;
+
+            styles [
+              "dim-label",
+            ]
+          }
+        };
+      };
+    };
+  };
+}

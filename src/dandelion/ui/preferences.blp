@@ -1,0 +1,82 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionPreferences: Adw.PreferencesDialog {
+  search-enabled: true;
+
+  Adw.PreferencesPage roles_page {
+    name: "roles";
+    title: _("Roles");
+    icon-name: "system-users-symbolic";
+
+    Adw.PreferencesGroup roles_group {
+      title: _("Roles");
+      description: _("A role bundles profiles, language, visibility and a signature, for example “Private” or “Blog”.");
+
+      ListBox roles_list {
+        selection-mode: none;
+
+        styles [
+          "boxed-list",
+        ]
+      }
+    }
+
+    Adw.PreferencesGroup profiles_group {
+      title: _("Profiles");
+      description: _("Login data is stored in the system keyring.");
+
+      ListBox profiles_list {
+        selection-mode: none;
+
+        styles [
+          "boxed-list",
+        ]
+      }
+    }
+  }
+
+  Adw.PreferencesPage general_page {
+    name: "general";
+    title: _("General");
+    icon-name: "preferences-system-symbolic";
+
+    Adw.PreferencesGroup {
+      title: _("Writing");
+
+      Adw.SwitchRow alt_everywhere_row {
+        title: _("Require Alt Text Everywhere");
+        subtitle: _("Mastodon always requires alt text. Other platforms only show a warning unless this is enabled.");
+      }
+
+      Adw.SwitchRow spellcheck_row {
+        title: _("Check Spelling");
+      }
+
+      Adw.SwitchRow signature_row {
+        title: _("Append Role Signature");
+        subtitle: _("Can be turned off for each post");
+      }
+
+      Adw.SwitchRow preview_row {
+        title: _("Show Preview");
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Drafts");
+
+      Adw.SpinRow retention_row {
+        title: _("Delete Empty Drafts After");
+        subtitle: _("Days, 0 keeps them forever");
+
+        adjustment: Adjustment {
+          lower: 0;
+          upper: 365;
+          step-increment: 1;
+          page-increment: 7;
+        };
+      }
+    }
+  }
+}

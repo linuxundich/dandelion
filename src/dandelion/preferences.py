@@ -1,0 +1,429 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Einstellungen, Rollen und Profile."""
+
+from __future__ import annotations
+
+from gettext import gettext as _
+from gettext import ngettext
+from typing import TYPE_CHECKING
+
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk
+
+from .core.models import ROLE_COLORS, Profile, ProfileStatus, Role
+from .util import LANGUAGES, VISIBILITY_LABELS, Debouncer, spawn, system_language
+from .widgets.avatars import AvatarCache
+from .widgets.profile_chip import STATUS_TEXT
+
+if TYPE_CHECKING:
+    from .application import DandelionApplication
+
+COLOR_NAMES = {
+    "blue": _("Blue"), "teal": _("Teal"), "green": _("Green"), "yellow": _("Yellow"),
+    "orange": _("Orange"), "red": _("Red"), "pink": _("Pink"), "purple": _("Purple"),
+    "slate": _("Slate"),
+}
+
+
+def _platform_name(app: DandelionApplication, platform_id: str) -> str:
+    return app.registry.get(platform_id).name if platform_id in app.registry else platform_id
+
+
+@Gtk.Template(resource_path="/de/linuxundich/Dandelion/ui/preferences.ui")
+class DandelionPreferences(Adw.PreferencesDialog):
+    __gtype_name__ = "DandelionPreferences"
+
+    roles_list: Gtk.ListBox = Gtk.Template.Child()
+    profiles_list: Gtk.ListBox = Gtk.Template.Child()
+    alt_everywhere_row: Adw.SwitchRow = Gtk.Template.Child()
+    spellcheck_row: Adw.SwitchRow = Gtk.Template.Child()
+    signature_row: Adw.SwitchRow = Gtk.Template.Child()
+    preview_row: Adw.SwitchRow = Gtk.Template.Child()
+    retention_row: Adw.SpinRow = Gtk.Template.Child()
+
+    def __init__(self, app: DandelionApplication, win: Gtk.Window) -> None:
+        super().__init__()
+        self.app = app
+        self.win = win
+        self.store = app.store
+        self.avatars = AvatarCache(app.http)
+        s = app.settings
+        flags = Gio.SettingsBindFlags.DEFAULT
+        s.bind("require-alt-text-everywhere", self.alt_everywhere_row, "active", flags)
+        s.bind("spellcheck", self.spellcheck_row, "active", flags)
+        s.bind("append-signature", self.signature_row, "active", flags)
+        s.bind("show-preview", self.preview_row, "active", flags)
+        s.bind("draft-retention-days", self.retention_row, "value", flags)
+        self.reload()
+
+    def reload(self) -> None:
+        self._fill_roles()
+        self._fill_profiles()
+
+    # -- Rollen --------------------------------------------------------------
+    def _fill_roles(self) -> None:
+        self.roles_list.remove_all()
+        roles = self.store.roles()
+        for idx, role in enumerate(roles):
+            self.roles_list.append(self._role_row(role, idx, len(roles)))
+        add = Adw.ButtonRow(title=_("Add Role"), start_icon_name="list-add-symbolic")
+        add.connect("activated", lambda *_: self._add_role())
+        self.roles_list.append(add)
+
+    def _role_row(self, role: Role, idx: int, total: int) -> Adw.ActionRow:
+        n = len(self.store.role_profiles(role.id))  # type: ignore[arg-type]
+        row = Adw.ActionRow(title=GLib.markup_escape_text(role.name), activatable=True,
+                            subtitle=ngettext("{n} profile", "{n} profiles", n).format(n=n))
+        handle = Gtk.Image(icon_name="list-drag-handle-symbolic")
+        handle.add_css_class("dim-label")
+        emoji = Gtk.Label(label=role.emoji or "•")
+        emoji.add_css_class("role-emoji")
+        emoji.add_css_class(f"role-{role.color}")
+        # add_prefix() stellt voran: zuerst das Emoji, dann den Griff ganz links
+        row.add_prefix(emoji)
+        row.add_prefix(handle)
+
+        menu = Gio.Menu()
+        menu.append(_("Move Up"), "role.up")
+        menu.append(_("Move Down"), "role.down")
+        group = Gio.SimpleActionGroup()
+        for name, delta, enabled in (("up", -1, idx > 0), ("down", 1, idx < total - 1)):
+            act = Gio.SimpleAction.new(name, None)
+            act.set_enabled(enabled)
+            act.connect("activate", lambda _a, _p, d=delta, r=role: self._move_role(r, d))
+            group.add_action(act)
+        row.insert_action_group("role", group)
+        more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=menu,
+                              valign=Gtk.Align.CENTER, tooltip_text=_("More"))
+        more.add_css_class("flat")
+        row.add_suffix(more)
+        row.add_suffix(Gtk.Image(icon_name="go-next-symbolic"))
+        row.connect("activated", lambda *_: self._open_role(role))
+
+        # Tastatur: Alt+Pfeil verschiebt
+        shortcuts = Gtk.ShortcutController()
+        for accel, delta in (("<alt>Up", -1), ("<alt>Down", 1)):
+            shortcuts.add_shortcut(Gtk.Shortcut.new(
+                Gtk.ShortcutTrigger.parse_string(accel),
+                Gtk.CallbackAction.new(lambda *_a, d=delta, r=role: (self._move_role(r, d), True)[1])))
+        row.add_controller(shortcuts)
+
+        # Ziehen und Ablegen
+        source = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
+        source.connect("prepare", lambda *_a, r=role: Gdk.ContentProvider.new_for_value(r.id))
+        source.connect("drag-begin", lambda src, _d, w=row: src.set_icon(
+            Gtk.WidgetPaintable.new(w), 0, 0))
+        handle.add_controller(source)
+        target = Gtk.DropTarget.new(GObject.TYPE_INT, Gdk.DragAction.MOVE)
+        target.connect("drop", lambda _t, value, _x, _y, r=role: self._drop_role(value, r))
+        row.add_controller(target)
+        return row
+
+    def _move_role(self, role: Role, delta: int) -> None:
+        ids = [r.id for r in self.store.roles()]
+        i = ids.index(role.id)
+        j = max(0, min(len(ids) - 1, i + delta))
+        ids.insert(j, ids.pop(i))
+        self.store.reorder_roles(ids)  # type: ignore[arg-type]
+        self._fill_roles()
+
+    def _drop_role(self, dragged_id: int, onto: Role) -> bool:
+        ids = [r.id for r in self.store.roles()]
+        if dragged_id not in ids or dragged_id == onto.id:
+            return False
+        ids.remove(dragged_id)
+        ids.insert(ids.index(onto.id), dragged_id)
+        self.store.reorder_roles(ids)  # type: ignore[arg-type]
+        self._fill_roles()
+        return True
+
+    def _add_role(self) -> None:
+        used = {r.color for r in self.store.roles()}
+        color = next((c for c in ROLE_COLORS if c not in used), "blue")
+        role = self.store.save_role(Role(_("New Role"), "💬", color, language=system_language()))
+        self._fill_roles()
+        self._open_role(role)
+
+    def _open_role(self, role: Role) -> None:
+        page = DandelionRolePage(self, role)
+        self.push_subpage(page)
+
+    # -- Profile -------------------------------------------------------------
+    def _fill_profiles(self) -> None:
+        self.profiles_list.remove_all()
+        for p in self.store.profiles():
+            row = Adw.ActionRow(title=GLib.markup_escape_text(p.label or p.full_handle),
+                                activatable=True)
+            status = STATUS_TEXT[p.status]
+            row.set_subtitle(f"{_platform_name(self.app, p.platform)} · {status}")
+            avatar = Adw.Avatar(size=32, text=p.title, show_initials=True)
+            self.avatars.apply(avatar, p.avatar_url)
+            row.add_prefix(avatar)
+            if p.status != ProfileStatus.OK:
+                icon = Gtk.Image(icon_name="dialog-warning-symbolic")
+                icon.add_css_class("warning" if p.status == ProfileStatus.EXPIRING else "error")
+                row.add_suffix(icon)
+            row.add_suffix(Gtk.Image(icon_name="go-next-symbolic"))
+            row.connect("activated", lambda *_a, prof=p: self.push_subpage(
+                DandelionProfilePage(self, prof)))
+            self.profiles_list.append(row)
+        add = Adw.ButtonRow(title=_("Add Profile"), start_icon_name="list-add-symbolic")
+        add.connect("activated", lambda *_: self.add_profile())
+        self.profiles_list.append(add)
+
+    def add_profile(self, platform: str | None = None, hint: str | None = None) -> None:
+        from .add_profile import DandelionAddProfileDialog
+
+        def added(_p: Profile) -> None:
+            self.reload()
+
+        DandelionAddProfileDialog(self.app, on_added=added, platform=platform,
+                                  hint=hint).present(self)
+
+
+@Gtk.Template(resource_path="/de/linuxundich/Dandelion/ui/role-page.ui")
+class DandelionRolePage(Adw.NavigationPage):
+    __gtype_name__ = "DandelionRolePage"
+
+    name_row: Adw.EntryRow = Gtk.Template.Child()
+    emoji_button: Gtk.MenuButton = Gtk.Template.Child()
+    color_box: Gtk.Box = Gtk.Template.Child()
+    profiles_group: Adw.PreferencesGroup = Gtk.Template.Child()
+    language_row: Adw.ComboRow = Gtk.Template.Child()
+    visibility_row: Adw.ComboRow = Gtk.Template.Child()
+    signature_row: Adw.EntryRow = Gtk.Template.Child()
+
+    def __init__(self, prefs: DandelionPreferences, role: Role) -> None:
+        super().__init__()
+        self.prefs = prefs
+        self.store = prefs.store
+        self.role = role
+        self._loading = True
+        self._save = Debouncer(400, self._save_now)
+        self.set_title(role.name)
+        self.name_row.set_text(role.name)
+        self.emoji_button.set_label(role.emoji or "💬")
+        self.signature_row.set_text(role.signature)
+
+        first: Gtk.ToggleButton | None = None
+        for color in ROLE_COLORS:
+            btn = Gtk.ToggleButton(tooltip_text=COLOR_NAMES[color])
+            btn.add_css_class("color-button")
+            btn.add_css_class(f"role-bg-{color}")
+            btn.update_property([Gtk.AccessibleProperty.LABEL], [COLOR_NAMES[color]])
+            if first is None:
+                first = btn
+            else:
+                btn.set_group(first)
+            btn.set_active(color == role.color)
+            btn.connect("toggled", lambda b, c=color: b.get_active() and self._set_color(c))
+            self.color_box.append(btn)
+
+        self._lang_codes = [c for c, _n in LANGUAGES]
+        self.language_row.set_model(Gtk.StringList.new([n for _c, n in LANGUAGES]))
+        self.language_row.set_expression(Gtk.PropertyExpression.new(Gtk.StringObject, None,
+                                                                     "string"))
+        code = role.language or system_language()
+        self.language_row.set_selected(self._lang_codes.index(code)
+                                       if code in self._lang_codes else 0)
+        self.language_row.connect("notify::selected", lambda *_: self._changed())
+        self._vis_codes = list(VISIBILITY_LABELS)
+        self.visibility_row.set_model(Gtk.StringList.new(
+            [VISIBILITY_LABELS[c][0] for c in self._vis_codes]))
+        vis = role.visibility or "public"
+        self.visibility_row.set_selected(self._vis_codes.index(vis))
+        self.visibility_row.connect("notify::selected", lambda *_: self._changed())
+
+        self._fill_profiles()
+        self._loading = False
+        self.connect("hidden", lambda *_: (self._save.flush(), self.prefs.reload()))
+
+    def _fill_profiles(self) -> None:
+        members = {rp.profile_id: rp for rp in self.store.role_profiles(self.role.id)}  # type: ignore[arg-type]
+        profiles = self.store.profiles()
+        if not profiles:
+            row = Adw.ActionRow(title=_("No profiles yet"))
+            self.profiles_group.add(row)
+            return
+        for p in profiles:
+            rp = members.get(p.id)  # type: ignore[arg-type]
+            row = Adw.ActionRow(title=GLib.markup_escape_text(p.label or p.full_handle),
+                                subtitle=_platform_name(self.prefs.app, p.platform))
+            check = Gtk.CheckButton(active=rp is not None, valign=Gtk.Align.CENTER)
+            check.update_property([Gtk.AccessibleProperty.LABEL],
+                                  [_("Include {handle} in this role").format(handle=p.full_handle)])
+            row.add_prefix(check)
+            row.set_activatable_widget(check)
+            switch = Gtk.Switch(active=bool(rp and rp.preselected), valign=Gtk.Align.CENTER,
+                                sensitive=rp is not None,
+                                tooltip_text=_("Preselected for new posts"))
+            switch.update_property([Gtk.AccessibleProperty.LABEL],
+                                   [_("Preselect {handle}").format(handle=p.full_handle)])
+            row.add_suffix(switch)
+
+            def on_check(c: Gtk.CheckButton, sw: Gtk.Switch = switch, prof: Profile = p) -> None:
+                self.store.set_role_profile(self.role.id, prof.id, c.get_active(),  # type: ignore[arg-type]
+                                            preselected=True)
+                sw.set_sensitive(c.get_active())
+                sw.set_active(c.get_active())
+
+            def on_switch(sw: Gtk.Switch, _pspec: object, prof: Profile = p,
+                          c: Gtk.CheckButton = check) -> None:
+                if c.get_active():
+                    self.store.set_role_profile(self.role.id, prof.id, True,  # type: ignore[arg-type]
+                                                preselected=sw.get_active())
+
+            check.connect("toggled", on_check)
+            switch.connect("notify::active", on_switch)
+            self.profiles_group.add(row)
+
+    def _set_color(self, color: str) -> None:
+        self.role.color = color
+        self._changed()
+
+    @Gtk.Template.Callback()
+    def on_name_changed(self, *_args: object) -> None:
+        self._changed()
+
+    @Gtk.Template.Callback()
+    def on_signature_changed(self, *_args: object) -> None:
+        self._changed()
+
+    @Gtk.Template.Callback()
+    def on_emoji_picked(self, _chooser: Gtk.EmojiChooser, emoji: str) -> None:
+        self.role.emoji = emoji
+        self.emoji_button.set_label(emoji)
+        self._changed()
+
+    def _changed(self) -> None:
+        if not self._loading:
+            self._save()
+
+    def _save_now(self) -> None:
+        name = self.name_row.get_text().strip()
+        if name:
+            self.role.name = name
+            self.set_title(name)
+        self.role.signature = self.signature_row.get_text()
+        i = self.language_row.get_selected()
+        self.role.language = self._lang_codes[i] if i < len(self._lang_codes) else None
+        i = self.visibility_row.get_selected()
+        self.role.visibility = self._vis_codes[i] if i < len(self._vis_codes) else None
+        self.store.save_role(self.role)
+
+    @Gtk.Template.Callback()
+    def on_delete(self, *_args: object) -> None:
+        dialog = Adw.AlertDialog(
+            heading=_("Delete Role “{name}”?").format(name=self.role.name),
+            body=_("The profiles stay available in the other roles."))
+        dialog.add_response("cancel", _("_Cancel"))
+        dialog.add_response("delete", _("_Delete"))
+        dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.set_close_response("cancel")
+
+        def on_response(_d: Adw.AlertDialog, response: str) -> None:
+            if response == "delete":
+                self._save = Debouncer(1, lambda: None)
+                self.store.delete_role(self.role.id)  # type: ignore[arg-type]
+                self.prefs.pop_subpage()
+
+        dialog.connect("response", on_response)
+        dialog.present(self.prefs)
+
+
+@Gtk.Template(resource_path="/de/linuxundich/Dandelion/ui/profile-page.ui")
+class DandelionProfilePage(Adw.NavigationPage):
+    __gtype_name__ = "DandelionProfilePage"
+
+    avatar: Adw.Avatar = Gtk.Template.Child()
+    name_label: Gtk.Label = Gtk.Template.Child()
+    handle_label: Gtk.Label = Gtk.Template.Child()
+    status_row: Adw.ActionRow = Gtk.Template.Child()
+    status_icon: Gtk.Image = Gtk.Template.Child()
+    limits_row: Adw.ActionRow = Gtk.Template.Child()
+    label_row: Adw.EntryRow = Gtk.Template.Child()
+
+    def __init__(self, prefs: DandelionPreferences, profile: Profile) -> None:
+        super().__init__()
+        self.prefs = prefs
+        self.app = prefs.app
+        self.profile = profile
+        self._loading = True
+        self.label_row.set_text(profile.label)
+        self._loading = False
+        self._save = Debouncer(400, lambda: self.app.store.save_profile(self.profile))
+        self._show()
+        self.connect("hidden", lambda *_: (self._save.flush(), self.prefs.reload()))
+
+    def _show(self) -> None:
+        p = self.profile
+        self.set_title(p.label or p.full_handle)
+        self.avatar.set_text(p.title)
+        self.prefs.avatars.apply(self.avatar, p.avatar_url)
+        self.name_label.set_label(p.display_name or p.handle)
+        self.handle_label.set_label(f"{p.full_handle} · {_platform_name(self.app, p.platform)}")
+        self.status_row.set_subtitle(GLib.markup_escape_text(
+            STATUS_TEXT[p.status].capitalize() + (f" – {p.status_detail}" if p.status_detail
+                                                  else "")))
+        ok = p.status == ProfileStatus.OK
+        self.status_icon.set_from_icon_name("object-select-symbolic" if ok
+                                            else "dialog-warning-symbolic")
+        for c in ("success", "error", "warning"):
+            self.status_icon.remove_css_class(c)
+        self.status_icon.add_css_class("success" if ok else "error")
+        if p.platform in self.app.registry:
+            lim = self.app.registry.get(p.platform).limits_for(p)
+            parts = [ngettext("{n} character", "{n} characters", lim.max_chars).format(
+                n=lim.max_chars),
+                ngettext("{n} image", "{n} images", lim.max_images).format(n=lim.max_images)]
+            if lim.alt_text_max:
+                parts.append(_("alt text up to {n}").format(n=lim.alt_text_max))
+            self.limits_row.set_subtitle(" · ".join(parts))
+
+    @Gtk.Template.Callback()
+    def on_label_changed(self, *_args: object) -> None:
+        if not self._loading:
+            self.profile.label = self.label_row.get_text().strip()
+            self._save()
+
+    @Gtk.Template.Callback()
+    def on_refresh(self, *_args: object) -> None:
+        async def run() -> None:
+            platform = self.app.registry.get(self.profile.platform)
+            self.profile = await platform.refresh_profile(self.profile)
+            self.app.store.save_profile(self.profile)
+            self._show()
+            self.prefs.add_toast(Adw.Toast(title=_("Connection checked")))
+
+        spawn(run())
+
+    @Gtk.Template.Callback()
+    def on_relogin(self, *_args: object) -> None:
+        hint = self.profile.server if self.profile.platform == "mastodon" else self.profile.handle
+        self.prefs.add_profile(self.profile.platform, hint)
+
+    @Gtk.Template.Callback()
+    def on_remove(self, *_args: object) -> None:
+        dialog = Adw.AlertDialog(
+            heading=_("Remove Profile?"),
+            body=_("{handle} is removed from Dandelion and its login data is deleted from the "
+                   "keyring. Published posts stay online.").format(handle=self.profile.full_handle))
+        dialog.add_response("cancel", _("_Cancel"))
+        dialog.add_response("remove", _("_Remove"))
+        dialog.set_response_appearance("remove", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.set_close_response("cancel")
+
+        def on_response(_d: Adw.AlertDialog, response: str) -> None:
+            if response != "remove":
+                return
+
+            async def run() -> None:
+                if self.profile.platform in self.app.registry:
+                    await self.app.registry.get(self.profile.platform).logout(self.profile)
+                self.app.store.delete_profile(self.profile.id)  # type: ignore[arg-type]
+                self.prefs.pop_subpage()
+                self.prefs.reload()
+
+            spawn(run())
+
+        dialog.connect("response", on_response)
+        dialog.present(self.prefs)

@@ -1,0 +1,112 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionAltTextDialog: Adw.Dialog {
+  title: _("Alt Text");
+  content-width: 520;
+  content-height: 640;
+  default-widget: done_button;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-end-title-buttons: false;
+      show-start-title-buttons: false;
+
+      [start]
+      Button {
+        label: _("_Cancel");
+        use-underline: true;
+        clicked => $on_cancel();
+      }
+
+      [end]
+      Button done_button {
+        label: _("_Done");
+        use-underline: true;
+        clicked => $on_done();
+
+        styles [
+          "suggested-action",
+        ]
+      }
+    }
+
+    content: ScrolledWindow {
+      hscrollbar-policy: never;
+
+      child: Box {
+        orientation: vertical;
+        spacing: 12;
+        margin-top: 12;
+        margin-bottom: 18;
+        margin-start: 18;
+        margin-end: 18;
+
+        Picture picture {
+          content-fit: contain;
+          can-shrink: true;
+          height-request: 240;
+
+          styles [
+            "card",
+          ]
+        }
+
+        Label {
+          label: _("Describe the image for people who cannot see it.");
+          wrap: true;
+          xalign: 0;
+
+          styles [
+            "dim-label",
+          ]
+        }
+
+        Frame {
+          child: ScrolledWindow {
+            min-content-height: 140;
+            hscrollbar-policy: never;
+
+            child: TextView text_view {
+              wrap-mode: word_char;
+              top-margin: 10;
+              bottom-margin: 10;
+              left-margin: 10;
+              right-margin: 10;
+              accepts-tab: false;
+
+              accessibility {
+                label: _("Alt text");
+              }
+            };
+          };
+
+          styles [
+            "view",
+          ]
+        }
+
+        Label counter_label {
+          xalign: 0;
+
+          styles [
+            "caption",
+            "numeric",
+          ]
+        }
+
+        Label hint_label {
+          xalign: 0;
+          wrap: true;
+          visible: false;
+
+          styles [
+            "caption",
+            "dim-label",
+          ]
+        }
+      };
+    };
+  };
+}

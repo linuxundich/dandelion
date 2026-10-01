@@ -1,0 +1,431 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Erzeugt bzw. aktualisiert po/de.po aus dandelion.pot und dem Wörterbuch unten.
+
+    meson compile -C _build dandelion-pot && python3 po/de_translations.py
+
+Einträge, die hier fehlen, bleiben unübersetzt (msgstr leer). Für neue
+Texte das Wörterbuch ergänzen; bestehende Übersetzungen aus de.po bleiben
+erhalten, wenn sie hier nicht vorkommen.
+"""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+HERE = Path(__file__).parent
+
+DE: dict[str, str | tuple[str, str]] = {
+    "Dandelion": "Dandelion",
+    "Social Media Poster": "Social-Media-Poster",
+    "Write once, post to Mastodon, Bluesky and more":
+        "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen",
+    "Mastodon;Bluesky;Fediverse;Social;Post;Crosspost;Toot;":
+        "Mastodon;Bluesky;Fediverse;Social;Post;Beitrag;Crossposting;Tröt;",
+    "Write once, post everywhere": "Einmal schreiben, überall veröffentlichen",
+    "Dandelion lets you write a post once and publish it to several social networks at the same time.":
+        "Mit Dandelion schreibst du einen Beitrag einmal und veröffentlichst ihn gleichzeitig in mehreren sozialen Netzwerken.",
+    "Roles group your profiles, for example private and work accounts":
+        "Rollen bündeln deine Profile, etwa private und berufliche Konten",
+    "Several accounts per network, such as two Mastodon instances":
+        "Mehrere Konten pro Netzwerk, zum Beispiel zwei Mastodon-Instanzen",
+    "Exact character counters and a preview for every profile":
+        "Exakte Zeichenzähler und eine Vorschau für jedes Profil",
+    "Alt text for images is required where it matters":
+        "Alt-Texte für Bilder sind Pflicht, wo es darauf ankommt",
+    "Credentials are stored in the system keyring":
+        "Zugangsdaten liegen im Schlüsselbund des Systems",
+    "Christoph Langner": "Christoph Langner",
+    "First preview with Mastodon and Bluesky.": "Erste Vorschau mit Mastodon und Bluesky.",
+    "Window width": "Fensterbreite",
+    "Window height": "Fensterhöhe",
+    "Window maximized": "Fenster maximiert",
+    "Show the drafts sidebar": "Seitenleiste mit Entwürfen anzeigen",
+    "Show the preview column": "Vorschauspalte anzeigen",
+    "UUID of the last used role": "UUID der zuletzt verwendeten Rolle",
+    "Require alt text on every platform": "Alt-Text auf allen Plattformen verlangen",
+    "Mastodon always requires alt text. If enabled, missing alt text blocks posting on all platforms instead of only showing a warning.":
+        "Mastodon verlangt immer einen Alt-Text. Wenn aktiviert, blockiert ein fehlender Alt-Text das Senden auf allen Plattformen, statt nur zu warnen.",
+    "Check spelling": "Rechtschreibung prüfen",
+    "Append the role signature to new posts": "Signatur der Rolle an neue Beiträge anhängen",
+    "Numbering of thread parts": "Nummerierung der Thread-Teile",
+    "Delete empty drafts after this many days (0 = never)":
+        "Leere Entwürfe nach so vielen Tagen löschen (0 = nie)",
+    "Notify on successful scheduled posts": "Bei erfolgreich geplanten Beiträgen benachrichtigen",
+    "Notify on failed scheduled posts": "Bei fehlgeschlagenen geplanten Beiträgen benachrichtigen",
+    "What to do with missed scheduled posts": "Umgang mit verpassten geplanten Beiträgen",
+    "Minutes after which a scheduled post counts as missed":
+        "Minuten, nach denen ein geplanter Beitrag als verpasst gilt",
+    "Default time zone (empty = system)": "Standard-Zeitzone (leer = System)",
+    "Enable AI features": "KI-Funktionen aktivieren",
+    "Drafts": "Entwürfe",
+    "New Post": "Neuer Beitrag",
+    "Main Menu": "Hauptmenü",
+    "_Publish": "_Veröffentlichen",
+    "Publish to all selected profiles": "Auf allen ausgewählten Profilen veröffentlichen",
+    "Search": "Suchen",
+    "Compose": "Verfassen",
+    "Published": "Veröffentlicht",
+    "_Send": "_Senden",
+    "_New Post": "_Neuer Beitrag",
+    "_Roles and Profiles": "_Rollen und Profile",
+    "_Preferences": "_Einstellungen",
+    "_Keyboard Shortcuts": "_Tastenkürzel",
+    "_About Dandelion": "_Info zu Dandelion",
+    "No Drafts": "Keine Entwürfe",
+    "Posts you start writing are saved here automatically.":
+        "Beiträge, die du zu schreiben beginnst, werden hier automatisch gespeichert.",
+    "Welcome to Dandelion": "Willkommen bei Dandelion",
+    "Add your Mastodon and Bluesky profiles to write a post once and publish it everywhere.":
+        "Füge deine Mastodon- und Bluesky-Profile hinzu, um einen Beitrag einmal zu schreiben und überall zu veröffentlichen.",
+    "_Add Profile": "Profil _hinzufügen",
+    "Preview": "Vorschau",
+    "Role": "Rolle",
+    "Problems": "Probleme",
+    "Content warning": "Inhaltswarnung",
+    "Post text": "Beitragstext",
+    "Add Images": "Bilder hinzufügen",
+    "Content Warning": "Inhaltswarnung",
+    "CW": "CW",
+    "Language": "Sprache",
+    "Visibility on Mastodon": "Sichtbarkeit auf Mastodon",
+    "Content label for Bluesky": "Inhaltslabel für Bluesky",
+    "Append the signature of this role": "Signatur dieser Rolle anhängen",
+    "Signature": "Signatur",
+    "_Manage Roles": "Rollen _verwalten",
+    "Search published posts": "Veröffentlichte Beiträge durchsuchen",
+    "Nothing Published Yet": "Noch nichts veröffentlicht",
+    "Published posts appear here with links to every platform.":
+        "Veröffentlichte Beiträge erscheinen hier mit Links zu jeder Plattform.",
+    "Roles": "Rollen",
+    "A role bundles profiles, language, visibility and a signature, for example “Private” or “Blog”.":
+        "Eine Rolle bündelt Profile, Sprache, Sichtbarkeit und eine Signatur, zum Beispiel „Privat“ oder „Blog“.",
+    "Profiles": "Profile",
+    "Login data is stored in the system keyring.": "Anmeldedaten liegen im Schlüsselbund des Systems.",
+    "General": "Allgemein",
+    "Writing": "Schreiben",
+    "Require Alt Text Everywhere": "Alt-Text überall verlangen",
+    "Mastodon always requires alt text. Other platforms only show a warning unless this is enabled.":
+        "Mastodon verlangt immer einen Alt-Text. Andere Plattformen zeigen nur eine Warnung, solange dies nicht aktiviert ist.",
+    "Check Spelling": "Rechtschreibung prüfen",
+    "Append Role Signature": "Signatur der Rolle anhängen",
+    "Can be turned off for each post": "Lässt sich für jeden Beitrag abschalten",
+    "Show Preview": "Vorschau anzeigen",
+    "Delete Empty Drafts After": "Leere Entwürfe löschen nach",
+    "Days, 0 keeps them forever": "Tagen, 0 behält sie für immer",
+    "Appearance": "Darstellung",
+    "Name": "Name",
+    "Symbol": "Symbol",
+    "Choose Emoji": "Emoji wählen",
+    "Color": "Farbe",
+    "Profiles in this role. Preselected profiles are switched on for every new post.":
+        "Profile in dieser Rolle. Vorausgewählte Profile sind bei jedem neuen Beitrag eingeschaltet.",
+    "Defaults": "Voreinstellungen",
+    "Signature or Hashtags": "Signatur oder Hashtags",
+    "Delete Role": "Rolle löschen",
+    "Profile": "Profil",
+    "Connection": "Verbindung",
+    "Status": "Status",
+    "Limits": "Limits",
+    "Check Connection": "Verbindung prüfen",
+    "Sign In Again": "Erneut anmelden",
+    "Display": "Anzeige",
+    "Name in Dandelion": "Name in Dandelion",
+    "Remove Profile": "Profil entfernen",
+    "Add Profile": "Profil hinzufügen",
+    "Choose the network of the profile.": "Wähle das Netzwerk des Profils.",
+    "And other Fediverse servers": "Und andere Fediverse-Server",
+    "Sign in with an app password": "Anmeldung mit App-Passwort",
+    "Coming Later": "Folgt später",
+    "Facebook Page": "Facebook-Seite",
+    "Enter the address of your server. Dandelion opens the login page in your browser.":
+        "Gib die Adresse deines Servers ein. Dandelion öffnet die Anmeldeseite in deinem Browser.",
+    "Server": "Server",
+    "_Sign In With Browser": "Im Browser _anmelden",
+    "Waiting for the browser": "Warte auf den Browser",
+    "Enter Code Manually": "Code manuell eingeben",
+    "If the browser cannot return to Dandelion": "Falls der Browser nicht zu Dandelion zurückkehren kann",
+    "Code or address from the browser": "Code oder Adresse aus dem Browser",
+    "Open Login Page Again": "Anmeldeseite erneut öffnen",
+    "Use an app password instead of your main password. You can revoke it at any time in the Bluesky settings.":
+        "Verwende ein App-Passwort statt deines Hauptpassworts. Du kannst es jederzeit in den Bluesky-Einstellungen widerrufen.",
+    "Handle, e.g. name.bsky.social": "Handle, z. B. name.bsky.social",
+    "App Password": "App-Passwort",
+    "Create App Password": "App-Passwort erstellen",
+    "_Sign In": "_Anmelden",
+    "Profile Added": "Profil hinzugefügt",
+    "Use in Roles": "In Rollen verwenden",
+    "_Done": "_Fertig",
+    "Alt Text": "Alt-Text",
+    "_Cancel": "_Abbrechen",
+    "Describe the image for people who cannot see it.":
+        "Beschreibe das Bild für Menschen, die es nicht sehen können.",
+    "Alt text": "Alt-Text",
+    "Publishing": "Veröffentlichen",
+    "Publish": "Veröffentlichen",
+    "Save Draft": "Entwurf speichern",
+    "Choose Role": "Rolle wählen",
+    "Undo": "Rückgängig",
+    "Redo": "Wiederholen",
+    "View": "Ansicht",
+    "Show Drafts": "Entwürfe anzeigen",
+    "Preferences": "Einstellungen",
+    "Keyboard Shortcuts": "Tastenkürzel",
+    "Close Window": "Fenster schließen",
+    "Quit": "Beenden",
+    "Write once, post to Mastodon, Bluesky and more.":
+        "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen.",
+    "translator-credits": "Christoph Langner",
+    "Personal": "Privat",
+    "{n} profile": ("{n} Profil", "{n} Profile"),
+    "No Role": "Keine Rolle",
+    "Role: {name}": "Rolle: {name}",
+    "Append signature: {signature}": "Signatur anhängen: {signature}",
+    "More Profiles": "Weitere Profile",
+    "Own Text for This Profile": "Eigener Text für dieses Profil",
+    "Role changed to “{name}”": "Rolle zu „{name}“ gewechselt",
+    "_Undo": "_Rückgängig",
+    "Main Text": "Haupttext",
+    "{name} uses its own text.": "{name} verwendet einen eigenen Text.",
+    "The main text has changed since.": "Der Haupttext wurde seitdem geändert.",
+    "_Use Main Text": "Haupttext _übernehmen",
+    "{name} uses the main text.": "{name} verwendet den Haupttext.",
+    "_Customize": "_Anpassen",
+    "Own text discarded": "Eigener Text verworfen",
+    "Cannot publish: {n} problem": ("Veröffentlichen nicht möglich: {n} Problem",
+                                    "Veröffentlichen nicht möglich: {n} Probleme"),
+    "within the limit": "innerhalb des Limits",
+    "over the limit": "über dem Limit",
+    "close to the limit": "nahe am Limit",
+    "{platform} {handle}: {used} of {limit} characters, {state}":
+        "{platform} {handle}: {used} von {limit} Zeichen, {state}",
+    "All Profiles": "Alle Profile",
+    "{n} problem": ("{n} Problem", "{n} Probleme"),
+    "No Preview": "Keine Vorschau",
+    "Select a profile to see how the post will look.":
+        "Wähle ein Profil, um zu sehen, wie der Beitrag aussehen wird.",
+    "Images and Videos": "Bilder und Videos",
+    "Could not add “{name}”": "„{name}“ konnte nicht hinzugefügt werden",
+    "“{name}” is not an image or video": "„{name}“ ist kein Bild und kein Video",
+    "Very tall or wide images are cropped in the timeline preview on most platforms.":
+        "Sehr hohe oder breite Bilder werden in der Timeline-Vorschau der meisten Plattformen beschnitten.",
+    "Media removed": "Medium entfernt",
+    "Empty Post": "Leerer Beitrag",
+    "Delete Draft": "Entwurf löschen",
+    "Draft deleted": "Entwurf gelöscht",
+    "Draft saved": "Entwurf gespeichert",
+    "Publish Despite Warnings?": "Trotz Warnungen veröffentlichen?",
+    "_Publish Anyway": "_Trotzdem veröffentlichen",
+    "This post is already being published": "Dieser Beitrag wird bereits veröffentlicht",
+    "Published on {n} profile": ("Auf {n} Profil veröffentlicht", "Auf {n} Profilen veröffentlicht"),
+    "Published on {ok} of {total} profiles": "Auf {ok} von {total} Profilen veröffentlicht",
+    "_Details": "_Details",
+    "Publishing failed": "Veröffentlichen fehlgeschlagen",
+    "No Results": "Keine Ergebnisse",
+    "Try a different search.": "Versuche eine andere Suche.",
+    "Post": "Beitrag",
+    "{n} published": "{n} veröffentlicht",
+    "{n} failed": "{n} fehlgeschlagen",
+    "Open Post": "Beitrag öffnen",
+    "Copy Link": "Link kopieren",
+    "Delete on {platform}": "Auf {platform} löschen",
+    "{platform} · deleted": "{platform} · gelöscht",
+    "Not published": "Nicht veröffentlicht",
+    "_Retry": "_Erneut versuchen",
+    "Use as New Draft": "Als neuen Entwurf verwenden",
+    "Link copied": "Link kopiert",
+    "Delete Post on {platform}?": "Beitrag auf {platform} löschen?",
+    "The post will be removed from {handle}. This cannot be undone.":
+        "Der Beitrag wird von {handle} entfernt. Das lässt sich nicht rückgängig machen.",
+    "_Delete": "_Löschen",
+    "Post deleted on {platform}": "Beitrag auf {platform} gelöscht",
+    "The post could not be deleted": "Der Beitrag konnte nicht gelöscht werden",
+    "Blue": "Blau",
+    "Teal": "Blaugrün",
+    "Green": "Grün",
+    "Yellow": "Gelb",
+    "Orange": "Orange",
+    "Red": "Rot",
+    "Pink": "Pink",
+    "Purple": "Lila",
+    "Slate": "Schiefer",
+    "Add Role": "Rolle hinzufügen",
+    "Move Up": "Nach oben",
+    "Move Down": "Nach unten",
+    "More": "Mehr",
+    "New Role": "Neue Rolle",
+    "No profiles yet": "Noch keine Profile",
+    "Include {handle} in this role": "{handle} in diese Rolle aufnehmen",
+    "Preselected for new posts": "Bei neuen Beiträgen vorausgewählt",
+    "Preselect {handle}": "{handle} vorauswählen",
+    "Delete Role “{name}”?": "Rolle „{name}“ löschen?",
+    "The profiles stay available in the other roles.":
+        "Die Profile bleiben in den anderen Rollen verfügbar.",
+    "{n} character": ("{n} Zeichen", "{n} Zeichen"),
+    "{n} image": ("{n} Bild", "{n} Bilder"),
+    "alt text up to {n}": "Alt-Text bis {n}",
+    "Connection checked": "Verbindung geprüft",
+    "Remove Profile?": "Profil entfernen?",
+    "{handle} is removed from Dandelion and its login data is deleted from the keyring. Published posts stay online.":
+        "{handle} wird aus Dandelion entfernt und die Anmeldedaten werden aus dem Schlüsselbund gelöscht. Veröffentlichte Beiträge bleiben online.",
+    "_Remove": "_Entfernen",
+    "Sign-in failed.": "Anmeldung fehlgeschlagen.",
+    "The server denied the sign-in: {reason}": "Der Server hat die Anmeldung abgelehnt: {reason}",
+    "The sign-in response did not match. Please try again.":
+        "Die Antwort auf die Anmeldung passte nicht. Bitte versuche es erneut.",
+    "{n} / {max}": "{n} / {max}",
+    "{platform} has the strictest limit": "{platform} hat das strengste Limit",
+    "{n} characters": "{n} Zeichen",
+    "Uploading media {i} of {n}": "Lade Medium {i} von {n} hoch",
+    "Preparing": "Wird vorbereitet",
+    "Failed": "Fehlgeschlagen",
+    "Waiting": "Wartet",
+    "Published on {ok} of {total} profile.": ("Auf {ok} von {total} Profil veröffentlicht.",
+                                              "Auf {ok} von {total} Profilen veröffentlicht."),
+    "Yesterday": "Gestern",
+    "Today": "Heute",
+    "Public": "Öffentlich",
+    "Quiet Public": "Still öffentlich",
+    "Followers Only": "Nur Follower",
+    "Mentioned Only": "Nur Erwähnte",
+    "No Label": "Kein Label",
+    "Suggestive": "Anzüglich",
+    "Nudity": "Nacktheit",
+    "Adult Content": "Inhalte für Erwachsene",
+    "Graphic Media": "Drastische Darstellungen",
+    "Signed in": "Angemeldet",
+    "Sign-in failed": "Anmeldung fehlgeschlagen",
+    "You can close this tab and return to Dandelion.":
+        "Du kannst diesen Tab schließen und zu Dandelion zurückkehren.",
+    "Return to Dandelion and try again.": "Kehre zu Dandelion zurück und versuche es erneut.",
+    "Not signed in. Please sign in again in the preferences.":
+        "Nicht angemeldet. Bitte melde dich in den Einstellungen erneut an.",
+    "The post is empty.": "Der Beitrag ist leer.",
+    "The text is {n} character too long.": ("Der Text ist {n} Zeichen zu lang.",
+                                            "Der Text ist {n} Zeichen zu lang."),
+    "The text uses too many bytes (emoji and special characters count more).":
+        "Der Text belegt zu viele Bytes (Emoji und Sonderzeichen zählen mehr).",
+    "At most {n} image is allowed.": ("Höchstens {n} Bild ist erlaubt.",
+                                      "Höchstens {n} Bilder sind erlaubt."),
+    "Videos are not supported for {platform} yet.":
+        "Videos werden für {platform} noch nicht unterstützt.",
+    "At most {n} video is allowed.": ("Höchstens {n} Video ist erlaubt.",
+                                      "Höchstens {n} Videos sind erlaubt."),
+    "Images and videos cannot be combined.": "Bilder und Videos lassen sich nicht kombinieren.",
+    "The file format of media {n} is not supported.":
+        "Das Dateiformat von Medium {n} wird nicht unterstützt.",
+    "Media {n} is larger than {size}.": "Medium {n} ist größer als {size}.",
+    "Media {n} has no alt text.": "Medium {n} hat keinen Alt-Text.",
+    "The alt text of media {n} is longer than {max} characters.":
+        "Der Alt-Text von Medium {n} ist länger als {max} Zeichen.",
+    "Select at least one profile.": "Wähle mindestens ein Profil.",
+    "The profile no longer exists.": "Das Profil existiert nicht mehr.",
+    "An unexpected error occurred.": "Ein unerwarteter Fehler ist aufgetreten.",
+    "The login has expired. Please sign in again.":
+        "Die Anmeldung ist abgelaufen. Bitte melde dich erneut an.",
+    "The server could not find the requested resource.":
+        "Der Server konnte die angeforderte Ressource nicht finden.",
+    "The file is too large for this server.": "Die Datei ist zu groß für diesen Server.",
+    "The server rejected the post.": "Der Server hat den Beitrag abgelehnt.",
+    "Too many requests. Please try again later.":
+        "Zu viele Anfragen. Bitte versuche es später erneut.",
+    "The server is currently unavailable.": "Der Server ist derzeit nicht erreichbar.",
+    "Unexpected answer from the server (HTTP {status}).":
+        "Unerwartete Antwort vom Server (HTTP {status}).",
+    "Please enter the address of your Mastodon server, for example mastodon.social.":
+        "Bitte gib die Adresse deines Mastodon-Servers ein, zum Beispiel mastodon.social.",
+    "No Mastodon server was found at {instance}.": "Unter {instance} wurde kein Mastodon-Server gefunden.",
+    "No login data found. Please sign in again.":
+        "Keine Anmeldedaten gefunden. Bitte melde dich erneut an.",
+    "The server could not be reached. Check your internet connection.":
+        "Der Server ist nicht erreichbar. Prüfe deine Internetverbindung.",
+    "The server rejected the post: {reason}": "Der Server hat den Beitrag abgelehnt: {reason}",
+    "Bluesky could not be reached. Check your internet connection.":
+        "Bluesky ist nicht erreichbar. Prüfe deine Internetverbindung.",
+    "Bluesky did not accept the login. Check the handle and the app password.":
+        "Bluesky hat die Anmeldung nicht akzeptiert. Prüfe Handle und App-Passwort.",
+    "This Bluesky account has been suspended.": "Dieses Bluesky-Konto wurde gesperrt.",
+    "A file is too large for Bluesky.": "Eine Datei ist zu groß für Bluesky.",
+    "Bluesky rejected the post: {reason}": "Bluesky hat den Beitrag abgelehnt: {reason}",
+    "The handle {handle} was not found on Bluesky.":
+        "Das Handle {handle} wurde auf Bluesky nicht gefunden.",
+    "Unsupported identity: {did}": "Nicht unterstützte Identität: {did}",
+    "No Bluesky server (PDS) was found for this account.":
+        "Für dieses Konto wurde kein Bluesky-Server (PDS) gefunden.",
+    "Videos are not supported for Bluesky yet.": "Videos werden für Bluesky noch nicht unterstützt.",
+    "Edit alt text": "Alt-Text bearbeiten",
+    "Media {n}, edit alt text": "Medium {n}, Alt-Text bearbeiten",
+    "Alt text present for media {n}": "Alt-Text für Medium {n} vorhanden",
+    "Alt text missing for media {n}": "Alt-Text für Medium {n} fehlt",
+    "Remove": "Entfernen",
+    "Remove media {n}": "Medium {n} entfernen",
+    "Edit Alt Text": "Alt-Text bearbeiten",
+    "Move Left": "Nach links",
+    "Move Right": "Nach rechts",
+    "Preview for {handle} on {platform}": "Vorschau für {handle} auf {platform}",
+    "Show more": "Mehr anzeigen",
+    "Show": "Anzeigen",
+    "Hide": "Verbergen",
+    "signed in": "angemeldet",
+    "login expires soon": "Anmeldung läuft bald ab",
+    "signed out": "abgemeldet",
+    "connection error": "Verbindungsfehler",
+    "selected": "ausgewählt",
+    "not selected": "nicht ausgewählt",
+    "Profile {handle} on {platform}, {status}, {state}":
+        "Profil {handle} auf {platform}, {status}, {state}",
+}
+
+
+def esc(s: str) -> str:
+    return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+
+
+def unesc(parts: str) -> str:
+    raw = "".join(re.findall(r'"(.*)"', parts))
+    return raw.replace('\\n', "\n").replace('\\"', '"').replace("\\\\", "\\")
+
+
+def main() -> None:
+    pot = (HERE / "dandelion.pot").read_text(encoding="utf-8")
+    blocks = pot.split("\n\n")
+    header = (
+        'msgid ""\nmsgstr ""\n'
+        '"Project-Id-Version: dandelion\\n"\n'
+        '"Last-Translator: Christoph Langner <mail@christoph-langner.de>\\n"\n'
+        '"Language-Team: German\\n"\n'
+        '"PO-Revision-Date: 2026-10-01 18:00+0200\\n"\n'
+        '"Language: de\\n"\n'
+        '"MIME-Version: 1.0\\n"\n'
+        '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+        '"Content-Transfer-Encoding: 8bit\\n"\n'
+        '"Plural-Forms: nplurals=2; plural=(n != 1);\\n"\n'
+    )
+    out = [header]
+    missing = []
+    for block in blocks[1:]:
+        m = re.search(r'msgid ((?:".*"\n?)+)(?:msgid_plural ((?:".*"\n?)+))?msgstr', block)
+        if not m:
+            continue
+        msgid = unesc(m.group(1))
+        comments = "\n".join(line for line in block.splitlines() if line.startswith("#"))
+        tr = DE.get(msgid)
+        if tr is None:
+            missing.append(msgid)
+        entry = (comments + "\n" if comments else "") + f'msgid "{esc(msgid)}"\n'
+        if m.group(2):
+            plural = unesc(m.group(2))
+            one, many = tr if isinstance(tr, tuple) else ("", "")
+            entry += (f'msgid_plural "{esc(plural)}"\nmsgstr[0] "{esc(one)}"\n'
+                      f'msgstr[1] "{esc(many)}"\n')
+        else:
+            entry += f'msgstr "{esc(tr if isinstance(tr, str) else "")}"\n'
+        out.append(entry)
+    (HERE / "de.po").write_text("\n".join(out), encoding="utf-8")
+    if missing:
+        print("Unübersetzt:", *missing, sep="\n  ")
+
+
+if __name__ == "__main__":
+    main()

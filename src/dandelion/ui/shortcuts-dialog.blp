@@ -1,0 +1,96 @@
+using Gtk 4.0;
+using Adw 1;
+
+Adw.ShortcutsDialog shortcuts_dialog {
+  Adw.ShortcutsSection {
+    title: _("Writing");
+
+    Adw.ShortcutsItem {
+      title: _("New Post");
+      accelerator: "<Control>n";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Publish");
+      accelerator: "<Control>Return";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Save Draft");
+      accelerator: "<Control>s";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Add Images");
+      accelerator: "<Control>o";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Choose Role");
+      accelerator: "<Control>r";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Undo");
+      accelerator: "<Control>z";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Redo");
+      accelerator: "<Control><Shift>z";
+    }
+  }
+
+  Adw.ShortcutsSection {
+    title: _("View");
+
+    Adw.ShortcutsItem {
+      title: _("Compose");
+      accelerator: "<Control>1";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Published");
+      accelerator: "<Control>2";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Show Drafts");
+      accelerator: "F9";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Show Preview");
+      accelerator: "<Control><Shift>p";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Search");
+      accelerator: "<Control>f";
+    }
+  }
+
+  Adw.ShortcutsSection {
+    title: _("General");
+
+    Adw.ShortcutsItem {
+      title: _("Preferences");
+      accelerator: "<Control>comma";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Keyboard Shortcuts");
+      accelerator: "<Control>question";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Close Window");
+      accelerator: "<Control>w";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Quit");
+      accelerator: "<Control>q";
+    }
+  }
+}

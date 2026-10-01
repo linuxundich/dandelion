@@ -1,0 +1,29 @@
+#!@PYTHON@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+import gettext
+import locale
+import os
+import signal
+import sys
+
+VERSION = '@VERSION@'
+APP_ID = '@APP_ID@'
+pkgdatadir = '@pkgdatadir@'
+localedir = '@localedir@'
+
+sys.path.insert(1, pkgdatadir)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+locale.bindtextdomain('dandelion', localedir)
+locale.textdomain('dandelion')
+gettext.bindtextdomain('dandelion', localedir)
+gettext.textdomain('dandelion')
+gettext.install('dandelion', localedir)
+
+if __name__ == '__main__':
+    from gi.repository import Gio
+    resource = Gio.Resource.load(os.path.join(pkgdatadir, 'dandelion.gresource'))
+    resource._register()
+
+    from dandelion import main
+    sys.exit(main.main(VERSION, APP_ID))

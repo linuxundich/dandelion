@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=de.linuxundich.Dandelion
+Exec=@bindir@/dandelion --gapplication-service

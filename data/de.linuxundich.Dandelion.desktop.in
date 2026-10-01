@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Dandelion
+GenericName=Social Media Poster
+Comment=Write once, post to Mastodon, Bluesky and more
+Exec=dandelion %U
+Icon=@APP_ID@
+Terminal=false
+Type=Application
+Categories=Network;GTK;GNOME;
+# Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+Keywords=Mastodon;Bluesky;Fediverse;Social;Post;Crosspost;Toot;
+StartupNotify=true
+DBusActivatable=true

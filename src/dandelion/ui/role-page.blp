@@ -1,0 +1,86 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionRolePage: Adw.NavigationPage {
+  title: _("Role");
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Adw.PreferencesPage {
+      Adw.PreferencesGroup {
+        title: _("Appearance");
+
+        Adw.EntryRow name_row {
+          title: _("Name");
+          changed => $on_name_changed();
+        }
+
+        Adw.ActionRow {
+          title: _("Symbol");
+          activatable-widget: emoji_button;
+
+          [suffix]
+          MenuButton emoji_button {
+            valign: center;
+            tooltip-text: _("Choose Emoji");
+
+            popover: EmojiChooser emoji_chooser {
+              emoji-picked => $on_emoji_picked();
+            };
+
+            styles [
+              "flat",
+              "emoji-button",
+            ]
+          }
+        }
+
+        Adw.ActionRow {
+          title: _("Color");
+
+          [suffix]
+          Box color_box {
+            spacing: 4;
+            valign: center;
+          }
+        }
+      }
+
+      Adw.PreferencesGroup profiles_group {
+        title: _("Profiles");
+        description: _("Profiles in this role. Preselected profiles are switched on for every new post.");
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Defaults");
+
+        Adw.ComboRow language_row {
+          title: _("Language");
+          enable-search: true;
+        }
+
+        Adw.ComboRow visibility_row {
+          title: _("Visibility on Mastodon");
+        }
+
+        Adw.EntryRow signature_row {
+          title: _("Signature or Hashtags");
+          changed => $on_signature_changed();
+        }
+      }
+
+      Adw.PreferencesGroup {
+        Adw.ButtonRow delete_row {
+          title: _("Delete Role");
+          activated => $on_delete();
+
+          styles [
+            "destructive-action",
+          ]
+        }
+      }
+    };
+  };
+}

@@ -1,0 +1,109 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+
+/* Rollenfarben aus der libadwaita-Akzentpalette */
+.role-blue   { color: var(--accent-blue); }
+.role-teal   { color: var(--accent-teal); }
+.role-green  { color: var(--accent-green); }
+.role-yellow { color: var(--accent-yellow); }
+.role-orange { color: var(--accent-orange); }
+.role-red    { color: var(--accent-red); }
+.role-pink   { color: var(--accent-pink); }
+.role-purple { color: var(--accent-purple); }
+.role-slate  { color: var(--accent-slate); }
+
+.role-button.role-blue   { box-shadow: inset 3px 0 var(--accent-blue); }
+.role-button.role-teal   { box-shadow: inset 3px 0 var(--accent-teal); }
+.role-button.role-green  { box-shadow: inset 3px 0 var(--accent-green); }
+.role-button.role-yellow { box-shadow: inset 3px 0 var(--accent-yellow); }
+.role-button.role-orange { box-shadow: inset 3px 0 var(--accent-orange); }
+.role-button.role-red    { box-shadow: inset 3px 0 var(--accent-red); }
+.role-button.role-pink   { box-shadow: inset 3px 0 var(--accent-pink); }
+.role-button.role-purple { box-shadow: inset 3px 0 var(--accent-purple); }
+.role-button.role-slate  { box-shadow: inset 3px 0 var(--accent-slate); }
+.role-button.role-blue, .role-button.role-teal, .role-button.role-green,
+.role-button.role-yellow, .role-button.role-orange, .role-button.role-red,
+.role-button.role-pink, .role-button.role-purple, .role-button.role-slate { color: inherit; }
+
+.role-emoji { font-size: 1.3em; }
+.emoji-button { font-size: 1.4em; min-width: 40px; }
+
+.color-button {
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border-radius: 999px;
+}
+.color-button:checked { outline: 2px solid var(--window-fg-color); outline-offset: 2px; }
+.role-bg-blue   { background: var(--accent-blue); }
+.role-bg-teal   { background: var(--accent-teal); }
+.role-bg-green  { background: var(--accent-green); }
+.role-bg-yellow { background: var(--accent-yellow); }
+.role-bg-orange { background: var(--accent-orange); }
+.role-bg-red    { background: var(--accent-red); }
+.role-bg-pink   { background: var(--accent-pink); }
+.role-bg-purple { background: var(--accent-purple); }
+.role-bg-slate  { background: var(--accent-slate); }
+
+/* Stilisierte Plattformfarben (keine Logos) */
+.platform-dot {
+  border-radius: 999px;
+  min-width: 10px;
+  min-height: 10px;
+  box-shadow: 0 0 0 2px var(--window-bg-color);
+}
+.platform-dot.platform-mastodon { background: var(--purple-3); }
+.platform-dot.platform-bluesky  { background: var(--blue-3); }
+
+.profile-chip {
+  border-radius: 999px;
+  padding: 3px 12px 3px 3px;
+}
+
+/* Editor */
+.composer-text { font-size: 1.1em; background: transparent; }
+textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
+
+/* Medien */
+.media-tile .media-button {
+  padding: 0;
+  border-radius: 12px;
+  min-width: 96px;
+  min-height: 96px;
+}
+.media-tile picture { border-radius: 12px; }
+.alt-badge {
+  min-height: 0;
+  padding: 2px 6px;
+  font-size: 0.75em;
+  font-weight: bold;
+  border-radius: 6px;
+  background: alpha(black, 0.65);
+  color: white;
+}
+.alt-badge.missing { background: var(--error-bg-color); color: var(--error-fg-color); }
+.alt-badge.optional { background: var(--warning-bg-color); color: var(--warning-fg-color); }
+
+/* Vorschau */
+.preview-pane { background: var(--sidebar-bg-color); }
+.preview-tile { padding: 14px; }
+.preview-tile.platform-mastodon { border-top: 3px solid var(--purple-3); }
+.preview-tile.platform-bluesky  { border-top: 3px solid var(--blue-3); }
+.preview-text { font-size: 1.0em; }
+.preview-image { border-radius: 8px; }
+.preview-card {
+  border-radius: 10px;
+  border: 1px solid alpha(currentColor, 0.15);
+}
+.preview-cw {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: alpha(var(--warning-bg-color), 0.15);
+}
+.alt-chip {
+  font-size: 0.7em;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: alpha(black, 0.65);
+  color: white;
+}

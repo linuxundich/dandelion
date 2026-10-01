@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.linuxundich.Dandelion</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Dandelion</name>
+  <summary>Write once, post everywhere</summary>
+  <description>
+    <p>Dandelion lets you write a post once and publish it to several social networks at the same time.</p>
+    <ul>
+      <li>Roles group your profiles, for example private and work accounts</li>
+      <li>Several accounts per network, such as two Mastodon instances</li>
+      <li>Exact character counters and a preview for every profile</li>
+      <li>Alt text for images is required where it matters</li>
+      <li>Credentials are stored in the system keyring</li>
+    </ul>
+  </description>
+  <developer id="de.linuxundich">
+    <name>Christoph Langner</name>
+  </developer>
+  <url type="homepage">https://github.com/linuxundich/dandelion</url>
+  <url type="bugtracker">https://github.com/linuxundich/dandelion/issues</url>
+  <launchable type="desktop-id">de.linuxundich.Dandelion.desktop</launchable>
+  <content_rating type="oars-1.1"/>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </supports>
+  <releases>
+    <release version="0.1.0" date="2026-10-01">
+      <description><p>First preview with Mastodon and Bluesky.</p></description>
+    </release>
+  </releases>
+</component>
