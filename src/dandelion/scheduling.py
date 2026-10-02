@@ -44,6 +44,9 @@ class SchedulingService(GObject.Object):
         self.trigger = create_trigger()
         self._source = 0
         self._running = False
+        self._remote_source = 0
+        self._remote_running = False
+        self._remote_again = False
 
     @property
     def is_portal(self) -> bool:
@@ -107,6 +110,41 @@ class SchedulingService(GObject.Object):
         """Nach dem Planen, Verschieben, Pausieren oder Löschen aufrufen."""
         spawn(self._update_trigger(self.scheduler().next_due()))
         self.emit("changed")
+        self._queue_remote_sync()
+
+    # -- Serverseitiges Planen (Mastodon) -------------------------------------
+    def _queue_remote_sync(self, delay: int = 3) -> None:
+        """Gleicht nach kurzer Ruhepause mit den Servern ab (nicht bei jedem Tastendruck)."""
+        if self._remote_source:
+            GLib.source_remove(self._remote_source)
+        self._remote_source = GLib.timeout_add_seconds(delay, self._run_remote_sync)
+
+    def _run_remote_sync(self) -> bool:
+        self._remote_source = 0
+        if self._remote_running:
+            self._remote_again = True
+            return GLib.SOURCE_REMOVE
+        spawn(self._remote_sync())
+        return GLib.SOURCE_REMOVE
+
+    async def _remote_sync(self) -> None:
+        from .core.remote_schedule import RemoteScheduler
+        self._remote_running = True
+        try:
+            remote = RemoteScheduler(self.app.store, self.app.registry, self.app.publisher)
+            errors = await remote.sync_all()
+        finally:
+            self._remote_running = False
+        if errors:
+            win = self.app.props.active_window
+            if win and hasattr(win, "toast"):
+                from gettext import gettext as _
+                win.toast(_("Scheduling on the server failed, Dandelion sends the post "
+                            "itself: {error}").format(error=errors[0]), timeout=10)
+        self.emit("changed")
+        if self._remote_again:
+            self._remote_again = False
+            self._queue_remote_sync(1)
 
     def enable(self, window=None) -> None:  # type: ignore[no-untyped-def]
         if isinstance(self.trigger, PortalTrigger):

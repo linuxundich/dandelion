@@ -42,3 +42,20 @@ def composition_for(post: Post, profile: Profile, role: Role | None) -> Composit
         content_label=post.bluesky_label,
         media=list(post.media),
     )
+
+
+def thread_parts(post: Post, comp: Composition, platform, limits) -> list[str]:  # type: ignore[no-untyped-def]
+    """Teile des Beitrags für diese Plattform (ein Teil ohne Thread-Modus)."""
+    from dataclasses import replace
+
+    from .splitting import THREAD_OFF, split_thread
+    if post.thread_mode == THREAD_OFF or not limits.supports_threads:
+        return [comp.text]
+
+    def count(text: str) -> int:
+        c = platform.count(replace(comp, text=text, media=[]), limits)
+        if c.bytes_limit and (c.bytes_used or 0) > c.bytes_limit:
+            return limits.max_chars + 1
+        return c.used
+
+    return split_thread(comp.text, count, limits.max_chars, post.thread_mode)

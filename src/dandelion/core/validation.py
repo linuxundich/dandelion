@@ -9,7 +9,9 @@ from gettext import ngettext
 
 from ..platforms import Registry
 from ..platforms.base import Count, Issue, Platform, PlatformLimits
-from .compose import base_text, composition_for
+from dataclasses import replace
+
+from .compose import base_text, composition_for, thread_parts
 from .graphemes import count_graphemes
 from .models import Post, Profile, ProfileStatus, Role
 
@@ -21,6 +23,7 @@ class TargetReport:
     limits: PlatformLimits
     count: Count
     issues: list[Issue] = field(default_factory=list)
+    parts: list[str] = field(default_factory=list)
 
     @property
     def errors(self) -> list[Issue]:
@@ -59,8 +62,14 @@ def validate_target(post: Post, profile: Profile, role: Role | None, platform: P
                     require_alt_everywhere: bool) -> TargetReport:
     limits = platform.limits_for(profile)
     comp = composition_for(post, profile, role)
-    count = platform.count(comp, limits)
-    rep = TargetReport(profile, platform, limits, count)
+    parts = thread_parts(post, comp, platform, limits)
+    if len(parts) > 1:
+        # Im Thread zählt der längste Teil
+        counts = [platform.count(replace(comp, text=p, media=[]), limits) for p in parts]
+        count = max(counts, key=lambda c: c.used)
+    else:
+        count = platform.count(comp, limits)
+    rep = TargetReport(profile, platform, limits, count, parts=parts)
     add = rep.issues.append
 
     if profile.status in (ProfileStatus.EXPIRED, ProfileStatus.ERROR):

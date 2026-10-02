@@ -59,6 +59,8 @@ class Role:
     signature: str = ""
     ai_style: str = ""
     avatar_path: str | None = None
+    #: Feste Zeitslots: [[Wochentag 0=Montag, "HH:MM"], …] in der lokalen Zeitzone
+    slots: list[list[object]] = field(default_factory=list)
     id: int | None = None
     uuid: str = field(default_factory=new_uuid)
 

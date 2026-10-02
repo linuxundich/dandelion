@@ -114,6 +114,7 @@ template $DandelionWindow: Adw.ApplicationWindow {
 
     setters {
       switcher_bar.reveal: true;
+      header_bar.title-widget: null;
       header_bar.show-title: false;
       publish_button.label: _("_Send");
     }
@@ -125,6 +126,11 @@ menu publish_menu {
     item {
       label: _("_Schedule…");
       action: "win.schedule";
+    }
+
+    item {
+      label: _("In Next _Free Slot");
+      action: "win.schedule-slot";
     }
   }
 }

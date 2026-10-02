@@ -51,11 +51,13 @@ class DandelionScheduleDialog(Adw.Dialog):
 
     def __init__(self, *, initial: datetime | None, timezone: str | None,
                  service_active: bool, on_schedule: Callable[[datetime, str], None],
-                 on_enable_service: Callable[[], None]) -> None:
+                 on_enable_service: Callable[[], None],
+                 next_slot: datetime | None = None) -> None:
         super().__init__()
         self._loading = True
         self._on_schedule = on_schedule
         self._on_enable = on_enable_service
+        self._next_slot = next_slot
         self.service_banner.set_revealed(not service_active)
 
         self.zones = all_timezones()
@@ -94,7 +96,13 @@ class DandelionScheduleDialog(Adw.Dialog):
         today = now.replace(second=0, microsecond=0)
         tomorrow = today + timedelta(days=1)
         monday = today + timedelta(days=(7 - today.weekday()) or 7)
-        presets = [(_("In One Hour"), (now + timedelta(hours=1)).replace(second=0, microsecond=0))]
+        presets: list[tuple[str, datetime]] = []
+        if self._next_slot:
+            presets.append((_("Next Free Slot · {when}").format(
+                when=self._next_slot.astimezone(tzinfo).strftime("%a %d.%m. %H:%M")),
+                self._next_slot))
+        presets.append((_("In One Hour"),
+                        (now + timedelta(hours=1)).replace(second=0, microsecond=0)))
         if now.hour < 17:
             presets.append((_("This Evening, 18:00"), today.replace(hour=18, minute=0)))
         presets += [
@@ -102,9 +110,11 @@ class DandelionScheduleDialog(Adw.Dialog):
             (_("Tomorrow, 12:00"), tomorrow.replace(hour=12, minute=0)),
             (_("Monday, 08:00"), monday.replace(hour=8, minute=0)),
         ]
-        for label, when in presets:
+        for i, (label, when) in enumerate(presets):
             btn = Gtk.Button(label=label)
             btn.add_css_class("pill")
+            if i == 0 and self._next_slot:
+                btn.add_css_class("accent-pill")
             btn.connect("clicked", lambda _b, w=when: self._apply_preset(w))
             self.presets_box.append(btn)
 

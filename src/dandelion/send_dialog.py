@@ -53,6 +53,10 @@ class TargetRow(Adw.ActionRow):
             _u, i, n = stage.split(":")
             self.stack.set_visible_child_name("busy")
             self.set_subtitle(_("Uploading media {i} of {n}").format(i=i, n=n))
+        elif stage.startswith("part:"):
+            _p, i, n = stage.split(":")
+            self.stack.set_visible_child_name("busy")
+            self.set_subtitle(_("Publishing part {i} of {n}").format(i=i, n=n))
         elif stage in ("start", "posting"):
             self.stack.set_visible_child_name("busy")
             self.set_subtitle(_("Publishing") if stage == "posting" else _("Preparing"))

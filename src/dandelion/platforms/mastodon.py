@@ -245,18 +245,58 @@ class Mastodon(Platform):
     async def post(self, profile: Profile, comp: Composition, media_refs: list[str], *,
                    reply_to: TargetPart | None, root: TargetPart | None,
                    idempotency_key: str) -> TargetPart:
-        form: dict[str, Any] = {
+        form = {**self._status_form(comp, media_refs),
+                "in_reply_to_id": reply_to.remote_id if reply_to else None}
+        resp = await self._api(profile, "POST", "/api/v1/statuses", form=form,
+                               headers={"Idempotency-Key": idempotency_key})
+        st = resp.json()
+        return TargetPart(idx=0, remote_id=str(st["id"]), remote_url=st.get("url") or st.get("uri"))
+
+    # -- Serverseitiges Planen ---------------------------------------------
+    def _status_form(self, comp: Composition, media_refs: list[str]) -> dict[str, Any]:
+        return {
             "status": comp.text,
             "media_ids[]": [json.loads(r)["id"] for r in media_refs] or None,
             "spoiler_text": comp.content_warning or None,
             "sensitive": True if comp.content_warning else None,
             "visibility": comp.visibility or None,
             "language": comp.language or None,
-            "in_reply_to_id": reply_to.remote_id if reply_to else None,
         }
+
+    async def schedule_remote(self, profile: Profile, comp: Composition, media_refs: list[str],
+                              at: str, idempotency_key: str) -> str:
+        """Legt einen geplanten Beitrag auf dem Server an und liefert dessen ID."""
+        form = {**self._status_form(comp, media_refs), "scheduled_at": at}
         resp = await self._api(profile, "POST", "/api/v1/statuses", form=form,
                                headers={"Idempotency-Key": idempotency_key})
-        st = resp.json()
+        data = resp.json() or {}
+        if "scheduled_at" not in data:
+            raise PlatformError(_("The server published the post immediately instead of "
+                                  "scheduling it."), json_or_text(data))
+        return str(data["id"])
+
+    async def cancel_remote(self, profile: Profile, scheduled_id: str) -> None:
+        try:
+            await self._api(profile, "DELETE", f"/api/v1/scheduled_statuses/{scheduled_id}")
+        except PlatformError as e:
+            if "404" not in e.detail and "not found" not in e.message.lower():
+                raise
+
+    async def find_published(self, profile: Profile, at: str) -> TargetPart | None:
+        """Sucht den vom Server veröffentlichten Beitrag zum geplanten Zeitpunkt."""
+        from datetime import datetime
+        planned = datetime.fromisoformat(at)
+        resp = await self._api(profile, "GET", f"/api/v1/accounts/{profile.remote_id}/statuses",
+                               params={"limit": 20, "exclude_reblogs": True})
+        best: tuple[float, dict[str, Any]] | None = None
+        for st in resp.json() or []:
+            created = datetime.fromisoformat(str(st["created_at"]).replace("Z", "+00:00"))
+            diff = abs((created - planned).total_seconds())
+            if diff <= 15 * 60 and (best is None or diff < best[0]):
+                best = (diff, st)
+        if best is None:
+            return None
+        st = best[1]
         return TargetPart(idx=0, remote_id=str(st["id"]), remote_url=st.get("url") or st.get("uri"))
 
     async def delete(self, profile: Profile, part: TargetPart) -> None:

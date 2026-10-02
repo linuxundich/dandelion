@@ -23,9 +23,13 @@
 - **Preview** for every profile. Profiles that would look the same share one
   tile, problems are shown right in the tile.
 - **Alt text** is required for Mastodon and suggested everywhere else.
+- **Threads:** long posts are split into numbered parts on Mastodon, Bluesky and
+  X – at paragraphs, sentences or words, or by hand with a `---` line.
 - **Scheduling** with a background service that also works while the window is
   closed. Missed posts (computer off or asleep) are reported instead of being
-  sent silently.
+  sent silently. Mastodon posts can optionally be scheduled on the server.
+- **Calendar and time slots:** a month view with drag and drop, and fixed time
+  slots per role (“next free slot”).
 - **History** with links to every post, retry for failed profiles and deletion
   on the platform.
 - **Optional writing assistant** with Google Gemini, OpenAI or xAI: rephrase,

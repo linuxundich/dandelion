@@ -99,6 +99,7 @@ class DandelionComposer(Adw.BreakpointBin):
     cw_revealer: Gtk.Revealer = Gtk.Template.Child()
     cw_entry: Gtk.Entry = Gtk.Template.Child()
     cw_button: Gtk.ToggleButton = Gtk.Template.Child()
+    thread_button: Gtk.ToggleButton = Gtk.Template.Child()
     text_view: GtkSource.View = Gtk.Template.Child()
     editor_scroller: Gtk.ScrolledWindow = Gtk.Template.Child()
     media_tiles: Gtk.Box = Gtk.Template.Child()
@@ -639,6 +640,17 @@ class DandelionComposer(Adw.BreakpointBin):
             self._changed()
 
     @Gtk.Template.Callback()
+    def on_thread_toggled(self, button: Gtk.ToggleButton) -> None:
+        if self._loading:
+            return
+        if button.get_active():
+            numbering = self.settings.get_string("thread-numbering")
+            self.post.thread_mode = "plain" if numbering == "off" else numbering
+        else:
+            self.post.thread_mode = "off"
+        self._changed()
+
+    @Gtk.Template.Callback()
     def on_signature_toggled(self, button: Gtk.ToggleButton) -> None:
         if not self._loading:
             self.post.use_signature = button.get_active()
@@ -699,6 +711,9 @@ class DandelionComposer(Adw.BreakpointBin):
         platforms = {p.platform for p in selected}
         self.visibility_dropdown.set_visible("mastodon" in platforms)
         self.label_dropdown.set_visible("bluesky" in platforms and bool(self.post.media))
+        self.thread_button.set_visible(any(
+            self.app.registry.get(p).default_limits().supports_threads
+            for p in platforms if p in self.app.registry))
         self._update_status_strip()
         self._rebuild_ai_menu()
         self._update_issues()
@@ -743,6 +758,12 @@ class DandelionComposer(Adw.BreakpointBin):
             counter.add_css_class("numeric")
             counter.add_css_class("dim-label")
             box.append(counter)
+            if len(t.parts) > 1:
+                parts_label = Gtk.Label(label=f"· {len(t.parts)}×")
+                parts_label.add_css_class("dim-label")
+                parts_label.set_tooltip_text(ngettext("{n} part", "{n} parts", len(t.parts)).format(
+                    n=len(t.parts)))
+                box.append(parts_label)
             state = _("within the limit")
             errors = [i for i in t.issues if i.severity == "error"]
             if c.over:
@@ -922,7 +943,7 @@ class DandelionComposer(Adw.BreakpointBin):
                 comp.content_warning if t.limits.supports_content_warning else "",
                 comp.content_label or "",
                 tuple((m.path, m.alt_text) for m in comp.media),
-                t.count.used, t.count.limit,
+                t.count.used, t.count.limit, tuple(t.parts),
                 tuple((i.severity, i.code, i.message) for i in t.issues),
             )
             groups.setdefault(key, []).append((t, comp))
@@ -941,7 +962,8 @@ class DandelionComposer(Adw.BreakpointBin):
             compact = (self.settings.get_boolean("preview-compact")
                        or self.layout_view.get_layout_name() == "narrow")
             tile = PreviewTile(t.platform, [it[0].profile for it in items], comp, t.limits,
-                               t.count, self.avatars, card, accent, t.issues, compact=compact)
+                               t.count, self.avatars, card, accent, t.issues, compact=compact,
+                               parts=t.parts)
             for it in items:
                 self._tile_for_profile[it[0].profile.id] = tile
             self.preview_tiles.append(tile)
@@ -1213,6 +1235,7 @@ class DandelionComposer(Adw.BreakpointBin):
         self.cw_entry.set_text(post.content_warning)
         self.cw_revealer.set_reveal_child(bool(post.content_warning))
         self.signature_button.set_active(post.use_signature)
+        self.thread_button.set_active(post.thread_mode != "off")
         self._select_language(post.language or (self.role.language if self.role else None))
         self._select_visibility(post.visibility or (self.role.visibility if self.role else None))
         label = post.bluesky_label or ""
@@ -1238,6 +1261,8 @@ class DandelionComposer(Adw.BreakpointBin):
         if self.post.id is None and self.post.is_empty():
             return
         new = self.post.id is None
+        if self.post.state != PostState.DRAFT:
+            GLib.idle_add(lambda: (self.app.scheduling._queue_remote_sync(5), False)[1])
         try:
             self.store.save_post(self.post, guard_editable=True)
         except PostLocked:
@@ -1538,6 +1563,30 @@ class DandelionComposer(Adw.BreakpointBin):
             self.load_post(post)
             self.win.stack.set_visible_child_name("composer")
 
+    def next_slot(self, exclude_iso: str | None = None) -> datetime | None:
+        """Nächster freier Zeitslot der aktuellen Rolle (oder None)."""
+        from zoneinfo import ZoneInfo
+
+        from .core.slots import next_free_slot
+        from .schedule_dialog import system_timezone
+        role = self.role
+        if not role or not role.slots:
+            return None
+        tz = ZoneInfo(self.settings.get_string("default-timezone") or system_timezone())
+        taken = [datetime.fromisoformat(x) for x in self.store.scheduled_times(role.id)
+                 if x != exclude_iso]
+        return next_free_slot(role.slots, taken, datetime.now(tz))
+
+    def schedule_next_slot(self) -> None:
+        self._refresh.flush()
+        if not self.report or not self.props.can_publish:
+            return
+        when = self.next_slot(self.post.scheduled_at)
+        if when is None:
+            self.win.toast(_("This role has no time slots. Add them in the role settings."))
+            return
+        self._do_schedule(when, str(when.tzinfo))
+
     def schedule(self) -> None:
         self._refresh.flush()
         if not self.report or not self.props.can_publish:
@@ -1551,7 +1600,8 @@ class DandelionComposer(Adw.BreakpointBin):
         DandelionScheduleDialog(initial=initial, timezone=tz,
                                 service_active=self.app.scheduling.props.active,
                                 on_schedule=self._do_schedule,
-                                on_enable_service=lambda: self.app.scheduling.enable(self.win)
+                                on_enable_service=lambda: self.app.scheduling.enable(self.win),
+                                next_slot=self.next_slot(self.post.scheduled_at)
                                 ).present(self.win)
 
     def _do_schedule(self, when: datetime, tz: str) -> None:

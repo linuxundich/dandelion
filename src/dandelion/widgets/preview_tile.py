@@ -66,7 +66,7 @@ class PreviewTile(Gtk.Box):
     def __init__(self, platform: Platform, profiles: list[Profile], comp: Composition,
                  limits: PlatformLimits, count: Count, avatars: AvatarCache,
                  card: LinkCard | None, accent_hex: str, issues: list[Issue] | None = None,
-                 compact: bool = False) -> None:
+                 compact: bool = False, parts: list[str] | None = None) -> None:
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=8 if compact else 10)
         self.compact = compact
         self.profile_ids = {p.id for p in profiles}
@@ -101,7 +101,8 @@ class PreviewTile(Gtk.Box):
         head.append(names)
         self.append(head)
 
-        text = platform.display_text(comp.text)
+        parts = parts if parts and len(parts) > 1 else None
+        text = platform.display_text(parts[0] if parts else comp.text)
         shown, truncated = _truncate(text, limits.preview_truncate)
         body = Gtk.Label(wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, selectable=False)
         body.set_markup(_markup(shown).replace("{accent}", accent_hex))
@@ -132,6 +133,9 @@ class PreviewTile(Gtk.Box):
             content.append(self._grid(images, limits.max_images))
         elif card and (card.title or card.description):
             content.append(self._card(card))
+
+        if parts:
+            content.append(self._thread(parts[1:], platform, accent_hex, compact))
 
         if comp.content_warning and limits.supports_content_warning:
             cw = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
@@ -182,6 +186,27 @@ class PreviewTile(Gtk.Box):
         if issues:
             worst = "error" if any(i.severity == "error" for i in issues) else "warning"
             self.add_css_class(f"has-{worst}")
+
+    def _thread(self, rest: list[str], platform: Platform, accent_hex: str,
+                compact: bool) -> Gtk.Widget:
+        """Weitere Teile eines Threads, kompakt nur als Hinweis."""
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        box.add_css_class("preview-thread")
+        if compact:
+            hint = Gtk.Label(label=ngettext("Thread: {n} more part", "Thread: {n} more parts",
+                                            len(rest)).format(n=len(rest)), xalign=0)
+            hint.add_css_class("caption-heading")
+            hint.add_css_class("accent")
+            box.append(hint)
+            return box
+        for i, part in enumerate(rest, 2):
+            label = Gtk.Label(wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0)
+            label.set_markup(_markup(platform.display_text(part)).replace("{accent}", accent_hex))
+            label.add_css_class("preview-text")
+            label.update_property([Gtk.AccessibleProperty.LABEL],
+                                  [_("Part {i}: {text}").format(i=i, text=part)])
+            box.append(label)
+        return box
 
     @staticmethod
     def _avatars(profiles: list[Profile], platform_id: str, avatars: AvatarCache) -> Gtk.Widget:

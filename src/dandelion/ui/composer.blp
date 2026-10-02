@@ -441,6 +441,21 @@ template $DandelionComposer: Adw.BreakpointBin {
                           ]
                         }
 
+                        ToggleButton thread_button {
+                          visible: false;
+                          tooltip-text: _("Split into a thread when the text is too long. A line with only “---” sets a break by hand.");
+                          toggled => $on_thread_toggled();
+
+                          child: Adw.ButtonContent {
+                            icon-name: "view-list-ordered-symbolic";
+                            label: _("Thread");
+                          };
+
+                          styles [
+                            "flat",
+                          ]
+                        }
+
                         DropDown language_dropdown {
                           tooltip-text: _("Language");
                           enable-search: true;

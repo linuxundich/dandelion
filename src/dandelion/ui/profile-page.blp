@@ -68,6 +68,16 @@ template $DandelionProfilePage: Adw.NavigationPage {
         }
       }
 
+      Adw.PreferencesGroup server_group {
+        title: _("Scheduling");
+        visible: false;
+
+        Adw.SwitchRow server_row {
+          title: _("Schedule on the Server");
+          subtitle: _("Scheduled posts are handed to the server right away and appear even when your computer is off. At least five minutes ahead; threads are still sent by Dandelion.");
+        }
+      }
+
       Adw.PreferencesGroup {
         title: _("Display");
 

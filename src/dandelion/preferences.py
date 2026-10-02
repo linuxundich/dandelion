@@ -40,6 +40,7 @@ class DandelionPreferences(Adw.PreferencesDialog):
     signature_row: Adw.SwitchRow = Gtk.Template.Child()
     preview_row: Adw.SwitchRow = Gtk.Template.Child()
     retention_row: Adw.SpinRow = Gtk.Template.Child()
+    numbering_row: Adw.ComboRow = Gtk.Template.Child()
     service_row: Adw.SwitchRow = Gtk.Template.Child()
     next_row: Adw.ActionRow = Gtk.Template.Child()
     notify_success_row: Adw.SwitchRow = Gtk.Template.Child()
@@ -67,6 +68,10 @@ class DandelionPreferences(Adw.PreferencesDialog):
         s.bind("append-signature", self.signature_row, "active", flags)
         s.bind("show-preview", self.preview_row, "active", flags)
         s.bind("draft-retention-days", self.retention_row, "value", flags)
+        numbering = ("off", "fraction", "thread-fraction")
+        self.numbering_row.set_selected(numbering.index(s.get_string("thread-numbering")))
+        self.numbering_row.connect("notify::selected", lambda r, _p: s.set_string(
+            "thread-numbering", numbering[r.get_selected()]))
         s.bind("notify-success", self.notify_success_row, "active", flags)
         s.bind("notify-failure", self.notify_failure_row, "active", flags)
         s.bind("missed-grace-minutes", self.grace_row, "value", flags)
@@ -377,6 +382,7 @@ class DandelionRolePage(Adw.NavigationPage):
     visibility_row: Adw.ComboRow = Gtk.Template.Child()
     signature_row: Adw.EntryRow = Gtk.Template.Child()
     ai_style_row: Adw.EntryRow = Gtk.Template.Child()
+    slots_group: Adw.PreferencesGroup = Gtk.Template.Child()
 
     def __init__(self, prefs: DandelionPreferences, role: Role) -> None:
         super().__init__()
@@ -422,6 +428,8 @@ class DandelionRolePage(Adw.NavigationPage):
         self.visibility_row.connect("notify::selected", lambda *_: self._changed())
 
         self._fill_profiles()
+        self._slot_rows: list[Gtk.Widget] = []
+        self._fill_slots()
         self._loading = False
         self.connect("hidden", lambda *_: (self._save.flush(), self.prefs.reload()))
 
@@ -463,6 +471,61 @@ class DandelionRolePage(Adw.NavigationPage):
             check.connect("toggled", on_check)
             switch.connect("notify::active", on_switch)
             self.profiles_group.add(row)
+
+    _WEEKDAYS = (_("Monday"), _("Tuesday"), _("Wednesday"), _("Thursday"), _("Friday"),
+                 _("Saturday"), _("Sunday"))
+
+    def _fill_slots(self) -> None:
+        for row in self._slot_rows:
+            self.slots_group.remove(row)
+        self._slot_rows = []
+        for idx, (weekday, hm) in enumerate(sorted(self.role.slots,
+                                                   key=lambda s: (int(s[0]), str(s[1])))):
+            row = Adw.ActionRow(title=self._WEEKDAYS[int(weekday)], subtitle=str(hm))
+            row.add_prefix(Gtk.Image(icon_name="alarm-symbolic"))
+            remove = Gtk.Button(icon_name="user-trash-symbolic", valign=Gtk.Align.CENTER)
+            remove.add_css_class("flat")
+            label_widget(remove, _("Remove slot {day} {time}").format(
+                day=self._WEEKDAYS[int(weekday)], time=hm))
+            remove.connect("clicked", lambda _b, s=[weekday, hm]: self._remove_slot(s))
+            row.add_suffix(remove)
+            self.slots_group.add(row)
+            self._slot_rows.append(row)
+
+        add = Adw.ActionRow(title=_("Add Slot"))
+        day = Gtk.DropDown.new_from_strings(list(self._WEEKDAYS))
+        day.set_valign(Gtk.Align.CENTER)
+        label_widget(day, _("Weekday"))
+        hour = Gtk.SpinButton.new_with_range(0, 23, 1)
+        minute = Gtk.SpinButton.new_with_range(0, 55, 5)
+        hour.set_value(8)
+        for spin, name in ((hour, _("Hour")), (minute, _("Minute"))):
+            spin.set_valign(Gtk.Align.CENTER)
+            spin.set_wrap(True)
+            spin.set_numeric(True)
+            spin.connect("output", lambda sp: (sp.set_text(f"{int(sp.get_value()):02d}"), True)[1])
+            label_widget(spin, name)
+        button = Gtk.Button(icon_name="list-add-symbolic", valign=Gtk.Align.CENTER)
+        button.add_css_class("flat")
+        label_widget(button, _("Add Slot"))
+        button.connect("clicked", lambda *_: self._add_slot(
+            day.get_selected(), f"{int(hour.get_value()):02d}:{int(minute.get_value()):02d}"))
+        for w in (day, hour, Gtk.Label(label=":"), minute, button):
+            add.add_suffix(w)
+        self.slots_group.add(add)
+        self._slot_rows.append(add)
+
+    def _add_slot(self, weekday: int, hm: str) -> None:
+        if [weekday, hm] not in self.role.slots:
+            self.role.slots.append([weekday, hm])
+            self.store.save_role(self.role)
+        self._fill_slots()
+
+    def _remove_slot(self, slot: list[object]) -> None:
+        self.role.slots = [s for s in self.role.slots if [int(s[0]), str(s[1])] !=
+                           [int(slot[0]), str(slot[1])]]  # type: ignore[call-overload]
+        self.store.save_role(self.role)
+        self._fill_slots()
 
     def _set_color(self, color: str) -> None:
         self.role.color = color
@@ -530,6 +593,8 @@ class DandelionProfilePage(Adw.NavigationPage):
     status_icon: Gtk.Image = Gtk.Template.Child()
     limits_row: Adw.ActionRow = Gtk.Template.Child()
     label_row: Adw.EntryRow = Gtk.Template.Child()
+    server_group: Adw.PreferencesGroup = Gtk.Template.Child()
+    server_row: Adw.SwitchRow = Gtk.Template.Child()
 
     def __init__(self, prefs: DandelionPreferences, profile: Profile) -> None:
         super().__init__()
@@ -540,6 +605,16 @@ class DandelionProfilePage(Adw.NavigationPage):
         self.label_row.set_text(profile.label)
         self._loading = False
         self._save = Debouncer(400, lambda: self.app.store.save_profile(self.profile))
+        from .core.remote_schedule import server_scheduling, set_server_scheduling
+        self.server_group.set_visible(profile.platform == "mastodon")
+        self.server_row.set_active(server_scheduling(profile))
+
+        def on_server(row: Adw.SwitchRow, _pspec: object) -> None:
+            set_server_scheduling(self.profile, row.get_active())
+            self.app.store.save_profile(self.profile)
+            self.app.scheduling.schedule_changed()
+
+        self.server_row.connect("notify::active", on_server)
         self._show()
         self.connect("hidden", lambda *_: (self._save.flush(), self.prefs.reload()))
 

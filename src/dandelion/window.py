@@ -37,6 +37,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self._action("new-post", lambda *_: self.composer.new_post())
         self._action("publish", lambda *_: self.composer.publish())
         self._action("schedule", lambda *_: self.composer.schedule())
+        self._action("schedule-slot", lambda *_: self.composer.schedule_next_slot())
         self._action("save-draft", lambda *_: self.composer.save_now(toast=True))
         self._action("add-media", lambda *_: self.composer.open_file_dialog())
         self._action("choose-role", lambda *_: self.composer.popup_roles())
@@ -98,6 +99,9 @@ class DandelionWindow(Adw.ApplicationWindow):
     def _sync_publish(self, *_args: object) -> None:
         self.lookup_action("publish").set_enabled(self.composer.props.can_publish)
         self.lookup_action("schedule").set_enabled(self.composer.props.can_publish)
+        role = self.composer.role
+        self.lookup_action("schedule-slot").set_enabled(
+            self.composer.props.can_publish and bool(role and role.slots))
         self.publish_button.set_tooltip_text(self.composer.publish_tooltip())
 
     def _on_close(self, *_args: object) -> bool:

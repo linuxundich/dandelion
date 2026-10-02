@@ -43,3 +43,5 @@ src/dandelion/ai/base.py
 src/dandelion/ai/openai.py
 src/dandelion/ai/xai.py
 src/dandelion/ai/gemini.py
+src/dandelion/widgets/month_calendar.py
+src/dandelion/scheduling.py

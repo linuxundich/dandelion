@@ -9,10 +9,11 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw, Gio, GLib, Gtk
 
-from .core.models import Media, Post, PostState, Target, Variant
+from .core.models import Media, Post, PostState, Target, TargetState, Variant
 from .core.scheduler import to_utc_iso
 from .schedule_dialog import DandelionScheduleDialog
 from .util import label_widget, day_label, first_line
+from .widgets.month_calendar import DandelionMonthCalendar
 
 if TYPE_CHECKING:
     from .application import DandelionApplication
@@ -22,7 +23,7 @@ STATES = (PostState.MISSED, PostState.SCHEDULED, PostState.PAUSED)
 
 
 @Gtk.Template(resource_path="/de/linuxundich/Dandelion/ui/scheduled.ui")
-class DandelionScheduledView(Adw.Bin):
+class DandelionScheduledView(Adw.BreakpointBin):
     __gtype_name__ = "DandelionScheduledView"
 
     service_banner: Adw.Banner = Gtk.Template.Child()
@@ -30,6 +31,9 @@ class DandelionScheduledView(Adw.Bin):
     role_filter: Gtk.DropDown = Gtk.Template.Child()
     platform_filter: Gtk.DropDown = Gtk.Template.Child()
     list_box: Gtk.Box = Gtk.Template.Child()
+    mode_group: Adw.ToggleGroup = Gtk.Template.Child()
+    mode_stack: Gtk.Stack = Gtk.Template.Child()
+    calendar: DandelionMonthCalendar = Gtk.Template.Child()
 
     def setup(self, app: DandelionApplication, win: DandelionWindow) -> None:
         self.app, self.win = app, win
@@ -38,6 +42,54 @@ class DandelionScheduledView(Adw.Bin):
         app.scheduling.connect("notify::active", lambda *_: self._sync_banner())
         app.scheduling.connect("notify::available", lambda *_: self._sync_banner())
         self._sync_banner()
+        try:
+            mode = app.settings.get_string("scheduled-view")
+        except Exception:
+            mode = "list"
+        self.mode_group.set_active_name(mode if mode in ("list", "calendar") else "list")
+
+    @Gtk.Template.Callback()
+    def on_mode_changed(self, *_args: object) -> None:
+        mode = self.mode_group.get_active_name() or "list"
+        self.mode_stack.set_visible_child_name(mode)
+        if getattr(self, "app", None):
+            self.app.settings.set_string("scheduled-view", mode)
+            self.reload()
+
+    @Gtk.Template.Callback()
+    def on_calendar_activated(self, _cal: object, post_id: int) -> None:
+        post = self.app.store.load_post(post_id)
+        if post:
+            self._edit(post)
+
+    @Gtk.Template.Callback()
+    def on_calendar_moved(self, _cal: object, post_id: int, year: int, month: int,
+                          day: int) -> None:
+        from datetime import UTC
+        from zoneinfo import ZoneInfo
+        post = self.app.store.load_post(post_id)
+        if post is None or not post.scheduled_at:
+            return
+        tz = ZoneInfo(post.timezone) if post.timezone else None
+        old = datetime.fromisoformat(post.scheduled_at)
+        local = old.astimezone(tz) if tz else old.astimezone()
+        new = local.replace(year=year, month=month, day=day)
+        if new.date() == local.date():
+            return
+        if new <= datetime.now(UTC):
+            self.win.toast(_("This time is in the past."))
+            return
+        state = PostState.SCHEDULED if post.state == PostState.MISSED else post.state
+        store = self.app.store
+        store.set_post_schedule(post_id, state, to_utc_iso(new))
+        self._changed()
+
+        def undo() -> None:
+            store.set_post_schedule(post_id, post.state, post.scheduled_at)
+            self._changed()
+
+        from .schedule_dialog import format_when
+        self.win.toast(_("Moved to {when}").format(when=format_when(new)), _("_Undo"), undo)
 
     def _sync_banner(self) -> None:
         s = self.app.scheduling
@@ -90,6 +142,11 @@ class DandelionScheduledView(Adw.Bin):
                 t.enabled and profiles.get(t.profile_id) and
                 profiles[t.profile_id].platform == platform for t in p.targets)]
 
+        if (self.mode_group.get_active_name() or "list") == "calendar":
+            self.calendar.set_posts([(p, roles.get(p.role_id)) for p in posts])
+            self.stack.set_visible_child_name("list")
+            return
+
         missed = [p for p in posts if p.state == PostState.MISSED]
         if missed:
             group = Adw.PreferencesGroup(
@@ -137,6 +194,13 @@ class DandelionScheduledView(Adw.Bin):
         parts.append(", ".join(handles))
         row.set_subtitle(GLib.markup_escape_text(" · ".join(parts)))
 
+        remote = [profiles[t.profile_id].full_handle for t in post.targets
+                  if t.state == TargetState.SCHEDULED_REMOTE and t.profile_id in profiles]
+        if remote:
+            icon = Gtk.Image(icon_name="network-server-symbolic")
+            label_widget(icon, _("Scheduled on the server: {profiles}").format(
+                profiles=", ".join(remote)))
+            row.add_suffix(icon)
         if post.state == PostState.PAUSED:
             badge = Gtk.Label(label=_("Paused"), valign=Gtk.Align.CENTER)
             badge.add_css_class("state-badge")
@@ -202,8 +266,21 @@ class DandelionScheduledView(Adw.Bin):
         DandelionScheduleDialog(initial=initial, timezone=post.timezone,
                                 service_active=self.app.scheduling.props.active,
                                 on_schedule=done,
-                                on_enable_service=lambda: self.app.scheduling.enable(self.win)
-                                ).present(self.win)
+                                on_enable_service=lambda: self.app.scheduling.enable(self.win),
+                                next_slot=self._next_slot(post)).present(self.win)
+
+    def _next_slot(self, post: Post) -> datetime | None:
+        from zoneinfo import ZoneInfo
+
+        from .core.slots import next_free_slot
+        from .schedule_dialog import system_timezone
+        role = self.app.store.role(post.role_id) if post.role_id else None
+        if not role or not role.slots:
+            return None
+        tz = ZoneInfo(self.app.settings.get_string("default-timezone") or system_timezone())
+        taken = [datetime.fromisoformat(x) for x in self.app.store.scheduled_times(role.id)
+                 if x != post.scheduled_at]
+        return next_free_slot(role.slots, taken, datetime.now(tz))
 
     def _toggle_pause(self, post: Post) -> None:
         state = PostState.SCHEDULED if post.state == PostState.PAUSED else PostState.PAUSED

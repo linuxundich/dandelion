@@ -8,6 +8,7 @@ Hintergrunddienst).
 
 from __future__ import annotations
 
+import json
 import os
 import sqlite3
 from collections.abc import Iterable
@@ -28,7 +29,7 @@ from .models import (
     now_iso,
 )
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 #: Zustände, in denen ein Beitrag noch bearbeitet werden darf
 EDITABLE_STATES = ("draft", "scheduled", "paused", "missed")
@@ -38,6 +39,9 @@ class PostLocked(Exception):
     """Der Beitrag wird gerade gesendet oder ist schon veröffentlicht."""
 
 _MIGRATIONS: dict[int, str] = {
+    2: """
+ALTER TABLE role ADD COLUMN slots_json TEXT NOT NULL DEFAULT '[]';
+""",
     1: """
 CREATE TABLE role (
   id            INTEGER PRIMARY KEY,
@@ -200,6 +204,14 @@ def cache_dir() -> Path:
     return path
 
 
+def _parse_slots(raw: str | None) -> list[list[object]]:
+    try:
+        data = json.loads(raw or "[]")
+    except ValueError:
+        return []
+    return [[int(d), str(t)] for d, t in data if isinstance(t, str)]
+
+
 class Store:
     def __init__(self, path: str | Path | None = None) -> None:
         self.path = str(path) if path is not None else str(data_dir() / "dandelion.db")
@@ -251,6 +263,7 @@ class Store:
             color=row["color"], avatar_path=row["avatar_path"], position=row["position"],
             language=row["language"], visibility=row["visibility"],
             signature=row["signature"], ai_style=row["ai_style"],
+            slots=_parse_slots(row["slots_json"]),
         )
 
     def roles(self) -> list[Role]:
@@ -260,6 +273,13 @@ class Store:
     def role(self, role_id: int) -> Role | None:
         row = self.db.execute("SELECT * FROM role WHERE id = ?", (role_id,)).fetchone()
         return self._role(row) if row else None
+
+    def scheduled_times(self, role_id: int | None) -> list[str]:
+        """Geplante Zeitpunkte einer Rolle (für die Slot-Belegung)."""
+        rows = self.db.execute(
+            "SELECT scheduled_at FROM post WHERE state IN ('scheduled', 'paused')"
+            " AND deleted_at IS NULL AND scheduled_at IS NOT NULL AND role_id IS ?", (role_id,))
+        return [r[0] for r in rows]
 
     def role_by_uuid(self, uuid: str) -> Role | None:
         row = self.db.execute("SELECT * FROM role WHERE uuid = ?", (uuid,)).fetchone()
@@ -273,18 +293,20 @@ class Store:
                 role.position = row[0]
             cur = self.db.execute(
                 "INSERT INTO role (uuid, name, emoji, color, avatar_path, position, language,"
-                " visibility, signature, ai_style, created_at, updated_at)"
-                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                " visibility, signature, ai_style, slots_json, created_at, updated_at)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (role.uuid, role.name, role.emoji, role.color, role.avatar_path, role.position,
-                 role.language, role.visibility, role.signature, role.ai_style, ts, ts),
+                 role.language, role.visibility, role.signature, role.ai_style,
+                 json.dumps(role.slots), ts, ts),
             )
             role.id = cur.lastrowid
         else:
             self.db.execute(
                 "UPDATE role SET name=?, emoji=?, color=?, avatar_path=?, position=?, language=?,"
-                " visibility=?, signature=?, ai_style=?, updated_at=? WHERE id=?",
+                " visibility=?, signature=?, ai_style=?, slots_json=?, updated_at=? WHERE id=?",
                 (role.name, role.emoji, role.color, role.avatar_path, role.position, role.language,
-                 role.visibility, role.signature, role.ai_style, ts, role.id),
+                 role.visibility, role.signature, role.ai_style, json.dumps(role.slots), ts,
+                 role.id),
             )
         return role
 
@@ -549,6 +571,14 @@ class Store:
     def post_state(self, post_id: int) -> PostState | None:
         row = self.db.execute("SELECT state FROM post WHERE id = ?", (post_id,)).fetchone()
         return PostState(row[0]) if row else None
+
+    def remote_candidates(self) -> list[tuple[int, bool]]:
+        """Beiträge, die serverseitig geplant sein könnten oder es noch sind."""
+        rows = self.db.execute(
+            "SELECT id, deleted_at IS NOT NULL FROM post WHERE"
+            " (state IN ('scheduled', 'paused', 'missed') AND deleted_at IS NULL)"
+            " OR id IN (SELECT post_id FROM post_target WHERE state = 'scheduled_remote')")
+        return [(r[0], bool(r[1])) for r in rows]
 
     def due_post_ids(self, now: str) -> list[int]:
         rows = self.db.execute(

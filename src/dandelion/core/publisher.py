@@ -12,7 +12,9 @@ from gettext import gettext as _
 
 from ..platforms import Registry
 from ..platforms.base import PlatformError
-from .compose import composition_for
+from dataclasses import replace
+
+from .compose import composition_for, thread_parts
 from .models import Post, PostState, Target, TargetPart, TargetState, now_iso
 from .store import Store
 
@@ -90,6 +92,9 @@ class Publisher:
             notify("failed")
             return
         platform = self.registry.get(profile.platform)
+        if t.state == TargetState.SCHEDULED_REMOTE:
+            await self._resolve_remote(post, profile, platform, t, notify)
+            return
         comp = composition_for(post, profile, role)
         t.state = TargetState.SENDING
         t.attempts += 1
@@ -99,29 +104,26 @@ class Publisher:
 
         for attempt in range(len(RETRY_DELAYS) + 1):
             try:
-                refs: list[str] = []
-                for i, m in enumerate(comp.media):
-                    notify(f"upload:{i + 1}:{len(comp.media)}")
-                    cached = self.store.media_upload(m.id, profile.id) if m.id else None  # type: ignore[arg-type]
-                    if cached and json.loads(cached).get("_alt") == m.alt_text:
-                        refs.append(cached)
-                        continue
-                    ref = await platform.upload_media(profile, m)
-                    ref = json.dumps({**json.loads(ref), "_alt": m.alt_text})
-                    if m.id:
-                        ttl = UPLOAD_TTL.get(profile.platform, timedelta(minutes=30))
-                        self.store.save_media_upload(
-                            m.id, profile.id, ref,  # type: ignore[arg-type]
-                            (datetime.now(UTC) + ttl).isoformat(timespec="seconds"))
-                    refs.append(ref)
-                clean = [json.dumps({k: v for k, v in json.loads(r).items() if k != "_alt"})
-                         for r in refs]
-                notify("posting")
-                part: TargetPart = await platform.post(
-                    profile, comp, clean, reply_to=None, root=None,
-                    idempotency_key=t.idempotency_key)
-                t.parts = [part]
-                t.remote_url = part.remote_url
+                clean = await self.upload(platform, profile, comp, notify)
+                limits = platform.limits_for(profile)
+                texts = thread_parts(post, comp, platform, limits)
+                done = {p.idx: p for p in t.parts if p.remote_id}
+                for idx, text in enumerate(texts):
+                    if idx in done:
+                        continue        # bei Wiederholung nicht doppelt senden
+                    notify("posting" if len(texts) == 1 else f"part:{idx + 1}:{len(texts)}")
+                    previous = done.get(idx - 1)
+                    root = done.get(0)
+                    part: TargetPart = await platform.post(
+                        profile, replace(comp, text=text, media=comp.media if idx == 0 else []),
+                        clean if idx == 0 else [], reply_to=previous, root=root,
+                        idempotency_key=t.idempotency_key if idx == 0
+                        else f"{t.idempotency_key}-{idx}")
+                    part.idx = idx
+                    done[idx] = part
+                    t.parts = [done[i] for i in sorted(done)]
+                    t.remote_url = done[0].remote_url
+                    self.store.save_target(post.id, t)  # type: ignore[arg-type]
                 t.state = TargetState.PUBLISHED
                 t.published_at = now_iso()
                 self.store.save_target(post.id, t)  # type: ignore[arg-type]
@@ -144,6 +146,43 @@ class Publisher:
             break
         self.store.save_target(post.id, t)  # type: ignore[arg-type]
         notify("failed")
+
+    async def upload(self, platform, profile, comp, notify=None) -> list[str]:  # type: ignore[no-untyped-def]
+        """Lädt die Medien hoch (mit Cache) und liefert die Referenzen der Plattform."""
+        refs: list[str] = []
+        for i, m in enumerate(comp.media):
+            if notify:
+                notify(f"upload:{i + 1}:{len(comp.media)}")
+            cached = self.store.media_upload(m.id, profile.id) if m.id else None
+            if cached and json.loads(cached).get("_alt") == m.alt_text:
+                refs.append(cached)
+                continue
+            ref = await platform.upload_media(profile, m)
+            ref = json.dumps({**json.loads(ref), "_alt": m.alt_text})
+            if m.id:
+                ttl = UPLOAD_TTL.get(profile.platform, timedelta(minutes=30))
+                self.store.save_media_upload(
+                    m.id, profile.id, ref,
+                    (datetime.now(UTC) + ttl).isoformat(timespec="seconds"))
+            refs.append(ref)
+        return [json.dumps({k: v for k, v in json.loads(r).items() if k != "_alt"})
+                for r in refs]
+
+    async def _resolve_remote(self, post: Post, profile, platform, t: Target,  # type: ignore[no-untyped-def]
+                              notify) -> None:
+        """Ein auf dem Server geplanter Beitrag ist fällig: Link nachtragen, nicht senden."""
+        part = None
+        if post.scheduled_at and hasattr(platform, "find_published"):
+            try:
+                part = await platform.find_published(profile, post.scheduled_at)
+            except PlatformError as e:
+                log.info("Server-Beitrag nicht gefunden: %s", e.message)
+        t.parts = [part] if part else []
+        t.remote_url = part.remote_url if part else None
+        t.state = TargetState.PUBLISHED
+        t.published_at = post.scheduled_at or now_iso()
+        self.store.save_target(post.id, t)  # type: ignore[arg-type]
+        notify("published")
 
     async def delete_remote(self, post_id: int, profile_id: int) -> None:
         post = self.store.load_post(post_id)

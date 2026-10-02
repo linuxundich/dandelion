@@ -77,6 +77,11 @@ template $DandelionRolePage: Adw.NavigationPage {
         }
       }
 
+      Adw.PreferencesGroup slots_group {
+        title: _("Time Slots");
+        description: _("Fixed times for this role, for example every Monday at 08:00. Used by “Next Free Slot” when scheduling.");
+      }
+
       Adw.PreferencesGroup {
         Adw.ButtonRow delete_row {
           title: _("Delete Role");

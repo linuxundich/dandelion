@@ -674,6 +674,62 @@ DE: dict[str, str | tuple[str, str]] = {
     "Scheduled posts with a background service": "Geplante Beiträge mit Hintergrunddienst",
     "Optional writing assistant": "Optionaler Schreibassistent",
     "Copy redirect address": "Redirect-Adresse kopieren",
+    # Threads, serverseitiges Planen, Kalender, Zeitslots
+    "View of scheduled posts (list or calendar)": "Ansicht der geplanten Beiträge (Liste oder Kalender)",
+    "In Next _Free Slot": "In nächsten _freien Slot",
+    "Split into a thread when the text is too long. A line with only “---” sets a break by hand.":
+        "Bei zu langem Text in einen Thread aufteilen. Eine Zeile nur mit „---“ setzt eine Trennstelle von Hand.",
+    "Thread": "Thread",
+    "Thread Numbering": "Thread-Nummerierung",
+    "Added to every part of a thread": "Wird an jeden Teil eines Threads angehängt",
+    "None": "Keine",
+    "Time Slots": "Zeitslots",
+    "Fixed times for this role, for example every Monday at 08:00. Used by “Next Free Slot” when scheduling.":
+        "Feste Termine für diese Rolle, zum Beispiel jeden Montag um 08:00. „Nächster freier Slot“ beim Planen nutzt sie.",
+    "Schedule on the Server": "Auf dem Server planen",
+    "Scheduled posts are handed to the server right away and appear even when your computer is off. At least five minutes ahead; threads are still sent by Dandelion.":
+        "Geplante Beiträge gehen sofort an den Server und erscheinen auch, wenn dein Rechner aus ist. Mindestens fünf Minuten Vorlauf; Threads sendet weiterhin Dandelion.",
+    "List": "Liste",
+    "Calendar": "Kalender",
+    "{n} part": ("{n} Teil", "{n} Teile"),
+    "This role has no time slots. Add them in the role settings.":
+        "Diese Rolle hat keine Zeitslots. Lege sie in den Rolleneinstellungen an.",
+    "Monday": "Montag",
+    "Tuesday": "Dienstag",
+    "Wednesday": "Mittwoch",
+    "Thursday": "Donnerstag",
+    "Friday": "Freitag",
+    "Saturday": "Samstag",
+    "Sunday": "Sonntag",
+    "Remove slot {day} {time}": "Slot {day} {time} entfernen",
+    "Add Slot": "Slot hinzufügen",
+    "Weekday": "Wochentag",
+    "Publishing part {i} of {n}": "Veröffentliche Teil {i} von {n}",
+    "The server published the post immediately instead of scheduling it.":
+        "Der Server hat den Beitrag sofort veröffentlicht, statt ihn zu planen.",
+    "Thread: {n} more part": ("Thread: {n} weiterer Teil", "Thread: {n} weitere Teile"),
+    "Part {i}: {text}": "Teil {i}: {text}",
+    "Next Free Slot · {when}": "Nächster freier Slot · {when}",
+    "Moved to {when}": "Verschoben auf {when}",
+    "Scheduled on the server: {profiles}": "Auf dem Server geplant: {profiles}",
+    "Previous Month": "Vorheriger Monat",
+    "Next Month": "Nächster Monat",
+    "_Today": "_Heute",
+    "{day}: {n} post": ("{day}: {n} Beitrag", "{day}: {n} Beiträge"),
+    "+{n} more": "+{n} weitere",
+    "paused": "pausiert",
+    "missed": "verpasst",
+    "Scheduling on the server failed, Dandelion sends the post itself: {error}":
+        "Planen auf dem Server fehlgeschlagen, Dandelion sendet den Beitrag selbst: {error}",
+    # Release 0.2.0
+    "Long posts can be split into threads on Mastodon, Bluesky and X":
+        "Lange Beiträge lassen sich auf Mastodon, Bluesky und X in Threads aufteilen",
+    "Mastodon posts can be scheduled on the server, so they appear even when the computer is off":
+        "Mastodon-Beiträge lassen sich auf dem Server planen und erscheinen so auch bei ausgeschaltetem Rechner",
+    "Calendar view for scheduled posts with drag and drop":
+        "Kalenderansicht für geplante Beiträge mit Ziehen und Ablegen",
+    "Time slots per role and scheduling into the next free slot":
+        "Zeitslots pro Rolle und Planen in den nächsten freien Slot",
 }
 
 

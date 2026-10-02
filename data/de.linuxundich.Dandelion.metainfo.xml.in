@@ -79,6 +79,16 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.0" date="2026-10-02">
+      <description>
+        <ul>
+          <li>Long posts can be split into threads on Mastodon, Bluesky and X</li>
+          <li>Mastodon posts can be scheduled on the server, so they appear even when the computer is off</li>
+          <li>Calendar view for scheduled posts with drag and drop</li>
+          <li>Time slots per role and scheduling into the next free slot</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-10-02">
       <description>
         <p>First release.</p>
