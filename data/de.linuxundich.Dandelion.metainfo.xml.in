@@ -79,6 +79,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.1" date="2026-10-02">
+      <description>
+        <ul>
+          <li>New icon: the seeds fly away from the dandelion like rays</li>
+          <li>Flatpak bundle with translations included</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.2.0" date="2026-10-02">
       <description>
         <ul>

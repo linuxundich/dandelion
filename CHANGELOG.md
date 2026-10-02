@@ -2,6 +2,19 @@
 
 All notable changes to Dandelion are listed here.
 
+## 0.2.1 – 2026-10-02
+
+### Changed
+
+- **New icon:** the seeds now fly away from the centre of the dandelion like rays,
+  with dotted flight trails. The symbolic icon on the welcome page follows the same
+  idea with three extended rays.
+
+### Added
+
+- Flatpak manifest for release builds (`de.linuxundich.Dandelion.release.json`)
+  and a shareable single-file bundle; translations are included in the bundle.
+
 ## 0.2.0 – 2026-10-02
 
 ### Added

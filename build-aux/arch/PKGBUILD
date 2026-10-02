@@ -1,6 +1,6 @@
 # Maintainer: Christoph Langner <mail@christoph-langner.de>
 pkgname=dandelion
-pkgver=0.2.0
+pkgver=0.2.1
 pkgrel=1
 pkgdesc="Write once, post to Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 arch=('any')

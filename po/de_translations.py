@@ -730,6 +730,11 @@ DE: dict[str, str | tuple[str, str]] = {
         "Kalenderansicht für geplante Beiträge mit Ziehen und Ablegen",
     "Time slots per role and scheduling into the next free slot":
         "Zeitslots pro Rolle und Planen in den nächsten freien Slot",
+    # Release 0.2.1
+    "New icon: the seeds fly away from the dandelion like rays":
+        "Neues Icon: Die Samen fliegen strahlenförmig von der Pusteblume davon",
+    "Flatpak bundle with translations included":
+        "Flatpak-Paket mit enthaltenen Übersetzungen",
 }
 
 

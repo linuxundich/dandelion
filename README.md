@@ -70,9 +70,30 @@ The PKGBUILD lives in [`build-aux/arch/`](build-aux/arch/PKGBUILD).
 
 ### Flatpak
 
+From a bundle (`dandelion-<version>-x86_64.flatpak`); the GNOME runtime is
+fetched from Flathub automatically:
+
 ```bash
+flatpak install --user dandelion-0.2.1-x86_64.flatpak
+```
+
+Build it yourself from the release tag, or from your working copy:
+
+```bash
+flatpak-builder --user --install --force-clean _flatpak build-aux/flatpak/de.linuxundich.Dandelion.release.json
 flatpak-builder --user --install --force-clean _flatpak build-aux/flatpak/de.linuxundich.Dandelion.json
 ```
+
+Create a bundle to share:
+
+```bash
+flatpak-builder --force-clean --repo=_flatpak-repo _flatpak build-aux/flatpak/de.linuxundich.Dandelion.release.json
+flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+    _flatpak-repo dandelion-0.2.1-x86_64.flatpak de.linuxundich.Dandelion master
+```
+
+The Flatpak keeps its own data and keyring entries, so profiles are added
+again there.
 
 ### From source
 

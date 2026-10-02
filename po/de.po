@@ -121,38 +121,46 @@ msgid "Dark style"
 msgstr "Dunkler Stil"
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:85
+msgid "New icon: the seeds fly away from the dandelion like rays"
+msgstr "Neues Icon: Die Samen fliegen strahlenförmig von der Pusteblume davon"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+msgid "Flatpak bundle with translations included"
+msgstr "Flatpak-Paket mit enthaltenen Übersetzungen"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:93
 msgid "Long posts can be split into threads on Mastodon, Bluesky and X"
 msgstr "Lange Beiträge lassen sich auf Mastodon, Bluesky und X in Threads aufteilen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:94
 msgid "Mastodon posts can be scheduled on the server, so they appear even when the computer is off"
 msgstr "Mastodon-Beiträge lassen sich auf dem Server planen und erscheinen so auch bei ausgeschaltetem Rechner"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:87
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:95
 msgid "Calendar view for scheduled posts with drag and drop"
 msgstr "Kalenderansicht für geplante Beiträge mit Ziehen und Ablegen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:88
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:96
 msgid "Time slots per role and scheduling into the next free slot"
 msgstr "Zeitslots pro Rolle und Planen in den nächsten freien Slot"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:94
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:102
 msgid "First release."
 msgstr "Erste Veröffentlichung."
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:96
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:104
 msgid "Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 msgstr "Mastodon, Bluesky, LinkedIn, Facebook-Seiten und X"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:97
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:105
 msgid "Roles, profiles, previews and exact character counters"
 msgstr "Rollen, Profile, Vorschauen und exakte Zeichenzähler"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:98
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:106
 msgid "Scheduled posts with a background service"
 msgstr "Geplante Beiträge mit Hintergrunddienst"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:99
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:107
 msgid "Optional writing assistant"
 msgstr "Optionaler Schreibassistent"
 

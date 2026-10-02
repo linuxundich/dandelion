@@ -49,11 +49,27 @@ def parachute(x: float, y: float, deg: float, stalk: float, fan: float,
 # Vollfarbiges Icon, 128 × 128
 # --------------------------------------------------------------------------
 
+def lines_d(ls: list[tuple[float, float, float, float]]) -> str:
+    return " ".join(f"M {f(a)} {f(b)} L {f(c)} {f(e)}" for a, b, c, e in ls)
+
+
+def seed(x: float, y: float, deg: float, s: float) -> list[str]:
+    """Fliegender Samen: Korn innen, Schirm außen, entlang der Flugrichtung."""
+    lines = parachute(x, y, deg, 9 * s, 6.5 * s, spread=120, rays=5)
+    out = [f'  <path d="{lines_d(lines[:1])}" fill="none" stroke="{LIGHT1}" stroke-width="{f(1.6 * s)}" stroke-linecap="round"/>',
+           f'  <path d="{lines_d(lines[1:])}" fill="none" stroke="{LIGHT1}" stroke-width="{f(1.2 * s)}" stroke-linecap="round"/>']
+    for _, _, ex, ey in lines[1:]:
+        out.append(f'  <circle cx="{f(ex)}" cy="{f(ey)}" r="{f(1.3 * s)}" fill="{LIGHT1}"/>')
+    out.append(f'  <ellipse cx="{f(x)}" cy="{f(y)}" rx="{f(2.8 * s)}" ry="{f(1.6 * s)}" '
+               f'transform="rotate({f(deg)} {f(x)} {f(y)})" fill="{BROWN3}"/>')
+    return out
+
+
 def app_icon() -> str:
     cx, cy, r = 64.0, 60.0, 54.0       # Himmelsscheibe
-    hx, hy = 52.0, 56.0                # Mitte des Samenkopfs
-    head_r = 26.0
-    gap = (-62.0, -8.0)                # Lücke oben rechts: hier sind Samen weggeflogen
+    hx, hy = 48.0, 64.0                # Mitte des Samenkopfs
+    head_r = 24.0
+    gap = (-80.0, 8.0)                 # Lücke oben rechts: hier sind Samen weggeflogen
 
     out: list[str] = []
     out.append(f'''<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
@@ -64,7 +80,7 @@ def app_icon() -> str:
     </linearGradient>
     <radialGradient id="glow" cx="{f(hx)}" cy="{f(hy)}" r="{f(head_r + 4)}" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="{LIGHT1}" stop-opacity="0.5"/>
-      <stop offset="0.75" stop-color="{LIGHT1}" stop-opacity="0.3"/>
+      <stop offset="0.75" stop-color="{LIGHT1}" stop-opacity="0.28"/>
       <stop offset="1" stop-color="{LIGHT1}" stop-opacity="0"/>
     </radialGradient>
     <clipPath id="disc"><circle cx="{f(cx)}" cy="{f(cy)}" r="{f(r)}"/></clipPath>
@@ -100,39 +116,22 @@ def app_icon() -> str:
         for _, _, ex, ey in parachute(x1, y1, deg, 0, 5, spread=100, rays=4)[1:]:
             fans.append((x1, y1, ex, ey))
             tufts.append((ex, ey))
-    def lines_d(ls):
-        return " ".join(f"M {f(a)} {f(b)} L {f(c)} {f(e)}" for a, b, c, e in ls)
     out.append(f'  <path d="{lines_d(rays)}" fill="none" stroke="{LIGHT1}" stroke-width="1.1" stroke-linecap="round" opacity="0.9"/>')
     out.append(f'  <path d="{lines_d(fans)}" fill="none" stroke="{LIGHT1}" stroke-width="0.9" stroke-linecap="round"/>')
     out.append("  " + "".join(f'<circle cx="{f(x)}" cy="{f(y)}" r="1.15" fill="{LIGHT1}"/>' for x, y in tufts))
-    # Fruchtboden
+
+    # Fliegende Samen: strahlenförmig aus der Mitte durch die Lücke, mit Flugspur
+    for deg, dist, s in ((-70, 34, 0.85), (-48, 39, 0.95), (-26, 36, 0.9), (-4, 33, 0.8)):
+        x0, y0 = pol(hx, hy, head_r + 1, deg)
+        x1, y1 = pol(hx, hy, dist - 4, deg)
+        out.append(f'  <path d="M {f(x0)} {f(y0)} L {f(x1)} {f(y1)}" fill="none" stroke="{LIGHT1}" '
+                   f'stroke-width="1.4" stroke-linecap="round" stroke-dasharray="0.1 3.6" opacity="0.65"/>')
+        out += seed(*pol(hx, hy, dist, deg), deg, s)
+
+    # Fruchtboden zuletzt, damit er über den Strahlen liegt
     out.append(f'  <circle cx="{f(hx)}" cy="{f(hy + 1)}" r="7.5" fill="{BROWN4}"/>')
     out.append(f'  <circle cx="{f(hx)}" cy="{f(hy)}" r="7" fill="{BROWN3}"/>')
     out.append(f'  <circle cx="{f(hx - 2.2)}" cy="{f(hy - 2.2)}" r="2.4" fill="{BROWN2}"/>')
-
-    # Fliegende Samen: ein Beitrag verteilt sich auf mehrere Ziele
-    seeds = [  # (x, y, Flugrichtung in Grad, Größe)
-        (81.0, 34.0, -60.0, 0.9),
-        (90.0, 49.0, -35.0, 0.9),
-        (87.0, 66.0, -12.0, 0.85),
-    ]
-    trail_d = []
-    for (sx, sy, deg, s) in seeds:
-        a = math.degrees(math.atan2(sy - hy, sx - hx))
-        bx, by = pol(hx, hy, head_r + 1, a)
-        ex, ey = pol(sx, sy, 3.5, a + 180)
-        mx, my = (bx + ex) / 2, (by + ey) / 2 - 5
-        trail_d.append(f"M {f(bx)} {f(by)} Q {f(mx)} {f(my)} {f(ex)} {f(ey)}")
-    out.append(f'  <path d="{" ".join(trail_d)}" fill="none" stroke="{LIGHT1}" stroke-width="1.4" '
-               f'stroke-linecap="round" stroke-dasharray="0.1 3.6" opacity="0.65"/>')
-    for (sx, sy, deg, s) in seeds:
-        lines = parachute(sx, sy, deg, 9 * s, 6.5 * s, spread=120, rays=5)
-        out.append(f'  <path d="{lines_d(lines[:1])}" fill="none" stroke="{LIGHT1}" stroke-width="{f(1.6 * s)}" stroke-linecap="round"/>')
-        out.append(f'  <path d="{lines_d(lines[1:])}" fill="none" stroke="{LIGHT1}" stroke-width="{f(1.2 * s)}" stroke-linecap="round"/>')
-        for _, _, ex, ey in lines[1:]:
-            out.append(f'  <circle cx="{f(ex)}" cy="{f(ey)}" r="{f(1.3 * s)}" fill="{LIGHT1}"/>')
-        out.append(f'  <ellipse cx="{f(sx)}" cy="{f(sy)}" rx="{f(2.8 * s)}" ry="{f(1.6 * s)}" '
-                   f'transform="rotate({f(deg)} {f(sx)} {f(sy)})" fill="{BROWN3}"/>')
 
     out.append("</svg>\n")
     return "\n".join(out)
@@ -158,23 +157,18 @@ def dot(x: float, y: float, r: float) -> str:
 
 
 def symbolic_icon() -> str:
-    hx, hy = 6.0, 7.5
-    parts = [dot(hx, hy, 1.75)]
+    hx, hy = 5.8, 10.0
+    parts = [dot(hx, hy, 1.7)]
     # Strahlen im 45°-Raster (pixelgenau), oben rechts fehlen Samen
     for deg in (-90, 180, 135, 90, 45, -135):
-        x0, y0 = pol(hx, hy, 2.6, deg)
-        x1, y1 = pol(hx, hy, 4.4, deg)
-        parts.append(bar(x0, y0, x1, y1, 1.1))
-        parts.append(dot(*pol(hx, hy, 5.0, deg), 1.0))
+        parts.append(bar(*pol(hx, hy, 2.5, deg), *pol(hx, hy, 4.3, deg), 1.05))
+        parts.append(dot(*pol(hx, hy, 4.9, deg), 0.95))
     # Stiel
-    parts.append(bar(hx, hy + 2.4, hx, 15.3, 1.3))
-    # Zwei fliegende Samen
-    for sx, sy in ((10.6, 5.4), (12.4, 10.0)):
-        deg = -45
-        tx, ty = pol(sx, sy, 2.4, deg)
-        parts.append(bar(sx, sy, tx, ty, 1.0))
-        parts.append(dot(sx, sy, 0.9))
-        parts.append(dot(tx, ty, 1.3))
+    parts.append(bar(hx, hy + 2.4, hx - 0.4, 15.4, 1.25))
+    # Drei verlängerte Strahlen: Samen fliegen aus der Mitte davon
+    for deg, dist in ((-64, 7.6), (-38, 8.6), (-12, 7.8)):
+        parts.append(bar(*pol(hx, hy, 2.5, deg), *pol(hx, hy, dist - 1.4, deg), 0.8))
+        parts.append(dot(*pol(hx, hy, dist, deg), 1.2))
     # Einzelne Pfade, damit sich Überlappungen nicht gegenseitig auslöschen
     body = "".join(f'  <path d="{d}"/>\n' for d in parts)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">\n'
