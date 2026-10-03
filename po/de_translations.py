@@ -735,6 +735,13 @@ DE: dict[str, str | tuple[str, str]] = {
         "Neues Icon: Die Samen fliegen strahlenförmig von der Pusteblume davon",
     "Flatpak bundle with translations included":
         "Flatpak-Paket mit enthaltenen Übersetzungen",
+    # Release 0.2.2
+    "The writing assistant asks Gemini and OpenAI for less reasoning and uses fewer tokens":
+        "Der Schreibassistent bittet Gemini und OpenAI um weniger Nachdenken und verbraucht weniger Tokens",
+    "Images for alt text are scaled down before they are sent":
+        "Bilder für Alt-Texte werden vor dem Senden verkleinert",
+    "Gemini thought summaries no longer end up in suggestions":
+        "Gedanken-Zusammenfassungen von Gemini landen nicht mehr in Vorschlägen",
 }
 
 

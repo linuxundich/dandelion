@@ -121,46 +121,58 @@ msgid "Dark style"
 msgstr "Dunkler Stil"
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:85
+msgid "The writing assistant asks Gemini and OpenAI for less reasoning and uses fewer tokens"
+msgstr "Der Schreibassistent bittet Gemini und OpenAI um weniger Nachdenken und verbraucht weniger Tokens"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+msgid "Images for alt text are scaled down before they are sent"
+msgstr "Bilder für Alt-Texte werden vor dem Senden verkleinert"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:87
+msgid "Gemini thought summaries no longer end up in suggestions"
+msgstr "Gedanken-Zusammenfassungen von Gemini landen nicht mehr in Vorschlägen"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:94
 msgid "New icon: the seeds fly away from the dandelion like rays"
 msgstr "Neues Icon: Die Samen fliegen strahlenförmig von der Pusteblume davon"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:95
 msgid "Flatpak bundle with translations included"
 msgstr "Flatpak-Paket mit enthaltenen Übersetzungen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:93
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:102
 msgid "Long posts can be split into threads on Mastodon, Bluesky and X"
 msgstr "Lange Beiträge lassen sich auf Mastodon, Bluesky und X in Threads aufteilen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:94
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:103
 msgid "Mastodon posts can be scheduled on the server, so they appear even when the computer is off"
 msgstr "Mastodon-Beiträge lassen sich auf dem Server planen und erscheinen so auch bei ausgeschaltetem Rechner"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:95
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:104
 msgid "Calendar view for scheduled posts with drag and drop"
 msgstr "Kalenderansicht für geplante Beiträge mit Ziehen und Ablegen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:96
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:105
 msgid "Time slots per role and scheduling into the next free slot"
 msgstr "Zeitslots pro Rolle und Planen in den nächsten freien Slot"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:102
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:111
 msgid "First release."
 msgstr "Erste Veröffentlichung."
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:104
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:113
 msgid "Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 msgstr "Mastodon, Bluesky, LinkedIn, Facebook-Seiten und X"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:105
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:114
 msgid "Roles, profiles, previews and exact character counters"
 msgstr "Rollen, Profile, Vorschauen und exakte Zeichenzähler"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:106
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:115
 msgid "Scheduled posts with a background service"
 msgstr "Geplante Beiträge mit Hintergrunddienst"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:107
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:116
 msgid "Optional writing assistant"
 msgstr "Optionaler Schreibassistent"
 
@@ -910,7 +922,7 @@ msgid "Alt Text"
 msgstr "Alt-Text"
 
 #: src/dandelion/ui/alt-text-dialog.blp:18
-#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1647
+#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1651
 #: src/dandelion/history.py:183 src/dandelion/preferences.py:570
 #: src/dandelion/preferences.py:674 src/dandelion/scheduled.py:298
 #: src/dandelion/ai_service.py:83
@@ -1133,8 +1145,8 @@ msgstr "Rolle zu „{name}“ gewechselt"
 
 #: src/dandelion/composer.py:422 src/dandelion/composer.py:600
 #: src/dandelion/composer.py:1129 src/dandelion/composer.py:1212
-#: src/dandelion/composer.py:1500 src/dandelion/composer.py:1557
-#: src/dandelion/composer.py:1627 src/dandelion/scheduled.py:92
+#: src/dandelion/composer.py:1500 src/dandelion/composer.py:1561
+#: src/dandelion/composer.py:1631 src/dandelion/scheduled.py:92
 #: src/dandelion/scheduled.py:334
 msgid "_Undo"
 msgstr "_Rückgängig"
@@ -1272,7 +1284,7 @@ msgid "Draft deleted"
 msgstr "Entwurf gelöscht"
 
 #. Der Hintergrunddienst hat den Beitrag inzwischen gesendet
-#: src/dandelion/composer.py:1270 src/dandelion/composer.py:1616
+#: src/dandelion/composer.py:1270 src/dandelion/composer.py:1620
 msgid "This post has been published in the meantime"
 msgstr "Dieser Beitrag wurde inzwischen veröffentlicht"
 
@@ -1347,64 +1359,64 @@ msgstr "Keine Vorschläge"
 msgid "Suggestion applied"
 msgstr "Vorschlag übernommen"
 
-#: src/dandelion/composer.py:1533
+#: src/dandelion/composer.py:1537
 #, python-brace-format
 msgid "Scheduled for {when}. Changes are saved automatically."
 msgstr "Geplant für {when}. Änderungen werden automatisch gespeichert."
 
-#: src/dandelion/composer.py:1534
+#: src/dandelion/composer.py:1538
 #, python-brace-format
 msgid "Paused, planned for {when}."
 msgstr "Pausiert, geplant für {when}."
 
-#: src/dandelion/composer.py:1535
+#: src/dandelion/composer.py:1539
 #, python-brace-format
 msgid "Missed, it was planned for {when}."
 msgstr "Verpasst, geplant war {when}."
 
-#: src/dandelion/composer.py:1557
+#: src/dandelion/composer.py:1561
 msgid "Schedule removed, the post is a draft again"
 msgstr "Planung aufgehoben, der Beitrag ist wieder ein Entwurf"
 
-#: src/dandelion/composer.py:1586
+#: src/dandelion/composer.py:1590
 msgid "This role has no time slots. Add them in the role settings."
 msgstr "Diese Rolle hat keine Zeitslots. Lege sie in den Rolleneinstellungen an."
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:1626
+#: src/dandelion/composer.py:1630
 #, python-brace-format
 msgid "Scheduled for {when}"
 msgstr "Geplant für {when}"
 
-#: src/dandelion/composer.py:1645
+#: src/dandelion/composer.py:1649
 msgid "Publish Despite Warnings?"
 msgstr "Trotz Warnungen veröffentlichen?"
 
-#: src/dandelion/composer.py:1648
+#: src/dandelion/composer.py:1652
 msgid "_Publish Anyway"
 msgstr "_Trotzdem veröffentlichen"
 
-#: src/dandelion/composer.py:1681
+#: src/dandelion/composer.py:1685
 msgid "This post is already being published"
 msgstr "Dieser Beitrag wird bereits veröffentlicht"
 
-#: src/dandelion/composer.py:1688
+#: src/dandelion/composer.py:1692
 msgid "Publishing failed"
 msgstr "Veröffentlichen fehlgeschlagen"
 
-#: src/dandelion/composer.py:1690
+#: src/dandelion/composer.py:1694
 #, python-brace-format
 msgid "Published on {n} profile"
 msgid_plural "Published on {n} profiles"
 msgstr[0] "Auf {n} Profil veröffentlicht"
 msgstr[1] "Auf {n} Profilen veröffentlicht"
 
-#: src/dandelion/composer.py:1693
+#: src/dandelion/composer.py:1697
 #, python-brace-format
 msgid "Published on {ok} of {total} profiles"
 msgstr "Auf {ok} von {total} Profilen veröffentlicht"
 
-#: src/dandelion/composer.py:1694
+#: src/dandelion/composer.py:1698
 msgid "_Details"
 msgstr "_Details"
 
@@ -2468,37 +2480,37 @@ msgstr "Der Anbieter verarbeitet die Daten nach seinen eigenen Bedingungen und s
 msgid "Send to {provider}?"
 msgstr "An {provider} senden?"
 
-#: src/dandelion/ai/base.py:62
+#: src/dandelion/ai/base.py:86
 #, python-brace-format
 msgid "{provider} could not be reached. Check your internet connection."
 msgstr "{provider} ist nicht erreichbar. Prüfe deine Internetverbindung."
 
-#: src/dandelion/ai/base.py:68
+#: src/dandelion/ai/base.py:92
 #, python-brace-format
 msgid "{provider} did not accept the API key."
 msgstr "{provider} hat den API-Schlüssel nicht akzeptiert."
 
-#: src/dandelion/ai/base.py:71
+#: src/dandelion/ai/base.py:95
 #, python-brace-format
 msgid "{provider}: limit reached or no credit left. Please try again later."
 msgstr "{provider}: Limit erreicht oder kein Guthaben mehr. Bitte versuche es später erneut."
 
-#: src/dandelion/ai/base.py:74
+#: src/dandelion/ai/base.py:98
 #, python-brace-format
 msgid "{provider} does not know this model. Choose another one in the preferences."
 msgstr "{provider} kennt dieses Modell nicht. Wähle in den Einstellungen ein anderes."
 
-#: src/dandelion/ai/base.py:76
+#: src/dandelion/ai/base.py:100
 #, python-brace-format
 msgid "{provider} reported an error (HTTP {status})."
 msgstr "{provider} hat einen Fehler gemeldet (HTTP {status})."
 
-#: src/dandelion/ai/openai.py:47 src/dandelion/ai/xai.py:42
+#: src/dandelion/ai/openai.py:54 src/dandelion/ai/xai.py:42
 #, python-brace-format
 msgid "{provider} returned an empty answer."
 msgstr "{provider} hat eine leere Antwort geliefert."
 
-#: src/dandelion/ai/gemini.py:51
+#: src/dandelion/ai/gemini.py:58
 #, python-brace-format
 msgid "{provider} returned no answer. {reason}"
 msgstr "{provider} hat keine Antwort geliefert. {reason}"

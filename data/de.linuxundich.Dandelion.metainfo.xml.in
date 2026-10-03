@@ -79,6 +79,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.2" date="2026-10-03">
+      <description>
+        <ul>
+          <li>The writing assistant asks Gemini and OpenAI for less reasoning and uses fewer tokens</li>
+          <li>Images for alt text are scaled down before they are sent</li>
+          <li>Gemini thought summaries no longer end up in suggestions</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.2.1" date="2026-10-02">
       <description>
         <ul>

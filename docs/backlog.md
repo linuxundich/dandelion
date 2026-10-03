@@ -1,10 +1,10 @@
 # Backlog
 
-Stand: 2026-10-02, Version 0.2.1
+Stand: 2026-10-03, Version 0.2.2
 
 ## Veröffentlichung
 
-- [ ] **AUR-Paket hochladen.** PKGBUILD und `.SRCINFO` für 0.2.1 liegen fertig
+- [ ] **AUR-Paket hochladen.** PKGBUILD und `.SRCINFO` für 0.2.2 liegen fertig
       in `build-aux/arch/` (Prüfsumme eingetragen).
 - [ ] **Flathub-Einreichung** (optional). Das Release-Manifest
       `build-aux/flatpak/de.linuxundich.Dandelion.release.json` baut aus dem
@@ -41,4 +41,5 @@ Stand: 2026-10-02, Version 0.2.1
 - [x] Kalenderansicht und Zeitslots pro Rolle (v0.2.0)
 - [x] Flatpak-Release-Manifest und weitergebbares Bundle mit Übersetzungen (v0.2.1)
 - [x] Neues Icon „Strahlenkranz“ (v0.2.1)
-- [x] GitHub-Releases v0.1.0, v0.2.0 und v0.2.1 (0.2.x mit Flatpak-Bundle)
+- [x] Schreibassistent sparsamer: wenig Denkaufwand, kleinere Bilder (v0.2.2)
+- [x] GitHub-Releases v0.1.0, v0.2.0, v0.2.1 und v0.2.2 (0.2.x mit Flatpak-Bundle)

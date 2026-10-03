@@ -74,7 +74,7 @@ From a bundle (`dandelion-<version>-x86_64.flatpak`); the GNOME runtime is
 fetched from Flathub automatically:
 
 ```bash
-flatpak install --user dandelion-0.2.1-x86_64.flatpak
+flatpak install --user dandelion-0.2.2-x86_64.flatpak
 ```
 
 Build it yourself from the release tag, or from your working copy:
@@ -89,7 +89,7 @@ Create a bundle to share:
 ```bash
 flatpak-builder --force-clean --repo=_flatpak-repo _flatpak build-aux/flatpak/de.linuxundich.Dandelion.release.json
 flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
-    _flatpak-repo dandelion-0.2.1-x86_64.flatpak de.linuxundich.Dandelion master
+    _flatpak-repo dandelion-0.2.2-x86_64.flatpak de.linuxundich.Dandelion master
 ```
 
 The Flatpak keeps its own data and keyring entries, so profiles are added
