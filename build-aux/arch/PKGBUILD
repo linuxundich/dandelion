@@ -27,7 +27,7 @@ optdepends=(
   'hunspell-en_us: English spell checking'
 )
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('3b7705f17cdc02225c659d3a626abf4452f02546ec21cc9c97e1fdbe6b13e71f')
+sha256sums=('61f597a00d9524cb55f2902f12dfdbb75352dc104d898ac90696a919d1123a69')
 
 build() {
   arch-meson "$pkgname-$pkgver" build

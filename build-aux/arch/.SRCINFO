@@ -1,6 +1,6 @@
 pkgbase = dandelion
 	pkgdesc = Write once, post to Mastodon, Bluesky, LinkedIn, Facebook pages and X
-	pkgver = 0.2.1
+	pkgver = 0.2.2
 	pkgrel = 1
 	url = https://github.com/linuxundich/dandelion
 	arch = any
@@ -24,7 +24,7 @@ pkgbase = dandelion
 	depends = python-gobject
 	optdepends = hunspell-de: German spell checking
 	optdepends = hunspell-en_us: English spell checking
-	source = dandelion-0.2.1.tar.gz::https://github.com/linuxundich/dandelion/archive/refs/tags/v0.2.1.tar.gz
-	sha256sums = 3b7705f17cdc02225c659d3a626abf4452f02546ec21cc9c97e1fdbe6b13e71f
+	source = dandelion-0.2.2.tar.gz::https://github.com/linuxundich/dandelion/archive/refs/tags/v0.2.2.tar.gz
+	sha256sums = 61f597a00d9524cb55f2902f12dfdbb75352dc104d898ac90696a919d1123a69
 
 pkgname = dandelion
