@@ -2,6 +2,21 @@
 
 All notable changes to Dandelion are listed here.
 
+## Unreleased
+
+### Changed
+
+- **Writing assistant uses fewer tokens:** rephrasing, translating, adapting,
+  hashtags and alt text ask Gemini and OpenAI for low reasoning effort, since
+  thinking tokens are billed like output. A model that rejects the setting gets
+  the same request again without it, and no longer receives it until restart.
+- Images for alt text are always scaled down to at most 1600 pixels, not only
+  files above 1.5 MB.
+
+### Fixed
+
+- Gemini thought summaries no longer end up in the suggestion.
+
 ## 0.2.1 – 2026-10-02
 
 ### Changed

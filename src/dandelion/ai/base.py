@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass
 from gettext import gettext as _
 
@@ -12,10 +13,11 @@ from ..net.http import HttpClient, NetworkError, Request, Response
 
 
 class AIError(Exception):
-    def __init__(self, message: str, detail: str = "") -> None:
+    def __init__(self, message: str, detail: str = "", status: int = 0) -> None:
         super().__init__(message)
         self.message = message
         self.detail = detail
+        self.status = status
 
 
 @dataclass
@@ -41,6 +43,8 @@ class AIProvider(ABC):
 
     def __init__(self, http: HttpClient) -> None:
         self.http = http
+        #: Modelle, die den Sparparameter (siehe _send_economical) abgelehnt haben
+        self._no_effort: set[str] = set()
 
     @abstractmethod
     async def list_models(self, api_key: str) -> list[str]: ...
@@ -54,6 +58,26 @@ class AIProvider(ABC):
             if want in models:
                 return want
         return models[0] if models else self.default_model
+
+    async def _send_economical(self, model: str, build: Callable[[bool], Request],
+                               hint: str) -> Response:
+        """Schickt die Anfrage mit wenig Denkaufwand, falls das Modell das kann.
+
+        Umformulieren, Hashtags und Alt-Text brauchen kein langes Nachdenken,
+        und Denk-Tokens werden wie Ausgabe bezahlt. Nicht jedes Modell kennt
+        den Parameter dafür: Lehnt es ihn ab (HTTP 400, die Meldung nennt
+        `hint`), geht dieselbe Anfrage ohne ihn noch einmal raus, und das
+        Modell bekommt ihn bis zum Neustart nicht mehr. Abgelehnte Anfragen
+        kosten nichts.
+        """
+        if model not in self._no_effort:
+            try:
+                return await self._send(build(True))
+            except AIError as e:
+                if e.status != 400 or hint not in e.detail.lower():
+                    raise
+                self._no_effort.add(model)
+        return await self._send(build(False))
 
     async def _send(self, req: Request) -> Response:
         try:
@@ -74,4 +98,4 @@ class AIProvider(ABC):
             raise AIError(_("{provider} does not know this model. Choose another one in the "
                             "preferences.").format(provider=self.name), detail)
         raise AIError(_("{provider} reported an error (HTTP {status}).").format(
-            provider=self.name, status=resp.status), detail)
+            provider=self.name, status=resp.status), detail, resp.status)

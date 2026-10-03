@@ -33,10 +33,17 @@ class OpenAI(AIProvider):
         content: list[dict[str, Any]] = [{"type": "input_text", "text": text}]
         for img in images or []:
             content.append({"type": "input_image", "image_url": img.data_url()})
-        resp = await self._send(Request(
-            "POST", f"{API}/responses", headers={"Authorization": f"Bearer {api_key}"},
-            json={"model": model, "instructions": system,
-                  "input": [{"role": "user", "content": content}]}, timeout=120))
+
+        def build(economical: bool) -> Request:
+            body: dict[str, Any] = {"model": model, "instructions": system,
+                                    "input": [{"role": "user", "content": content}]}
+            if economical:
+                body["reasoning"] = {"effort": "low"}
+            return Request("POST", f"{API}/responses",
+                           headers={"Authorization": f"Bearer {api_key}"}, json=body,
+                           timeout=120)
+
+        resp = await self._send_economical(model, build, "reasoning")
         data = resp.json() or {}
         if data.get("output_text"):
             return str(data["output_text"])

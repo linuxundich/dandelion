@@ -1512,7 +1512,11 @@ class DandelionComposer(Adw.BreakpointBin):
         from .ai import ImageInput, tasks
         data = imaging.load_bytes(media.path)
         mime = media.mime
-        if len(data) > 1_500_000 or mime not in ("image/jpeg", "image/png", "image/webp"):
+        # Auch kleine Dateien mit vielen Pixeln verkleinern: Mehr als 1600 px
+        # verbessern keinen Alt-Text, kosten aber Bild-Tokens.
+        large = max(media.width or 0, media.height or 0) > 1600
+        if large or len(data) > 1_500_000 or mime not in ("image/jpeg", "image/png",
+                                                          "image/webp"):
             data, mime, _w, _h = imaging.shrink_to(data, 1_500_000, max_dim=1600)
         ctx = await self.app.ai.context(self.role)
         code = self.post.language or (self.role.language if self.role else None) or "de"

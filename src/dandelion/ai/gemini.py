@@ -37,15 +37,22 @@ class Gemini(AIProvider):
         parts: list[dict[str, Any]] = [{"text": text}]
         for img in images or []:
             parts.append({"inline_data": {"mime_type": img.mime, "data": img.b64()}})
-        resp = await self._send(Request(
-            "POST", f"{API}/models/{model}:generateContent",
-            headers={"x-goog-api-key": api_key},
-            json={"systemInstruction": {"parts": [{"text": system}]},
-                  "contents": [{"role": "user", "parts": parts}]}, timeout=120))
+
+        def build(economical: bool) -> Request:
+            body: dict[str, Any] = {"systemInstruction": {"parts": [{"text": system}]},
+                                    "contents": [{"role": "user", "parts": parts}]}
+            if economical:
+                body["generationConfig"] = {"thinkingConfig": {"thinkingLevel": "low"}}
+            return Request("POST", f"{API}/models/{model}:generateContent",
+                           headers={"x-goog-api-key": api_key}, json=body, timeout=120)
+
+        resp = await self._send_economical(model, build, "thinking")
         data = resp.json() or {}
         try:
             cand = data["candidates"][0]
-            return "".join(p.get("text", "") for p in cand["content"]["parts"])
+            # Gedanken-Zusammenfassungen (thought: true) gehören nicht in die Antwort
+            return "".join(p.get("text", "") for p in cand["content"]["parts"]
+                           if not p.get("thought"))
         except (KeyError, IndexError, TypeError) as e:
             reason = (data.get("promptFeedback") or {}).get("blockReason", "")
             raise AIError(_("{provider} returned no answer. {reason}").format(
