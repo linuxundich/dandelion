@@ -34,7 +34,6 @@ class DandelionWindow(Adw.ApplicationWindow):
     publish_button: Adw.SplitButton = Gtk.Template.Child()
     preview_button: Gtk.ToggleButton = Gtk.Template.Child()
     history_search_button: Gtk.ToggleButton = Gtk.Template.Child()
-    calendar_nav: Gtk.Box = Gtk.Template.Child()
     filter_button: Gtk.MenuButton = Gtk.Template.Child()
     draft_menu: Gio.MenuModel = Gtk.Template.Child()
     scheduled_menu: Gio.MenuModel = Gtk.Template.Child()
@@ -195,7 +194,6 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.publish_button.set_visible(composing)
         self.preview_button.set_visible(composing)
         self.history_search_button.set_visible(name == "history")
-        self.calendar_nav.set_visible(name == "scheduled")
         self.filter_button.set_visible(name == "scheduled")
         if name == "history":
             self.history.reload()

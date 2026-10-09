@@ -32,6 +32,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
     service_banner: Adw.Banner = Gtk.Template.Child()
     calendar: DandelionMonthCalendar = Gtk.Template.Child()
     day_box: Gtk.Box = Gtk.Template.Child()
+    month_label: Gtk.Label = Gtk.Template.Child()
     day_title: Gtk.Label = Gtk.Template.Child()
     day_list: Gtk.ListBox = Gtk.Template.Child()
     day_empty: Gtk.Label = Gtk.Template.Child()
@@ -60,7 +61,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
 
     # -- Kopfzeile -------------------------------------------------------------
     def title(self) -> tuple[str, str]:
-        return self.calendar.title(), self._summary
+        return _("Calendar"), self._summary
 
     def filtered(self) -> bool:
         return bool(self.role_filter.get_selected() or self.platform_filter.get_selected())
@@ -197,6 +198,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
         if not getattr(self, "app", None):
             return
         self._fill_filters()
+        self.month_label.set_label(self.calendar.title())
         store = self.app.store
         profiles = {p.id: p for p in store.profiles()}
         roles = {r.id: r for r in store.roles()}
@@ -264,8 +266,9 @@ class DandelionScheduledView(Adw.BreakpointBin):
             return
         self.day_list.remove_all()
         day = self.calendar.selected
-        self.day_title.set_label(GLib.DateTime.new_local(day.year, day.month, day.day, 0, 0, 0)
-                                 .format("%A, %e. %B") or "")
+        dt = GLib.DateTime.new_local(day.year, day.month, day.day, 0, 0, 0)
+        # %e füllt einstellige Tage mit einem Leerzeichen auf
+        self.day_title.set_label(f"{dt.format('%A')}, {day.day}. {dt.format('%B')}")
         entries = self.calendar.entries_for(day)
         for _when, post, _role in entries:
             if post.state in PUBLISHED_STATES:

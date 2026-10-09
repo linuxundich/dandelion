@@ -93,8 +93,13 @@ class DandelionMonthCalendar(Gtk.Box):
         month = self.month + delta
         self.year += (month - 1) // 12
         self.month = (month - 1) % 12 + 1
+        # Im neuen Monat heute auswählen, sonst den Ersten
+        today = date.today()
+        self.selected = today if (today.year, today.month) == (self.year, self.month) \
+            else date(self.year, self.month, 1)
         self._rebuild()
         self.emit("month-changed")
+        self.emit("day-selected", self.selected.year, self.selected.month, self.selected.day)
 
     def go_today(self) -> None:
         today = date.today()

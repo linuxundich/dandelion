@@ -171,7 +171,8 @@ Each phase ends with a review by the maintainer before the next one starts.
    Originally planned: Growing width, two columns, default visibility by
    breakpoint, F9, summary header, drop the status strip.
 4. **Calendar page.** *Done 2026-10-09:* `DandelionMonthCalendar` without its
-   own header (navigation via `calendar.*` actions in the window header,
+   own header (navigation via `calendar.*` actions in a month row above the
+   grid, since 0.3.1 not in the header bar where it clashed with the back button;
    filters in `scheduled.filter_popover`). Dragging out of the sidebar works
    with a `Gtk.DragSource` on the whole `Adw.Sidebar` in the **capture**
    phase (bubble phase never fires, the list claims the pointer) that maps the

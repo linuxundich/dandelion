@@ -20,11 +20,66 @@ template $DandelionScheduledView: Adw.BreakpointBin {
 
       child: Box {
         orientation: vertical;
-        spacing: 18;
+        spacing: 12;
         margin-top: 12;
         margin-bottom: 18;
         margin-start: 18;
         margin-end: 18;
+
+        Box month_bar {
+          spacing: 6;
+
+          Button {
+            icon-name: "go-previous-symbolic";
+            tooltip-text: _("Previous Month");
+            action-name: "calendar.previous";
+            valign: center;
+
+            accessibility {
+              label: _("Previous Month");
+            }
+
+            styles [
+              "flat",
+              "circular",
+            ]
+          }
+
+          Label month_label {
+            width-chars: 14;
+
+            styles [
+              "title-4",
+            ]
+          }
+
+          Button {
+            icon-name: "go-next-symbolic";
+            tooltip-text: _("Next Month");
+            action-name: "calendar.next";
+            valign: center;
+
+            accessibility {
+              label: _("Next Month");
+            }
+
+            styles [
+              "flat",
+              "circular",
+            ]
+          }
+
+          Box {
+            hexpand: true;
+          }
+
+          Button {
+            label: _("_Today");
+            use-underline: true;
+            action-name: "calendar.today";
+            valign: center;
+          }
+        }
 
         $DandelionMonthCalendar calendar {
           vexpand: true;

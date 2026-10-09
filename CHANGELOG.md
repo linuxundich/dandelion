@@ -2,6 +2,18 @@
 
 All notable changes to Dandelion are listed here.
 
+## [Unreleased]
+
+### Fixed
+
+- **Calendar header:** month navigation moved out of the header bar into a row
+  above the month ("‹ October 2026 ›" and "Today"). In narrow windows the
+  back button and the previous-month arrow looked the same side by side. The
+  header now reads "Calendar" with the month summary below.
+- The day list in narrow windows no longer shows extra spaces before the day
+  ("Friday,   9 October"), and switching months selects today or the first
+  day of that month instead of keeping a day from another month.
+
 ## 0.3.0 – 2026-10-09
 
 A new window layout that grows with the screen, following the current GNOME
