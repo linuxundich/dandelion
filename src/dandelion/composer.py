@@ -39,6 +39,7 @@ from .util import (
     system_language,
 )
 from .widgets.avatars import AvatarCache
+from .widgets.counter_ring import DandelionCounterRing
 from .widgets.media_tile import MediaTile
 from .widgets.preview_tile import PreviewTile
 from .widgets.profile_chip import ProfileChip, platform_badge
@@ -80,8 +81,8 @@ class DandelionComposer(Adw.BreakpointBin):
     variant_info: Gtk.Box = Gtk.Template.Child()
     variant_info_label: Gtk.Label = Gtk.Template.Child()
     variant_info_button: Gtk.Button = Gtk.Template.Child()
-    media_box: Gtk.Box = Gtk.Template.Child()
-    strict_counter: Gtk.Label = Gtk.Template.Child()
+    media_box: Gtk.ScrolledWindow = Gtk.Template.Child()
+    strict_counter: DandelionCounterRing = Gtk.Template.Child()
     density_group: Adw.ToggleGroup = Gtk.Template.Child()
     ai_button: Gtk.MenuButton = Gtk.Template.Child()
     ai_revealer: Gtk.Revealer = Gtk.Template.Child()
@@ -98,13 +99,18 @@ class DandelionComposer(Adw.BreakpointBin):
     cw_button: Gtk.ToggleButton = Gtk.Template.Child()
     thread_button: Gtk.ToggleButton = Gtk.Template.Child()
     text_view: GtkSource.View = Gtk.Template.Child()
-    editor_scroller: Gtk.ScrolledWindow = Gtk.Template.Child()
+    text_scroller: Gtk.ScrolledWindow = Gtk.Template.Child()
+    editor_box: Gtk.Box = Gtk.Template.Child()
+    placeholder_label: Gtk.Label = Gtk.Template.Child()
+    options_content: Adw.ButtonContent = Gtk.Template.Child()
+    mastodon_options: Adw.PreferencesGroup = Gtk.Template.Child()
+    bluesky_options: Adw.PreferencesGroup = Gtk.Template.Child()
     media_tiles: Gtk.Box = Gtk.Template.Child()
     add_media_button: Gtk.Button = Gtk.Template.Child()
-    language_dropdown: Gtk.DropDown = Gtk.Template.Child()
-    visibility_dropdown: Gtk.DropDown = Gtk.Template.Child()
-    label_dropdown: Gtk.DropDown = Gtk.Template.Child()
-    signature_button: Gtk.ToggleButton = Gtk.Template.Child()
+    language_dropdown: Adw.ComboRow = Gtk.Template.Child()
+    visibility_dropdown: Adw.ComboRow = Gtk.Template.Child()
+    label_dropdown: Adw.ComboRow = Gtk.Template.Child()
+    signature_button: Adw.SwitchRow = Gtk.Template.Child()
     preview_tiles: Gtk.Box = Gtk.Template.Child()
     preview_scroller: Gtk.ScrolledWindow = Gtk.Template.Child()
     status_strip: Adw.WrapBox = Gtk.Template.Child()
@@ -167,6 +173,8 @@ class DandelionComposer(Adw.BreakpointBin):
             self._spell_checker = None
         self._attach_spelling(self.buffers[MAIN])
         self.text_view.connect("paste-clipboard", self._on_paste)
+        self.text_view.connect("notify::buffer", lambda *_: self._sync_placeholder())
+        self.text_scroller.get_hadjustment().connect("changed", self._on_text_width)
 
         # Auf dem ganzen Fenster, in der Capture-Phase: sonst schluckt die
         # Textansicht das Ablegen, und nur der Editorrand nähme Dateien an.
@@ -184,6 +192,7 @@ class DandelionComposer(Adw.BreakpointBin):
         self._style.connect("notify::dark", self._on_dark_changed)
         self._apply_scheme(self._inherit_buffer)
         self.layout_view.connect("notify::layout-name", lambda *_: self._on_layout_changed())
+        self.sheet.connect("notify::bottom-bar-height", lambda *_: self._sync_bottom_space())
 
         self._setup_ai()
         self.reload_profiles()
@@ -204,6 +213,7 @@ class DandelionComposer(Adw.BreakpointBin):
         accent = self._style.get_accent_color_rgba()
         buf.create_tag("entity", foreground_rgba=accent)
         buf.connect("changed", self._on_buffer_changed)
+        buf.connect("changed", lambda *_: self._sync_placeholder())
         self._apply_scheme(buf)
         return buf
 
@@ -471,17 +481,28 @@ class DandelionComposer(Adw.BreakpointBin):
             self._loading = True
             self.variant_group.remove_all()
             for key, label in keys:
-                toggle = Adw.Toggle(name=key, label=label + (" ✎" if self._variant(key) else ""))
+                toggle = Adw.Toggle(name=key, child=self._variant_label(key, label))
                 toggle.set_tooltip(label)
                 self.variant_group.add(toggle)
             self.variant_group.set_active_name(current if current in wanted else MAIN)
             self._loading = False
         else:
             for i, (key, label) in enumerate(keys):
-                self.variant_group.get_toggle(i).set_label(
-                    label + (" ✎" if self._variant(key) else ""))
+                self.variant_group.get_toggle(i).set_child(self._variant_label(key, label))
         self.card_head.set_visible(len(keys) > 1)
         self._show_variant()
+
+    def _variant_label(self, key: str, label: str) -> Gtk.Widget:
+        """Beschriftung eines Varianten-Tabs; ein Punkt zeigt einen eigenen Text an."""
+        box = Gtk.Box(spacing=6, margin_start=6, margin_end=6)
+        box.append(Gtk.Label(label=label))
+        if self._variant(key):
+            dot = Gtk.Box(valign=Gtk.Align.CENTER)
+            dot.add_css_class("variant-dot")
+            box.append(dot)
+            box.update_property([Gtk.AccessibleProperty.LABEL],
+                                [_("{name}, own text").format(name=label)])
+        return box
 
     def _variant(self, key: str) -> Variant | None:
         if key.startswith("platform:"):
@@ -516,6 +537,7 @@ class DandelionComposer(Adw.BreakpointBin):
             self.text_view.set_editable(True)
             self.text_view.remove_css_class("inherited")
             self.variant_info.set_visible(False)
+            self._sync_placeholder()
             return
         name = self._key_platform_name(key)
         variant = self._variant(key)
@@ -550,6 +572,7 @@ class DandelionComposer(Adw.BreakpointBin):
             self.variant_info_label.set_label(_("{name} uses the main text.").format(name=name))
             self.variant_info_button.set_label(_("_Customize"))
         self.variant_info.set_visible(True)
+        self._sync_placeholder()
 
     @Gtk.Template.Callback()
     def on_variant_banner_clicked(self, *_args: object) -> None:
@@ -649,7 +672,7 @@ class DandelionComposer(Adw.BreakpointBin):
         self._changed()
 
     @Gtk.Template.Callback()
-    def on_signature_toggled(self, button: Gtk.ToggleButton) -> None:
+    def on_signature_toggled(self, button: Adw.SwitchRow, *_args: object) -> None:
         if not self._loading:
             self.post.use_signature = button.get_active()
             self._changed()
@@ -707,8 +730,9 @@ class DandelionComposer(Adw.BreakpointBin):
                                self.settings.get_boolean("require-alt-text-everywhere"))
         selected = self._selected_profiles()
         platforms = {p.platform for p in selected}
-        self.visibility_dropdown.set_visible("mastodon" in platforms)
-        self.label_dropdown.set_visible("bluesky" in platforms and bool(self.post.media))
+        self.mastodon_options.set_visible("mastodon" in platforms)
+        self.bluesky_options.set_visible("bluesky" in platforms and bool(self.post.media))
+        self._sync_options_label()
         self.thread_button.set_visible(any(
             self.app.registry.get(p).default_limits().supports_threads
             for p in platforms if p in self.app.registry))
@@ -856,12 +880,10 @@ class DandelionComposer(Adw.BreakpointBin):
                 on_remove=self._remove_media, on_move=self._move_media))
 
     def _update_strict_counter(self, targets: list) -> None:  # type: ignore[type-arg]
-        """Zähler in der Werkzeugleiste: das Profil, das seinem Limit am nächsten ist."""
-        label = self.strict_counter
-        for cls in ("error", "warning", "dim-label"):
-            label.remove_css_class(cls)
+        """Ring in der Werkzeugleiste: das Profil, das seinem Limit am nächsten ist."""
+        ring = self.strict_counter
         if not targets:
-            label.set_visible(False)
+            ring.set_visible(False)
             return
 
         def tightness(t) -> float:  # type: ignore[no-untyped-def]
@@ -873,18 +895,42 @@ class DandelionComposer(Adw.BreakpointBin):
 
         t = max(targets, key=tightness)
         c = t.count
-        label.set_label(f"{c.used} / {c.limit}")
-        label.set_visible(True)
-        if c.over:
-            label.add_css_class("error")
-        elif c.ratio >= 0.9:
-            label.add_css_class("warning")
-        else:
-            label.add_css_class("dim-label")
+        ring.set_count(c.used, c.limit)
+        ring.set_visible(True)
         text = _("Strictest limit: {platform} {handle}, {used} of {limit} characters").format(
             platform=t.platform.name, handle=t.profile.full_handle, used=c.used, limit=c.limit)
-        label.set_tooltip_text(text)
-        label.update_property([Gtk.AccessibleProperty.LABEL], [text])
+        ring.set_tooltip_text(text)
+        ring.update_property([Gtk.AccessibleProperty.LABEL], [text])
+
+    def _sync_options_label(self) -> None:
+        parts = []
+        item = self.language_dropdown.get_selected_item()
+        if item is not None:
+            parts.append(item.get_string())
+        if self.mastodon_options.get_visible():
+            item = self.visibility_dropdown.get_selected_item()
+            if item is not None:
+                parts.append(item.get_string())
+        self.options_content.set_label(" · ".join(parts))
+
+    def _sync_placeholder(self) -> None:
+        buf = self.text_view.get_buffer()
+        self.placeholder_label.set_visible(buf.get_char_count() == 0
+                                           and self.text_view.get_editable())
+
+    def _on_text_width(self, adj: Gtk.Adjustment) -> None:
+        """Hält die Textspalte bei breitem Fenster mittig und lesbar breit."""
+        width = int(adj.get_page_size())
+        margin = max(16, (width - 728) // 2)
+        if margin != self.placeholder_label.get_margin_start():
+            self.text_view.set_left_margin(margin)
+            self.text_view.set_right_margin(margin)
+            self.placeholder_label.set_margin_start(margin)
+
+    @Gtk.Template.Callback()
+    def on_emoji_clicked(self, *_args: object) -> None:
+        self.text_view.grab_focus()
+        self.text_view.emit("insert-emoji")
 
     @Gtk.Template.Callback()
     def on_density_changed(self, *_args: object) -> None:
@@ -1145,6 +1191,12 @@ class DandelionComposer(Adw.BreakpointBin):
         narrow = self.layout_view.get_layout_name() == "narrow"
         for chip in self.chips.values():
             chip.set_compact(narrow)
+        self._sync_bottom_space()
+
+    def _sync_bottom_space(self) -> None:
+        """Im schmalen Layout liegt die Vorschau-Leiste über dem Editor: Platz freihalten."""
+        narrow = self.layout_view.get_layout_name() == "narrow"
+        self.editor_box.set_margin_bottom(self.sheet.get_bottom_bar_height() if narrow else 0)
 
     def reload_drafts(self) -> None:
         if self.win:

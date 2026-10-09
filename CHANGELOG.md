@@ -13,11 +13,22 @@ All notable changes to Dandelion are listed here.
   (change time, pause, send now, duplicate, delete, use as new draft).
 - **Search** (Ctrl+F) looks through drafts, scheduled and published posts at
   once.
+- **The editor is a plain writing surface** (phase 2): no card, the text
+  column stays centered and readable on wide windows, and an empty post shows
+  "What's new?". The variant tabs mark platforms with their own text with a
+  dot.
+- **Leaner toolbar:** images, emoji, content warning, thread and assistant are
+  icon buttons. Language, signature, Mastodon visibility and the Bluesky label
+  moved into an options popover, grouped by platform; its button shows the
+  current language and visibility.
+- **Character count as a ring** with the remaining characters of the strictest
+  profile.
 - **F9** now shows or hides the preview; Ctrl+2 opens the calendar, which
   shows the month view by default.
 
 ### Added
 
+- **Emoji button** in the toolbar.
 - **Detail page for published posts** with the text, images and one row per
   profile to open, copy, delete or retry.
 
@@ -35,6 +46,7 @@ All notable changes to Dandelion are listed here.
 
 ### Fixed
 
+- In narrow windows the preview bar no longer covers the editor toolbar.
 - The image preview in the alt text dialog and in the platform previews was
   blank for some files (for example WebP).
 

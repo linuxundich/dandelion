@@ -154,7 +154,12 @@ Each phase ends with a review by the maintainer before the next one starts.
    detail, published list, calendar placeholder). Remove the view switcher
    and the inner drafts split. Settings: drop `drafts-sidebar-visible`,
    map `scheduled-view` to the last selected sidebar item.
-2. **Composer surface.** Remove the card, placeholder, InlineViewSwitcher with
+2. **Composer surface.** *Done 2026-10-09:* `widgets/counter_ring.py`;
+   text column centered by dynamic `left/right-margin` on the GtkSource.View
+   (728 px), header and toolbar clamped to the same width; options popover
+   uses `Adw.ComboRow`/`Adw.SwitchRow`. Variant tabs stay an
+   `Adw.ToggleGroup` (framed), which is what InlineViewSwitcher draws.
+   Originally planned: Remove the card, placeholder, InlineViewSwitcher with
    variant dots, attachment row, symbolic toolbar, options popover, counter
    ring.
 3. **Preview pane.** Growing width, two columns, default visibility by

@@ -770,6 +770,15 @@ DE: dict[str, str | tuple[str, str]] = {
     "Show All ({n})": "Alle anzeigen ({n})",
     "Partly Published": "Teilweise veröffentlicht",
     "Not Published": "Nicht veröffentlicht",
+    # Editor als Fläche (Umbau 2026-10)
+    "From": "Von",
+    "What’s new?": "Was gibt’s Neues?",
+    "Insert Emoji": "Emoji einfügen",
+    "Post Options": "Optionen für den Beitrag",
+    "Append Signature": "Signatur anhängen",
+    "Visibility": "Sichtbarkeit",
+    "Content Label": "Inhaltslabel",
+    "{name}, own text": "{name}, eigener Text",
 }
 
 

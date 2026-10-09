@@ -21,15 +21,15 @@ class MediaTile(Gtk.Overlay):
         super().__init__()
         self.media = media
         self.add_css_class("media-tile")
-        self.set_size_request(96, 96)
+        self.set_size_request(112, 112)
 
         pic = Gtk.Image(icon_name="video-x-generic-symbolic", pixel_size=48)
         if media.is_image:
-            data = imaging.thumbnail_png(media.path, 192)
+            data = imaging.thumbnail_png(media.path, 224)
             if data:
                 pic = Gtk.Image.new_from_paintable(Gdk.Texture.new_from_bytes(GLib.Bytes.new(data)))
-                pic.set_pixel_size(96)
-        pic.set_size_request(96, 96)
+                pic.set_pixel_size(112)
+        pic.set_size_request(112, 112)
         frame = Gtk.Button(child=pic, tooltip_text=_("Edit alt text"))
         frame.add_css_class("media-button")
         frame.connect("clicked", lambda *_: on_edit_alt(media))

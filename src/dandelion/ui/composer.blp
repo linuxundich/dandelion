@@ -89,7 +89,7 @@ template $DandelionComposer: Adw.BreakpointBin {
         }
 
         [editor]
-        Box {
+        Box editor_box {
           orientation: vertical;
 
           Adw.Banner schedule_banner {
@@ -97,398 +97,396 @@ template $DandelionComposer: Adw.BreakpointBin {
             button-clicked => $on_unschedule();
           }
 
-          ScrolledWindow editor_scroller {
-            hscrollbar-policy: never;
-            vexpand: true;
+          Adw.Clamp {
+            maximum-size: 760;
+            tightening-threshold: 760;
 
-            child: Adw.Clamp {
-              maximum-size: 760;
-              tightening-threshold: 560;
+            child: Box {
+              orientation: vertical;
+              spacing: 10;
+              margin-top: 14;
+              margin-start: 16;
+              margin-end: 16;
 
-              child: Box editor_box {
-                orientation: vertical;
+              Adw.WrapBox chips_box {
+                child-spacing: 6;
+                line-spacing: 6;
+
+                Label from_label {
+                  valign: center;
+                  /* Translators: "From role to profiles", like in an e-mail */
+                  label: C_("recipients", "From");
+
+                  styles [
+                    "dim-label",
+                  ]
+                }
+
+                MenuButton role_button {
+                  tooltip-text: _("Role");
+                  popover: role_popover;
+
+                  child: Box {
+                    spacing: 6;
+
+                    Label role_emoji {}
+
+                    Label role_label {
+                      ellipsize: end;
+
+                      styles [
+                        "heading",
+                      ]
+                    }
+
+                    Image {
+                      icon-name: "pan-down-symbolic";
+                    }
+                  };
+
+                  styles [
+                    "flat",
+                    "role-button",
+                  ]
+                }
+
+                Label to_label {
+                  valign: center;
+                  /* Translators: "Role to profiles", like "From … to …" in an e-mail */
+                  label: C_("recipients", "to");
+
+                  styles [
+                    "dim-label",
+                  ]
+                }
+              }
+
+              Box card_head {
                 spacing: 10;
-                margin-top: 12;
-                margin-bottom: 12;
-                margin-start: 12;
-                margin-end: 12;
+                visible: false;
 
-                Adw.WrapBox chips_box {
-                  child-spacing: 6;
-                  line-spacing: 6;
+                Adw.ToggleGroup variant_group {
+                  homogeneous: false;
+                  halign: start;
+                  valign: center;
+                  notify::active-name => $on_variant_changed();
+                }
 
-                  MenuButton role_button {
-                    tooltip-text: _("Role");
-                    popover: role_popover;
+                Box variant_info {
+                  spacing: 6;
+                  visible: false;
+                  hexpand: true;
 
-                    child: Box {
-                      spacing: 6;
-
-                      Label role_emoji {}
-
-                      Label role_label {
-                        ellipsize: end;
-
-                        styles [
-                          "heading",
-                        ]
-                      }
-
-                      Image {
-                        icon-name: "pan-down-symbolic";
-                      }
-                    };
+                  Label variant_info_label {
+                    hexpand: true;
+                    xalign: 0;
+                    wrap: true;
 
                     styles [
-                      "flat",
-                      "role-button",
-                    ]
-                  }
-
-                  Label to_label {
-                    valign: center;
-                    /* Translators: "Role to profiles", like "From … to …" in an e-mail */
-                    label: C_("recipients", "to");
-
-                    styles [
+                      "caption",
                       "dim-label",
                     ]
                   }
+
+                  Button variant_info_button {
+                    use-underline: true;
+                    valign: center;
+                    clicked => $on_variant_banner_clicked();
+
+                    styles [
+                      "flat",
+                      "small-button",
+                    ]
+                  }
+                }
+              }
+
+              Revealer cw_revealer {
+                transition-type: slide_down;
+
+                child: Entry cw_entry {
+                  placeholder-text: _("Content warning");
+                  primary-icon-name: "dialog-warning-symbolic";
+                  changed => $on_cw_changed();
+
+                  accessibility {
+                    label: _("Content warning");
+                  }
+                };
+              }
+            };
+          }
+
+          Overlay text_overlay {
+            vexpand: true;
+
+            child: ScrolledWindow text_scroller {
+              hscrollbar-policy: never;
+              min-content-height: 160;
+
+              child: GtkSource.View text_view {
+                wrap-mode: word_char;
+                top-margin: 12;
+                bottom-margin: 24;
+                left-margin: 16;
+                right-margin: 16;
+                accepts-tab: false;
+
+                accessibility {
+                  label: _("Post text");
                 }
 
-                Box composer_card {
+                styles [
+                  "composer-text",
+                ]
+              };
+            };
+
+            [overlay]
+            Label placeholder_label {
+              label: _("What’s new?");
+              halign: start;
+              valign: start;
+              can-target: false;
+              margin-top: 12;
+              margin-start: 16;
+
+              styles [
+                "composer-text",
+                "composer-placeholder",
+              ]
+            }
+          }
+
+          Adw.Clamp {
+            maximum-size: 760;
+            tightening-threshold: 760;
+
+            child: Box {
+              orientation: vertical;
+              margin-start: 16;
+              margin-end: 16;
+
+              Revealer ai_revealer {
+                transition-type: slide_up;
+
+                child: Box {
                   orientation: vertical;
-                  vexpand: true;
-                  overflow: hidden;
+                  spacing: 8;
+                  margin-bottom: 10;
 
-                  Box card_head {
-                    orientation: vertical;
-                    spacing: 6;
-                    visible: false;
+                  Box {
+                    spacing: 8;
 
-                    Adw.ToggleGroup variant_group {
-                      homogeneous: false;
-                      halign: start;
-                      notify::active-name => $on_variant_changed();
-
-                      styles [
-                        "flat",
-                      ]
+                    Image {
+                      icon-name: "starred-symbolic";
                     }
 
-                    Box variant_info {
-                      spacing: 6;
-                      visible: false;
-
-                      Image {
-                        icon-name: "dialog-information-symbolic";
-
-                        styles [
-                          "dim-label",
-                        ]
-                      }
-
-                      Label variant_info_label {
-                        hexpand: true;
-                        xalign: 0;
-                        wrap: true;
-
-                        styles [
-                          "caption",
-                          "dim-label",
-                        ]
-                      }
-
-                      Button variant_info_button {
-                        use-underline: true;
-                        valign: center;
-                        clicked => $on_variant_banner_clicked();
-
-                        styles [
-                          "flat",
-                          "small-button",
-                        ]
-                      }
-                    }
-
-                    styles [
-                      "composer-card-head",
-                    ]
-                  }
-
-                  Revealer cw_revealer {
-                    transition-type: slide_down;
-
-                    child: Entry cw_entry {
-                      placeholder-text: _("Content warning");
-                      primary-icon-name: "dialog-warning-symbolic";
-                      changed => $on_cw_changed();
-
-                      accessibility {
-                        label: _("Content warning");
-                      }
-
-                      styles [
-                        "cw-entry",
-                      ]
-                    };
-                  }
-
-                  ScrolledWindow text_scroller {
-                    vexpand: true;
-                    min-content-height: 240;
-                    hscrollbar-policy: never;
-
-                    child: GtkSource.View text_view {
-                      wrap-mode: word_char;
-                      top-margin: 14;
-                      bottom-margin: 14;
-                      left-margin: 16;
-                      right-margin: 16;
-                      accepts-tab: false;
-
-                      accessibility {
-                        label: _("Post text");
-                      }
-
-                      styles [
-                        "composer-text",
-                      ]
-                    };
-                  }
-
-                  Revealer ai_revealer {
-                    transition-type: slide_down;
-
-                    child: Box {
-                      orientation: vertical;
-                      spacing: 8;
-                      margin-start: 12;
-                      margin-end: 12;
-                      margin-bottom: 10;
-
-                      Box {
-                        spacing: 8;
-
-                        Image {
-                          icon-name: "starred-symbolic";
-                        }
-
-                        Label ai_title {
-                          hexpand: true;
-                          xalign: 0;
-                          ellipsize: end;
-
-                          styles [
-                            "heading",
-                          ]
-                        }
-
-                        Adw.Spinner ai_spinner {}
-                      }
-
-                      Label ai_result {
-                        wrap: true;
-                        wrap-mode: word_char;
-                        xalign: 0;
-                        selectable: true;
-                      }
-
-                      Adw.WrapBox ai_tags {
-                        child-spacing: 6;
-                        line-spacing: 6;
-                        visible: false;
-                      }
-
-                      Box ai_actions {
-                        spacing: 6;
-                        halign: end;
-
-                        Button {
-                          label: _("_Discard");
-                          use-underline: true;
-                          clicked => $on_ai_discard();
-                        }
-
-                        Button ai_retry_button {
-                          label: _("_Try Again");
-                          use-underline: true;
-                          clicked => $on_ai_retry();
-                        }
-
-                        Button ai_accept_button {
-                          label: _("_Apply");
-                          use-underline: true;
-                          clicked => $on_ai_accept();
-                        }
-                      }
-
-                      styles [
-                        "ai-panel",
-                      ]
-                    };
-                  }
-
-                  Box media_box {
-                    visible: false;
-                    margin-start: 12;
-                    margin-end: 12;
-                    margin-bottom: 10;
-
-                    Box media_tiles {
-                      spacing: 8;
-                    }
-                  }
-
-                  Box toolbar {
-                    spacing: 6;
-
-                    Adw.WrapBox options_box {
+                    Label ai_title {
                       hexpand: true;
-                      child-spacing: 2;
-                      line-spacing: 2;
-
-                      Button add_media_button {
-                        icon-name: "insert-image-symbolic";
-                        tooltip-text: _("Add Images");
-
-                        accessibility {
-                          label: _("Add Images");
-                        }
-                        action-name: "win.add-media";
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      MenuButton ai_button {
-                        visible: false;
-                        tooltip-text: _("Writing Assistant");
-
-                        child: Adw.ButtonContent {
-                          icon-name: "starred-symbolic";
-                          label: _("Assistant");
-                        };
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      ToggleButton cw_button {
-                        tooltip-text: _("Content Warning");
-                        toggled => $on_cw_toggled();
-
-                        child: Adw.ButtonContent {
-                          icon-name: "dialog-warning-symbolic";
-                          label: _("CW");
-                        };
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      ToggleButton thread_button {
-                        visible: false;
-                        tooltip-text: _("Split into a thread when the text is too long. A line with only “---” sets a break by hand.");
-                        toggled => $on_thread_toggled();
-
-                        child: Adw.ButtonContent {
-                          icon-name: "view-list-ordered-symbolic";
-                          label: _("Thread");
-                        };
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      DropDown language_dropdown {
-                        tooltip-text: _("Language");
-                        enable-search: true;
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      DropDown visibility_dropdown {
-                        tooltip-text: _("Visibility on Mastodon");
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      DropDown label_dropdown {
-                        tooltip-text: _("Content label for Bluesky");
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-
-                      ToggleButton signature_button {
-                        tooltip-text: _("Append the signature of this role");
-                        toggled => $on_signature_toggled();
-
-                        child: Adw.ButtonContent {
-                          icon-name: "text-x-generic-symbolic";
-                          label: _("Signature");
-                        };
-
-                        styles [
-                          "flat",
-                        ]
-                      }
-                    }
-
-                    MenuButton issues_button {
-                      visible: false;
-                      valign: center;
-                      popover: issues_popover;
-                      tooltip-text: _("Problems");
-
-                      child: Box {
-                        spacing: 6;
-
-                        Image issues_icon {
-                          icon-name: "dialog-warning-symbolic";
-                        }
-
-                        Label issues_label {}
-                      };
+                      xalign: 0;
+                      ellipsize: end;
 
                       styles [
-                        "flat",
+                        "heading",
                       ]
                     }
 
-                    Label strict_counter {
-                      valign: center;
-                      margin-end: 8;
+                    Adw.Spinner ai_spinner {}
+                  }
 
-                      styles [
-                        "numeric",
-                        "caption-heading",
-                      ]
+                  Label ai_result {
+                    wrap: true;
+                    wrap-mode: word_char;
+                    xalign: 0;
+                    selectable: true;
+                  }
+
+                  Adw.WrapBox ai_tags {
+                    child-spacing: 6;
+                    line-spacing: 6;
+                    visible: false;
+                  }
+
+                  Box ai_actions {
+                    spacing: 6;
+                    halign: end;
+
+                    Button {
+                      label: _("_Discard");
+                      use-underline: true;
+                      clicked => $on_ai_discard();
                     }
 
-                    styles [
-                      "composer-toolbar",
-                    ]
+                    Button ai_retry_button {
+                      label: _("_Try Again");
+                      use-underline: true;
+                      clicked => $on_ai_retry();
+                    }
+
+                    Button ai_accept_button {
+                      label: _("_Apply");
+                      use-underline: true;
+                      clicked => $on_ai_accept();
+                    }
                   }
 
                   styles [
-                    "card",
-                    "composer-card",
+                    "ai-panel",
                   ]
-                }
-              };
+                };
+              }
+
+              ScrolledWindow media_box {
+                visible: false;
+                vscrollbar-policy: never;
+                propagate-natural-height: true;
+                margin-bottom: 10;
+
+                child: Box media_tiles {
+                  spacing: 8;
+                };
+              }
             };
           }
+
+          Box toolbar {
+            styles [
+              "composer-toolbar",
+            ]
+
+            Adw.Clamp {
+              hexpand: true;
+              maximum-size: 760;
+              tightening-threshold: 760;
+
+              child: Box {
+                spacing: 2;
+                margin-start: 10;
+                margin-end: 10;
+
+                Button add_media_button {
+                  icon-name: "insert-image-symbolic";
+                  tooltip-text: _("Add Images");
+
+                  accessibility {
+                    label: _("Add Images");
+                  }
+                  action-name: "win.add-media";
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                Button emoji_button {
+                  icon-name: "face-smile-symbolic";
+                  tooltip-text: _("Insert Emoji");
+                  clicked => $on_emoji_clicked();
+
+                  accessibility {
+                    label: _("Insert Emoji");
+                  }
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                ToggleButton cw_button {
+                  icon-name: "dialog-warning-symbolic";
+                  tooltip-text: _("Content Warning");
+                  toggled => $on_cw_toggled();
+
+                  accessibility {
+                    label: _("Content Warning");
+                  }
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                ToggleButton thread_button {
+                  visible: false;
+                  icon-name: "view-list-ordered-symbolic";
+                  tooltip-text: _("Split into a thread when the text is too long. A line with only “---” sets a break by hand.");
+                  toggled => $on_thread_toggled();
+
+                  accessibility {
+                    label: _("Thread");
+                  }
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                MenuButton ai_button {
+                  visible: false;
+                  icon-name: "starred-symbolic";
+                  tooltip-text: _("Writing Assistant");
+
+                  accessibility {
+                    label: _("Writing Assistant");
+                  }
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                Box {
+                  hexpand: true;
+                }
+
+                MenuButton issues_button {
+                  visible: false;
+                  valign: center;
+                  popover: issues_popover;
+                  tooltip-text: _("Problems");
+
+                  child: Box {
+                    spacing: 6;
+
+                    Image issues_icon {
+                      icon-name: "dialog-warning-symbolic";
+                    }
+
+                    Label issues_label {}
+                  };
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                MenuButton options_button {
+                  popover: options_popover;
+                  tooltip-text: _("Post Options");
+
+                  child: Adw.ButtonContent options_content {
+                    icon-name: "emblem-system-symbolic";
+                    can-shrink: true;
+                  };
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                $DandelionCounterRing strict_counter {
+                  valign: center;
+                  margin-start: 6;
+                  margin-end: 4;
+                }
+              };
+            }
+          }
+
+          styles [
+            "view",
+          ]
         }
 
         [preview]
@@ -640,5 +638,47 @@ Popover issues_popover {
       margin-end: 6;
       width-request: 280;
     };
+  };
+}
+
+Popover options_popover {
+  child: Box {
+    orientation: vertical;
+    spacing: 12;
+    margin-top: 6;
+    margin-bottom: 6;
+    margin-start: 6;
+    margin-end: 6;
+    width-request: 320;
+
+    Adw.PreferencesGroup {
+      title: _("All Profiles");
+
+      Adw.ComboRow language_dropdown {
+        title: _("Language");
+        enable-search: true;
+      }
+
+      Adw.SwitchRow signature_button {
+        title: _("Append Signature");
+        notify::active => $on_signature_toggled();
+      }
+    }
+
+    Adw.PreferencesGroup mastodon_options {
+      title: "Mastodon";
+
+      Adw.ComboRow visibility_dropdown {
+        title: _("Visibility");
+      }
+    }
+
+    Adw.PreferencesGroup bluesky_options {
+      title: "Bluesky";
+
+      Adw.ComboRow label_dropdown {
+        title: _("Content Label");
+      }
+    }
   };
 }
