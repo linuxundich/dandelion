@@ -1,6 +1,6 @@
 # Maintainer: Christoph Langner <mail@christoph-langner.de>
 pkgname=dandelion
-pkgver=0.2.2
+pkgver=0.3.0
 pkgrel=1
 pkgdesc="Write once, post to Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 arch=('any')
@@ -12,7 +12,7 @@ depends=(
   'gtk4'
   'gtksourceview5'
   'hicolor-icon-theme'
-  'libadwaita'
+  'libadwaita>=1:1.9'
   'libportal-gtk4'
   'libsecret'
   'libsoup3'

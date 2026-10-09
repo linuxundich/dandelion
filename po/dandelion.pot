@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dandelion\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 11:38+0200\n"
+"POT-Creation-Date: 2026-10-09 11:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,63 +137,95 @@ msgstr ""
 msgid "Dark style"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:85
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:84
+msgid "A new window layout that grows with the screen."
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+msgid "Drafts, scheduled and published posts share one sidebar with search"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:87
+msgid ""
+"The editor is a plain writing surface with an options popover and a "
+"character ring"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:88
+msgid "The preview grows with the window and shows two columns on wide screens"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:89
+msgid ""
+"Calendar page with published posts and free time slots; drag a draft onto a "
+"day to schedule it"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:90
+msgid "Detail page for published posts"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:91
+msgid "OpenRouter as a further AI provider and a word limit for AI alt text"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:98
 msgid ""
 "The writing assistant asks Gemini and OpenAI for less reasoning and uses "
 "fewer tokens"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:99
 msgid "Images for alt text are scaled down before they are sent"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:87
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:100
 msgid "Gemini thought summaries no longer end up in suggestions"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:94
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:107
 msgid "New icon: the seeds fly away from the dandelion like rays"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:95
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:108
 msgid "Flatpak bundle with translations included"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:102
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:115
 msgid "Long posts can be split into threads on Mastodon, Bluesky and X"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:103
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:116
 msgid ""
 "Mastodon posts can be scheduled on the server, so they appear even when the "
 "computer is off"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:104
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:117
 msgid "Calendar view for scheduled posts with drag and drop"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:105
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:118
 msgid "Time slots per role and scheduling into the next free slot"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:111
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:124
 msgid "First release."
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:113
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:126
 msgid "Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:114
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:127
 msgid "Roles, profiles, previews and exact character counters"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:115
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:128
 msgid "Scheduled posts with a background service"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:116
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:129
 msgid "Optional writing assistant"
 msgstr ""
 

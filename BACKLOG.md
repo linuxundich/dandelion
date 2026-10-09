@@ -1,12 +1,12 @@
 # Backlog
 
-As of 2026-10-03, version 0.2.2. Shipped changes are in
+As of 2026-10-09, version 0.3.0. Shipped changes are in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Release
 
-- [ ] **Upload the AUR package.** PKGBUILD and `.SRCINFO` for 0.2.2 are ready
-      in `build-aux/arch/` (checksum filled in).
+- [ ] **Upload the AUR package.** PKGBUILD for 0.3.0 is in `build-aux/arch/`;
+      fill in the checksum of the GitHub tarball after pushing the tag.
 - [ ] **Submit to Flathub** (optional). The release manifest
       `build-aux/flatpak/de.linuxundich.Dandelion.release.json` builds from the
       Git tag. Still missing: verification via
@@ -23,9 +23,6 @@ As of 2026-10-03, version 0.2.2. Shipped changes are in
 
 ## Features
 
-- [ ] **UI redesign** after [docs/ui-redesign.md](docs/ui-redesign.md): sidebar
-      archive, editor surface, growing preview, calendar page. Phases 1–5,
-      each reviewed before the next.
 - [ ] **Videos** for Bluesky, X, LinkedIn and Facebook. So far videos only go
       to Mastodon.
 - [ ] **Bluesky OAuth** as an alternative to the app password, with the
@@ -38,6 +35,8 @@ As of 2026-10-03, version 0.2.2. Shipped changes are in
 
 ## Done
 
+- [x] UI redesign after [docs/ui-redesign.md](docs/ui-redesign.md): sidebar
+      archive, editor surface, growing preview, calendar page (v0.3.0)
 - [x] Phases 1 to 8 of the original brief (v0.1.0)
 - [x] CHANGELOG created (v0.2.0)
 - [x] Thread splitting for Mastodon, Bluesky and X (v0.2.0)

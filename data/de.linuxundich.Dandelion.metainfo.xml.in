@@ -79,6 +79,19 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.0" date="2026-10-09">
+      <description>
+        <p>A new window layout that grows with the screen.</p>
+        <ul>
+          <li>Drafts, scheduled and published posts share one sidebar with search</li>
+          <li>The editor is a plain writing surface with an options popover and a character ring</li>
+          <li>The preview grows with the window and shows two columns on wide screens</li>
+          <li>Calendar page with published posts and free time slots; drag a draft onto a day to schedule it</li>
+          <li>Detail page for published posts</li>
+          <li>OpenRouter as a further AI provider and a word limit for AI alt text</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.2.2" date="2026-10-03">
       <description>
         <ul>

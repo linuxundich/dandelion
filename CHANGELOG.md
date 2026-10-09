@@ -2,52 +2,55 @@
 
 All notable changes to Dandelion are listed here.
 
-## [Unreleased]
+## 0.3.0 – 2026-10-09
+
+A new window layout that grows with the screen, following the current GNOME
+HIG and libadwaita 1.9.
 
 ### Changed
 
-- **New window layout with a sidebar** (UI redesign, phase 1): drafts,
-  scheduled and published posts and the calendar now sit in one sidebar at
-  full window height, grouped by state. The view switcher at the top and the
-  separate drafts panel are gone. Right-click an entry for its actions
-  (change time, pause, send now, duplicate, delete, use as new draft).
+- **One sidebar for everything:** drafts, scheduled and published posts and
+  the calendar sit in a sidebar at full window height, grouped by state. The
+  view switcher at the top and the separate drafts panel are gone.
+  Right-click an entry for its actions (change time, pause, send now,
+  duplicate, delete, use as new draft). In narrow windows the sidebar becomes
+  its own page.
 - **Search** (Ctrl+F) looks through drafts, scheduled and published posts at
   once.
-- **The editor is a plain writing surface** (phase 2): no card, the text
-  column stays centered and readable on wide windows, and an empty post shows
-  "What's new?". The variant tabs mark platforms with their own text with a
-  dot.
+- **The editor is a plain writing surface:** no card, the text column stays
+  centered and readable on wide windows, and an empty post shows "What's
+  new?". The variant tabs mark platforms with their own text with a dot.
 - **Leaner toolbar:** images, emoji, content warning, thread and assistant are
   icon buttons. Language, signature, Mastodon visibility and the Bluesky label
   moved into an options popover, grouped by platform; its button shows the
   current language and visibility.
-- **New screenshots** in README and AppStream metadata.
 - **Character count as a ring** with the remaining characters of the strictest
   profile.
-- **The preview grows with the window** (phase 3) and shows its tiles in two
-  columns from about 640 px. Below roughly 1100 px window width it is hidden
-  and slides in over the editor when needed. Its header sums up how many
-  profiles are ready; the row of profile chips with counters is gone, and a
-  tile shows a character count only when that profile is over its limit.
+- **The preview grows with the window** and shows its tiles in two columns
+  from about 640 px. Below roughly 1100 px window width it is hidden and slides
+  in over the editor when needed. Its header sums up how many profiles are
+  ready; the row of profile chips with counters is gone, and a tile shows a
+  character count only when that profile is over its limit.
 - **Compact preview** is now a switch under Preferences › General instead of
   a toggle in the preview.
-- **Calendar page** (phase 4): the month fills the window and shows published
-  posts (dimmed, with a check mark) next to scheduled ones, plus the free time
-  slots of the roles as dashed entries. Month navigation sits in the header
-  bar, role and platform filters in a popover. Clicking a published post opens
-  its detail page. In narrow windows the month shrinks to dots and the posts of
-  the selected day are listed below. The separate list view is gone.
+- **Calendar page:** the month fills the window and shows published posts
+  (dimmed, with a check mark) next to scheduled ones, plus the free time slots
+  of the roles as dashed entries. Month navigation sits in the header bar, role
+  and platform filters in a popover. In narrow windows the month shrinks to
+  dots and the posts of the selected day are listed below. The separate list
+  of scheduled posts is gone.
 - **F9** now shows or hides the preview; Ctrl+2 opens the calendar.
+- **New screenshots** in README and AppStream metadata.
+- Requires libadwaita 1.9 (GNOME 50).
 
 ### Added
 
 - **Drag a draft from the sidebar onto a calendar day** to schedule it. The
   schedule dialog opens with that day and the role's free slot on it (or 9:00)
   preselected.
-- **Emoji button** in the toolbar.
 - **Detail page for published posts** with the text, images and one row per
   profile to open, copy, delete or retry.
-
+- **Emoji button** in the toolbar.
 - **Word limit for AI alt text**, 20 words by default, adjustable (0 = no
   limit) under Preferences › AI. The prompt asks for it, and longer answers are
   cut at a word boundary.
@@ -63,8 +66,6 @@ All notable changes to Dandelion are listed here.
 ### Fixed
 
 - In narrow windows the preview bar no longer covers the editor toolbar.
-- The header shows "Draft" instead of "New Post" as soon as a new post is
-  saved for the first time.
 - The image preview in the alt text dialog and in the platform previews was
   blank for some files (for example WebP).
 

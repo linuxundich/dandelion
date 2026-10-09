@@ -797,6 +797,20 @@ DE: dict[str, str | tuple[str, str]] = {
     "Free time slot of “{role}”": "Freies Zeitfenster von „{role}“",
     "Plan posts in a month calendar with free time slots":
         "Beiträge im Monatskalender mit freien Zeitfenstern planen",
+    # Release 0.3.0
+    "A new window layout that grows with the screen.":
+        "Eine neue Fensteraufteilung, die mit dem Bildschirm wächst.",
+    "Drafts, scheduled and published posts share one sidebar with search":
+        "Entwürfe, geplante und veröffentlichte Beiträge teilen sich eine Seitenleiste mit Suche",
+    "The editor is a plain writing surface with an options popover and a character ring":
+        "Der Editor ist eine schlichte Schreibfläche mit Optionen-Menü und Zeichenring",
+    "The preview grows with the window and shows two columns on wide screens":
+        "Die Vorschau wächst mit dem Fenster und zeigt auf breiten Bildschirmen zwei Spalten",
+    "Calendar page with published posts and free time slots; drag a draft onto a day to schedule it":
+        "Kalenderseite mit veröffentlichten Beiträgen und freien Zeitfenstern; Entwürfe lassen sich auf einen Tag ziehen",
+    "Detail page for published posts": "Detailseite für veröffentlichte Beiträge",
+    "OpenRouter as a further AI provider and a word limit for AI alt text":
+        "OpenRouter als weiterer KI-Anbieter und eine Wortgrenze für KI-Alt-Texte",
 }
 
 

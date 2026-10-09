@@ -181,7 +181,12 @@ Each phase ends with a review by the maintainer before the next one starts.
    Originally planned: Move `DandelionMonthCalendar` into the content,
    filters in the header, slots, drag source on draft items, drop opens the
    schedule dialog.
-5. **Narrow layouts and polish.** Checks at 360, 600, 860, 1100 and 1920 sp in
+5. **Narrow layouts and polish.** *Done 2026-10-09, released as 0.3.0:*
+   screenshots come from a headless GNOME session with a seeded copy of the
+   database, `DANDELION_OFFLINE=1` and a memory secret store, so no profile
+   shows a login error. Widths checked: 420, 900, 1060, 1280 px; 1920 px not
+   available in the test session.
+   Originally planned: Checks at 360, 600, 860, 1100 and 1920 sp in
    light and dark, keyboard navigation, shortcuts dialog, screenshots in
    README and metainfo, CHANGELOG, release.
 
