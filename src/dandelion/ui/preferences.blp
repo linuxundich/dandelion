@@ -62,6 +62,11 @@ template $DandelionPreferences: Adw.PreferencesDialog {
         title: _("Show Preview");
       }
 
+      Adw.SwitchRow compact_preview_row {
+        title: _("Compact Preview");
+        subtitle: _("Shortens long texts and link cards in the preview");
+      }
+
       Adw.ComboRow numbering_row {
         title: _("Thread Numbering");
         subtitle: _("Added to every part of a thread");

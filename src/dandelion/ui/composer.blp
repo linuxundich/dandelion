@@ -41,9 +41,9 @@ template $DandelionComposer: Adw.BreakpointBin {
 
           content: Adw.OverlaySplitView preview_split {
             sidebar-position: end;
-            min-sidebar-width: 300;
-            max-sidebar-width: 380;
-            sidebar-width-fraction: 0.33;
+            min-sidebar-width: 320;
+            max-sidebar-width: 900;
+            sidebar-width-fraction: 0.4;
 
             content: Adw.LayoutSlot {
               id: "editor";
@@ -502,44 +502,33 @@ template $DandelionComposer: Adw.BreakpointBin {
             margin-end: 12;
 
             Box {
-              spacing: 6;
+              spacing: 8;
 
               Label {
                 label: _("Preview");
                 xalign: 0;
-                hexpand: true;
 
                 styles [
                   "heading",
                 ]
               }
 
-              Adw.ToggleGroup density_group {
-                notify::active-name => $on_density_changed();
+              Box preview_summary {
+                spacing: 4;
+                halign: end;
+                hexpand: true;
 
-                Adw.Toggle {
-                  name: "compact";
-                  label: _("Compact");
+                Image preview_summary_icon {
+                  pixel-size: 14;
                 }
 
-                Adw.Toggle {
-                  name: "full";
-                  label: _("Full");
+                Label preview_summary_label {
+                  ellipsize: end;
+
+                  styles [
+                    "caption-heading",
+                  ]
                 }
-
-                styles [
-                  "round",
-                  "small-toggles",
-                ]
-              }
-            }
-
-            Adw.WrapBox status_strip {
-              child-spacing: 6;
-              line-spacing: 6;
-
-              accessibility {
-                label: _("Status of all selected profiles");
               }
             }
 
@@ -571,8 +560,21 @@ template $DandelionComposer: Adw.BreakpointBin {
             }
 
             Box preview_tiles {
-              orientation: vertical;
               spacing: 12;
+              homogeneous: true;
+
+              Box preview_col_start {
+                orientation: vertical;
+                spacing: 12;
+                valign: start;
+              }
+
+              Box preview_col_end {
+                orientation: vertical;
+                spacing: 12;
+                valign: start;
+                visible: false;
+              }
             }
           };
 
@@ -585,11 +587,20 @@ template $DandelionComposer: Adw.BreakpointBin {
   };
 
   Adw.Breakpoint {
+    condition ("max-width: 860sp")
+
+    setters {
+      preview_split.collapsed: true;
+      preview_split.show-sidebar: false;
+      preview_split.max-sidebar-width: 420;
+    }
+  }
+
+  Adw.Breakpoint {
     condition ("max-width: 700sp")
 
     setters {
       layout_view.layout-name: "narrow";
-      density_group.visible: false;
     }
   }
 }

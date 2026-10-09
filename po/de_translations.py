@@ -779,6 +779,12 @@ DE: dict[str, str | tuple[str, str]] = {
     "Visibility": "Sichtbarkeit",
     "Content Label": "Inhaltslabel",
     "{name}, own text": "{name}, eigener Text",
+    # Vorschau (Umbau 2026-10)
+    "Compact Preview": "Kompakte Vorschau",
+    "Shortens long texts and link cards in the preview":
+        "Kürzt lange Texte und Linkkarten in der Vorschau",
+    "{n} profile not ready": ("{n} Profil nicht bereit", "{n} Profile nicht bereit"),
+    "{n} profile ready": ("{n} Profil bereit", "{n} Profile bereit"),
 }
 
 

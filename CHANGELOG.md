@@ -23,6 +23,13 @@ All notable changes to Dandelion are listed here.
   current language and visibility.
 - **Character count as a ring** with the remaining characters of the strictest
   profile.
+- **The preview grows with the window** (phase 3) and shows its tiles in two
+  columns from about 640 px. Below roughly 1100 px window width it is hidden
+  and slides in over the editor when needed. Its header sums up how many
+  profiles are ready; the row of profile chips with counters is gone, and a
+  tile shows a character count only when that profile is over its limit.
+- **Compact preview** is now a switch under Preferences › General instead of
+  a toggle in the preview.
 - **F9** now shows or hides the preview; Ctrl+2 opens the calendar, which
   shows the month view by default.
 

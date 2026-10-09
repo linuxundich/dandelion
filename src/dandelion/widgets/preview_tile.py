@@ -163,14 +163,13 @@ class PreviewTile(Gtk.Box):
         plat.add_css_class("caption")
         plat.add_css_class("dim-label")
         foot.append(plat)
-        counter = Gtk.Label(label=f"{count.used} / {count.limit}")
-        counter.add_css_class("caption")
-        counter.add_css_class("numeric")
+        # Die Zeichenzahl steht im Ring des Editors; hier nur, wenn dieses Profil überzieht
         if count.over:
+            counter = Gtk.Label(label=f"{count.used} / {count.limit}")
+            counter.add_css_class("caption")
+            counter.add_css_class("numeric")
             counter.add_css_class("error")
-        elif count.ratio >= 0.9:
-            counter.add_css_class("warning")
-        foot.append(counter)
+            foot.append(counter)
         self.append(foot)
 
         # Probleme dieser Kachel direkt anzeigen

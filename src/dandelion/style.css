@@ -118,12 +118,6 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
 }
 
 /* Vorschau: Statusleiste und Gruppen */
-.status-chip {
-  padding: 2px 8px 2px 3px;
-  border-radius: 999px;
-  min-height: 0;
-  font-size: 0.85em;
-}
 .stacked-avatar {
   box-shadow: 0 0 0 2px var(--card-bg-color);
   border-radius: 999px;
@@ -153,11 +147,6 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
   min-height: 24px;
   padding: 2px 8px;
   font-size: 0.9em;
-}
-.small-toggles toggle {
-  min-height: 22px;
-  padding: 0 8px;
-  font-size: 0.85em;
 }
 
 /* Weitere Plattformen (stilisiert, keine Logos) */

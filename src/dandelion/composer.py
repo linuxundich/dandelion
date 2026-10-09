@@ -83,7 +83,6 @@ class DandelionComposer(Adw.BreakpointBin):
     variant_info_button: Gtk.Button = Gtk.Template.Child()
     media_box: Gtk.ScrolledWindow = Gtk.Template.Child()
     strict_counter: DandelionCounterRing = Gtk.Template.Child()
-    density_group: Adw.ToggleGroup = Gtk.Template.Child()
     ai_button: Gtk.MenuButton = Gtk.Template.Child()
     ai_revealer: Gtk.Revealer = Gtk.Template.Child()
     ai_title: Gtk.Label = Gtk.Template.Child()
@@ -113,7 +112,11 @@ class DandelionComposer(Adw.BreakpointBin):
     signature_button: Adw.SwitchRow = Gtk.Template.Child()
     preview_tiles: Gtk.Box = Gtk.Template.Child()
     preview_scroller: Gtk.ScrolledWindow = Gtk.Template.Child()
-    status_strip: Adw.WrapBox = Gtk.Template.Child()
+    preview_summary: Gtk.Box = Gtk.Template.Child()
+    preview_summary_icon: Gtk.Image = Gtk.Template.Child()
+    preview_summary_label: Gtk.Label = Gtk.Template.Child()
+    preview_col_start: Gtk.Box = Gtk.Template.Child()
+    preview_col_end: Gtk.Box = Gtk.Template.Child()
     filter_hint: Gtk.Box = Gtk.Template.Child()
     filter_label: Gtk.Label = Gtk.Template.Child()
 
@@ -184,10 +187,11 @@ class DandelionComposer(Adw.BreakpointBin):
         self.add_controller(drop)
 
         self.preview_split.set_show_sidebar(self.settings.get_boolean("show-preview"))
-        self._loading = True
-        self.density_group.set_active_name(
-            "compact" if self.settings.get_boolean("preview-compact") else "full")
-        self._loading = False
+        self._two_columns = False
+        self.settings.connect("changed::preview-compact", lambda *_: self._update_previews())
+        self.preview_scroller.get_hadjustment().connect("changed", self._on_preview_width)
+        self.preview_split.connect("notify::show-sidebar", self._on_preview_shown)
+        self.sheet.connect("notify::open", self._on_preview_shown)
         self._style.connect("notify::accent-color-rgba", lambda *_: self._update_tags_color())
         self._style.connect("notify::dark", self._on_dark_changed)
         self._apply_scheme(self._inherit_buffer)
@@ -736,7 +740,7 @@ class DandelionComposer(Adw.BreakpointBin):
         self.thread_button.set_visible(any(
             self.app.registry.get(p).default_limits().supports_threads
             for p in platforms if p in self.app.registry))
-        self._update_status_strip()
+        self._update_summary()
         self._rebuild_ai_menu()
         self._update_issues()
         self._update_media()
@@ -755,69 +759,31 @@ class DandelionComposer(Adw.BreakpointBin):
         return ngettext("Cannot publish: {n} problem", "Cannot publish: {n} problems",
                         len(errors)).format(n=len(errors))
 
-    def _update_status_strip(self) -> None:
-        """Eine kompakte Zeile pro Profil: Avatar, Name, Zähler, Status."""
-        while (child := self.status_strip.get_first_child()) is not None:
-            self.status_strip.remove(child)
+    def _update_summary(self) -> None:
+        """Kopf der Vorschau: wie viele Profile bereit sind oder wo es hakt."""
         targets = self.report.targets if self.report else []
-        over = 0
-        for t in targets:
-            c = t.count
-            btn = Gtk.Button()
-            btn.add_css_class("status-chip")
-            box = Gtk.Box(spacing=5)
-            avatar = Adw.Avatar(size=18, text=t.profile.title, show_initials=True)
-            self.avatars.apply(avatar, t.profile.avatar_url)
-            overlay = Gtk.Overlay(child=avatar)
-            overlay.add_overlay(platform_badge(t.profile.platform, 8))
-            box.append(overlay)
-            platform_label = Gtk.Label(label=t.platform.name)
-            platform_label.add_css_class("dim-label")
-            box.append(platform_label)
-            box.append(Gtk.Label(label=t.profile.label or t.profile.handle, ellipsize=3,
-                                 max_width_chars=20))
-            counter = Gtk.Label(label=f"{c.used}/{c.limit}")
-            counter.add_css_class("numeric")
-            counter.add_css_class("dim-label")
-            box.append(counter)
-            if len(t.parts) > 1:
-                parts_label = Gtk.Label(label=f"· {len(t.parts)}×")
-                parts_label.add_css_class("dim-label")
-                parts_label.set_tooltip_text(ngettext("{n} part", "{n} parts", len(t.parts)).format(
-                    n=len(t.parts)))
-                box.append(parts_label)
-            state = _("within the limit")
-            errors = [i for i in t.issues if i.severity == "error"]
-            if c.over:
-                over += 1
-                state = _("over the limit")
-                counter.remove_css_class("dim-label")
-                counter.add_css_class("error")
-            elif c.ratio >= 0.9:
-                state = _("close to the limit")
-                counter.remove_css_class("dim-label")
-                counter.add_css_class("warning")
-            if t.issues:
-                icon = Gtk.Image(icon_name="dialog-error-symbolic" if errors
-                                 else "dialog-warning-symbolic")
-                icon.add_css_class("error" if errors else "warning")
-                box.append(icon)
-            btn.set_child(box)
-            text = _("{platform} {handle}: {used} of {limit} characters, {state}").format(
-                platform=t.platform.name, handle=t.profile.full_handle, used=c.used,
-                limit=c.limit, state=state)
-            if t.issues:
-                text += ". " + " ".join(i.message for i in t.issues)
-            btn.update_property([Gtk.AccessibleProperty.LABEL], [text])
-            btn.set_tooltip_text(text)
-            btn.connect("clicked", lambda _b, pid=t.profile.id: self._scroll_to_preview(pid))
-            self.status_strip.append(btn)
-        self.status_strip.set_visible(len(targets) > 1)
+        problems = sum(1 for t in targets if any(i.severity == "error" for i in t.issues))
+        over = sum(1 for t in targets if t.count.over)
         self._update_strict_counter(targets)
+        for cls in ("success", "error"):
+            self.preview_summary.remove_css_class(cls)
+        if not targets:
+            text = ""
+        elif problems:
+            text = ngettext("{n} profile not ready", "{n} profiles not ready",
+                            problems).format(n=problems)
+            self.preview_summary.add_css_class("error")
+            self.preview_summary_icon.set_from_icon_name("dialog-error-symbolic")
+        else:
+            text = ngettext("{n} profile ready", "{n} profiles ready",
+                            len(targets)).format(n=len(targets))
+            self.preview_summary.add_css_class("success")
+            self.preview_summary_icon.set_from_icon_name("object-select-symbolic")
+        self.preview_summary_label.set_label(text)
+        self.preview_summary.set_visible(bool(text))
         summary = _("Preview")
-        if targets:
-            summary += " · " + ngettext("{n} profile", "{n} profiles", len(targets)).format(
-                n=len(targets))
+        if text:
+            summary += " · " + text
         if over:
             summary += " · " + ngettext("{n} over the limit", "{n} over the limit",
                                         over).format(n=over)
@@ -932,13 +898,21 @@ class DandelionComposer(Adw.BreakpointBin):
         self.text_view.grab_focus()
         self.text_view.emit("insert-emoji")
 
-    @Gtk.Template.Callback()
-    def on_density_changed(self, *_args: object) -> None:
-        if not self.app or self._loading:
+    def _on_preview_width(self, adj: Gtk.Adjustment) -> None:
+        """Ab 640 px Breite stehen die Vorschaukacheln in zwei Spalten."""
+        two = adj.get_page_size() >= 640 and self.layout_view.get_layout_name() != "narrow"
+        if two != self._two_columns:
+            self._two_columns = two
+            self._update_previews()
+
+    def _on_preview_shown(self, *_args: object) -> None:
+        if self.win is None:
             return
-        self.settings.set_boolean("preview-compact",
-                                  self.density_group.get_active_name() != "full")
-        self._update_previews()
+        action = self.win.lookup_action("toggle-preview")
+        shown = (self.sheet.get_open() if self.layout_view.get_layout_name() == "narrow"
+                 else self.preview_split.get_show_sidebar())
+        if action and action.get_state().get_boolean() != shown:
+            action.set_state(GLib.Variant.new_boolean(shown))
 
     def _preview_filter(self) -> tuple[str | None, int | None, str]:
         """(Plattform, Profil, Beschriftung) passend zum aktiven Varianten-Tab."""
@@ -952,8 +926,10 @@ class DandelionComposer(Adw.BreakpointBin):
         return None, profile_id, self._key_platform_name(key)
 
     def _update_previews(self) -> None:
-        while (child := self.preview_tiles.get_first_child()) is not None:
-            self.preview_tiles.remove(child)
+        for col in (self.preview_col_start, self.preview_col_end):
+            while (child := col.get_first_child()) is not None:
+                col.remove(child)
+        self.preview_col_end.set_visible(self._two_columns)
         self._tile_for_profile.clear()
         targets = self.report.targets if self.report else []
         if not targets:
@@ -962,7 +938,7 @@ class DandelionComposer(Adw.BreakpointBin):
                                     description=_("Select a profile to see how the post "
                                                   "will look."))
             status.add_css_class("compact")
-            self.preview_tiles.append(status)
+            self.preview_col_start.append(status)
             return
 
         platform_filter, profile_filter, label = self._preview_filter()
@@ -999,7 +975,7 @@ class DandelionComposer(Adw.BreakpointBin):
                 if items[0][0].platform.id in [p.id for p in self.app.registry.all()] else 99
             return severity, order
 
-        for items in sorted(groups.values(), key=rank):
+        for n, items in enumerate(sorted(groups.values(), key=rank)):
             t, comp = items[0]
             urls = find_urls(comp.text)
             card = self.link_cards.get(urls[0].value) if urls else None
@@ -1010,7 +986,8 @@ class DandelionComposer(Adw.BreakpointBin):
                                parts=t.parts)
             for it in items:
                 self._tile_for_profile[it[0].profile.id] = tile
-            self.preview_tiles.append(tile)
+            column = self.preview_col_end if self._two_columns and n % 2 else self.preview_col_start
+            column.append(tile)
 
     def _scroll_to_preview(self, profile_id: int) -> None:
         if profile_id not in self._tile_for_profile:
@@ -1181,6 +1158,11 @@ class DandelionComposer(Adw.BreakpointBin):
     # ------------------------------------------------------------------
     # Entwürfe
     # ------------------------------------------------------------------
+    def preview_docked(self) -> bool:
+        """Steht die Vorschau fest neben dem Editor (nicht als Überlagerung oder Sheet)?"""
+        return (self.layout_view.get_layout_name() != "narrow"
+                and not self.preview_split.get_collapsed())
+
     def set_preview_visible(self, visible: bool) -> None:
         if self.layout_view.get_layout_name() == "narrow":
             self.sheet.set_open(visible)
@@ -1192,6 +1174,7 @@ class DandelionComposer(Adw.BreakpointBin):
         for chip in self.chips.values():
             chip.set_compact(narrow)
         self._sync_bottom_space()
+        self._on_preview_shown()
 
     def _sync_bottom_space(self) -> None:
         """Im schmalen Layout liegt die Vorschau-Leiste über dem Editor: Platz freihalten."""

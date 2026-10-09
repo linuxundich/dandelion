@@ -162,7 +162,13 @@ Each phase ends with a review by the maintainer before the next one starts.
    Originally planned: Remove the card, placeholder, InlineViewSwitcher with
    variant dots, attachment row, symbolic toolbar, options popover, counter
    ring.
-3. **Preview pane.** Growing width, two columns, default visibility by
+3. **Preview pane.** *Done 2026-10-09:* fraction 0.4, 320–900 px; composer
+   breakpoint at 860 sp collapses it into an overlay of max. 420 px (hidden
+   by default), at 700 sp the bottom sheet takes over. Two columns are two
+   vertical boxes filled alternately once the pane is 640 px wide. The
+   toggle button follows the overlay and the sheet; only the docked state is
+   saved as `show-preview`.
+   Originally planned: Growing width, two columns, default visibility by
    breakpoint, F9, summary header, drop the status strip.
 4. **Calendar page.** Move `DandelionMonthCalendar` into the content,
    filters in the header, slots, drag source on draft items, drop opens the

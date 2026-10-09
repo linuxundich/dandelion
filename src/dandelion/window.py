@@ -96,7 +96,9 @@ class DandelionWindow(Adw.ApplicationWindow):
 
     def _on_toggle_preview(self, action: Gio.SimpleAction, value: GLib.Variant) -> None:
         action.set_state(value)
-        self.settings.set_boolean("show-preview", value.get_boolean())
+        # Im eingeklappten Zustand nur vorübergehend zeigen, nicht als Vorgabe merken
+        if self.composer.preview_docked():
+            self.settings.set_boolean("show-preview", value.get_boolean())
         self.composer.set_preview_visible(value.get_boolean())
 
     # -- Navigation ------------------------------------------------------
