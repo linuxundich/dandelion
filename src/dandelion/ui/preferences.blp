@@ -217,6 +217,22 @@ template $DandelionPreferences: Adw.PreferencesDialog {
     }
 
     Adw.PreferencesGroup {
+      title: _("Alt Text");
+
+      Adw.SpinRow alt_words_row {
+        title: _("Maximum Length");
+        subtitle: _("Words in a suggested alt text, 0 for no limit");
+
+        adjustment: Adjustment {
+          lower: 0;
+          upper: 200;
+          step-increment: 1;
+          page-increment: 10;
+        };
+      }
+    }
+
+    Adw.PreferencesGroup {
       title: _("Privacy");
       description: _("Before text or images are sent to a provider for the first time, Dandelion asks for confirmation. API keys are stored in the system keyring.");
 

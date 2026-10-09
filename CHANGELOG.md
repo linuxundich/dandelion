@@ -6,6 +6,9 @@ All notable changes to Dandelion are listed here.
 
 ### Added
 
+- **Word limit for AI alt text**, 20 words by default, adjustable (0 = no
+  limit) under Preferences › AI. The prompt asks for it, and longer answers are
+  cut at a word boundary.
 - **OpenRouter** as a fourth AI provider next to Gemini, OpenAI and xAI: one
   key for many models. The model list only shows models that accept images.
 - **Alt text chat:** after a suggestion from Gemini, OpenAI or Grok you can ask

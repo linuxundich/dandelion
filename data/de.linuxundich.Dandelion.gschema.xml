@@ -52,6 +52,12 @@
     <key name="ai-model-openai" type="s"><default>'gpt-6-luna'</default><summary>OpenAI model</summary></key>
     <key name="ai-model-xai" type="s"><default>'grok-4.7'</default><summary>xAI model</summary></key>
     <key name="ai-model-openrouter" type="s"><default>'google/gemini-3.6-flash'</default><summary>OpenRouter model</summary></key>
+    <key name="ai-alt-text-words" type="i">
+      <range min="0" max="200"/>
+      <default>20</default>
+      <summary>Maximum words in AI-generated alt text</summary>
+      <description>0 means no word limit.</description>
+    </key>
     <key name="ai-privacy-accepted" type="as">
       <default>[]</default>
       <summary>Privacy notices already confirmed</summary>

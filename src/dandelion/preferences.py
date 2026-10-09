@@ -52,6 +52,7 @@ class DandelionPreferences(Adw.PreferencesDialog):
     ai_provider_group: Adw.PreferencesGroup = Gtk.Template.Child()
     provider_row: Adw.ComboRow = Gtk.Template.Child()
     key_row: Adw.PasswordEntryRow = Gtk.Template.Child()
+    alt_words_row: Adw.SpinRow = Gtk.Template.Child()
     model_row: Adw.ComboRow = Gtk.Template.Child()
     load_models_row: Adw.ButtonRow = Gtk.Template.Child()
 
@@ -86,6 +87,7 @@ class DandelionPreferences(Adw.PreferencesDialog):
         s = self.app.settings
         s.bind("ai-enabled", self.ai_enabled_row, "active", Gio.SettingsBindFlags.DEFAULT)
         s.bind("ai-enabled", self.ai_provider_group, "sensitive", Gio.SettingsBindFlags.GET)
+        s.bind("ai-alt-text-words", self.alt_words_row, "value", Gio.SettingsBindFlags.DEFAULT)
         self._ai_loading = True
         pid = self.app.ai.provider_id
         self.provider_row.set_selected(self._PROVIDERS.index(pid))

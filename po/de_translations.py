@@ -599,6 +599,11 @@ DE: dict[str, str | tuple[str, str]] = {
     "Ask for changes, e.g. “shorter” or “mention the cable”":
         "Änderung wünschen, z. B. „kürzer“ oder „Kabel erwähnen“",
     "Send": "Senden",
+    "Alt Text": "Alt-Text",
+    "Maximum Length": "Maximale Länge",
+    "Words in a suggested alt text, 0 for no limit": "Wörter in einem vorgeschlagenen Alt-Text, 0 für unbegrenzt",
+    "Maximum words in AI-generated alt text": "Höchstzahl Wörter in KI-erzeugten Alt-Texten",
+    "0 means no word limit.": "0 bedeutet kein Wortlimit.",
     "Shorter": "Kürzer",
     "Longer": "Länger",
     "More Casual": "Lockerer",

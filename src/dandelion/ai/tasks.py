@@ -120,8 +120,12 @@ async def hashtags(ctx: Context, text: str, platform_id: str | None = None,
 
 async def alt_text(ctx: Context, image: ImageInput, max_chars: int | None,
                    language: str, context_text: str = "", previous: str = "",
-                   instruction: str = "") -> str:
+                   instruction: str = "", max_words: int = 0) -> str:
     limit = f" Use at most {max_chars} characters." if max_chars else ""
+    if max_words:
+        limit += (f" Use at most {max_words} words: name only the most important "
+                  "content, leave out details, and do not describe the style or mood "
+                  "unless it matters.")
     system = (
         "You write alt text for images in social media posts, for people who cannot see "
         f"the image. Describe what is important, concise and objective, in {language}. "
@@ -137,6 +141,9 @@ async def alt_text(ctx: Context, image: ImageInput, max_chars: int | None,
                    f"Revise it according to this request: {instruction.strip()[:500]}")
     answer = await ctx.provider.complete(ctx.api_key, ctx.model, system, prompt, [image])
     result = clean(answer)
+    words = result.split()
+    if max_words and len(words) > max_words:
+        result = " ".join(words[:max_words]).rstrip(",;:") + "…"
     if max_chars and len(result) > max_chars:
         result = result[: max_chars - 1].rsplit(" ", 1)[0] + "…"
     return result

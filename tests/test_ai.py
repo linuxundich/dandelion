@@ -169,3 +169,13 @@ def test_openrouter(http, run):
     req = http.requests[-1]
     assert req.headers["Authorization"] == "Bearer or-key"
     assert req.json["reasoning"] == {"effort": "low"}
+
+
+def test_alt_text_word_limit(http, run):
+    http.add("POST", "https://api.x.ai/v1/chat/completions",
+             {"choices": [{"message": {"content": "eins zwei drei vier fünf sechs"}}]})
+    ctx = Context(create("xai", http), "k", "grok-4.7")
+    text = run(tasks.alt_text(ctx, ImageInput("image/png", b"P"), None, "German",
+                              max_words=4))
+    assert text == "eins zwei drei vier…"
+    assert "at most 4 words" in http.requests[-1].json["messages"][0]["content"]

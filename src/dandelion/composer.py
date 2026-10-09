@@ -1526,7 +1526,8 @@ class DandelionComposer(Adw.BreakpointBin):
         code = self.post.language or (self.role.language if self.role else None) or "de"
         language = dict(LANGUAGES).get(code, code)
         return await tasks.alt_text(ctx, ImageInput(mime, data), limit, language,
-                                    self.post.body, previous, instruction)
+                                    self.post.body, previous, instruction,
+                                    self.settings.get_int("ai-alt-text-words"))
 
     # ------------------------------------------------------------------
     # Planen
