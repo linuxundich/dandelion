@@ -193,104 +193,100 @@ msgid "Show the preview column"
 msgstr "Vorschauspalte anzeigen"
 
 #: data/de.linuxundich.Dandelion.gschema.xml:18
-msgid "View of scheduled posts (list or calendar)"
-msgstr "Ansicht der geplanten Beiträge (Liste oder Kalender)"
-
-#: data/de.linuxundich.Dandelion.gschema.xml:19
 msgid "Show compact preview tiles"
 msgstr "Kompakte Vorschaukacheln anzeigen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:20
+#: data/de.linuxundich.Dandelion.gschema.xml:19
 msgid "UUID of the last used role"
 msgstr "UUID der zuletzt verwendeten Rolle"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:24
+#: data/de.linuxundich.Dandelion.gschema.xml:23
 msgid "Require alt text on every platform"
 msgstr "Alt-Text auf allen Plattformen verlangen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:25
+#: data/de.linuxundich.Dandelion.gschema.xml:24
 msgid "Mastodon always requires alt text. If enabled, missing alt text blocks posting on all platforms instead of only showing a warning."
 msgstr "Mastodon verlangt immer einen Alt-Text. Wenn aktiviert, blockiert ein fehlender Alt-Text das Senden auf allen Plattformen, statt nur zu warnen."
 
-#: data/de.linuxundich.Dandelion.gschema.xml:27
+#: data/de.linuxundich.Dandelion.gschema.xml:26
 msgid "Check spelling"
 msgstr "Rechtschreibung prüfen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:28
+#: data/de.linuxundich.Dandelion.gschema.xml:27
 msgid "Append the role signature to new posts"
 msgstr "Signatur der Rolle an neue Beiträge anhängen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:30
+#: data/de.linuxundich.Dandelion.gschema.xml:29
 msgid "Numbering of thread parts"
 msgstr "Nummerierung der Thread-Teile"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:34
+#: data/de.linuxundich.Dandelion.gschema.xml:33
 msgid "Delete empty drafts after this many days (0 = never)"
 msgstr "Leere Entwürfe nach so vielen Tagen löschen (0 = nie)"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:37
+#: data/de.linuxundich.Dandelion.gschema.xml:36
 msgid "Notify on successful scheduled posts"
 msgstr "Bei erfolgreich geplanten Beiträgen benachrichtigen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:38
+#: data/de.linuxundich.Dandelion.gschema.xml:37
 msgid "Notify on failed scheduled posts"
 msgstr "Bei fehlgeschlagenen geplanten Beiträgen benachrichtigen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:40
+#: data/de.linuxundich.Dandelion.gschema.xml:39
 msgid "What to do with missed scheduled posts"
 msgstr "Umgang mit verpassten geplanten Beiträgen"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:44
+#: data/de.linuxundich.Dandelion.gschema.xml:43
 msgid "Minutes after which a scheduled post counts as missed"
 msgstr "Minuten, nach denen ein geplanter Beitrag als verpasst gilt"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:46
+#: data/de.linuxundich.Dandelion.gschema.xml:45
 msgid "Default time zone (empty = system)"
 msgstr "Standard-Zeitzone (leer = System)"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:48
+#: data/de.linuxundich.Dandelion.gschema.xml:47
 msgid "Enable AI features"
 msgstr "KI-Funktionen aktivieren"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:49
+#: data/de.linuxundich.Dandelion.gschema.xml:48
 msgid "AI provider (gemini, openai, xai, openrouter)"
 msgstr "KI-Anbieter (gemini, openai, xai, openrouter)"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:50
+#: data/de.linuxundich.Dandelion.gschema.xml:49
 msgid "Gemini model"
 msgstr "Gemini-Modell"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:51
+#: data/de.linuxundich.Dandelion.gschema.xml:50
 msgid "OpenAI model"
 msgstr "OpenAI-Modell"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:52
+#: data/de.linuxundich.Dandelion.gschema.xml:51
 msgid "xAI model"
 msgstr "xAI-Modell"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:53
+#: data/de.linuxundich.Dandelion.gschema.xml:52
 msgid "OpenRouter model"
 msgstr "OpenRouter-Modell"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:57
+#: data/de.linuxundich.Dandelion.gschema.xml:56
 msgid "Maximum words in AI-generated alt text"
 msgstr "Höchstzahl Wörter in KI-erzeugten Alt-Texten"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:58
+#: data/de.linuxundich.Dandelion.gschema.xml:57
 msgid "0 means no word limit."
 msgstr "0 bedeutet kein Wortlimit."
 
-#: data/de.linuxundich.Dandelion.gschema.xml:62
+#: data/de.linuxundich.Dandelion.gschema.xml:61
 msgid "Privacy notices already confirmed"
 msgstr "Bereits bestätigte Datenschutzhinweise"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:63
+#: data/de.linuxundich.Dandelion.gschema.xml:62
 msgid "Entries like “openai:text” or “gemini:images”."
 msgstr "Einträge wie „openai:text“ oder „gemini:images“."
 
 #: src/dandelion/ui/window.blp:25 src/dandelion/ui/window.blp:28
-#: src/dandelion/ui/shortcuts-dialog.blp:9 src/dandelion/window.py:157
-#: src/dandelion/archive.py:156
+#: src/dandelion/ui/shortcuts-dialog.blp:9 src/dandelion/window.py:160
+#: src/dandelion/archive.py:169
 msgid "New Post"
 msgstr "Neuer Beitrag"
 
@@ -299,7 +295,7 @@ msgid "Main Menu"
 msgstr "Hauptmenü"
 
 #: src/dandelion/ui/window.blp:48 src/dandelion/ui/window.blp:51
-#: src/dandelion/ui/window.blp:125 src/dandelion/ui/window.blp:129
+#: src/dandelion/ui/window.blp:168 src/dandelion/ui/window.blp:172
 msgid "Search"
 msgstr "Suchen"
 
@@ -315,86 +311,102 @@ msgstr "Keine Ergebnisse"
 msgid "Compose"
 msgstr "Verfassen"
 
-#: src/dandelion/ui/window.blp:99 src/dandelion/scheduled.py:299
+#: src/dandelion/ui/window.blp:103 src/dandelion/ui/window.blp:107
+msgid "Previous Month"
+msgstr "Vorheriger Monat"
+
+#: src/dandelion/ui/window.blp:113 src/dandelion/ui/window.blp:117
+msgid "Next Month"
+msgstr "Nächster Monat"
+
+#: src/dandelion/ui/window.blp:122
+msgid "_Today"
+msgstr "_Heute"
+
+#: src/dandelion/ui/window.blp:131 src/dandelion/ui/window.blp:135
+msgid "Filter"
+msgstr "Filtern"
+
+#: src/dandelion/ui/window.blp:142 src/dandelion/scheduled.py:405
 msgid "_Publish"
 msgstr "_Veröffentlichen"
 
-#: src/dandelion/ui/window.blp:103 src/dandelion/composer.py:758
+#: src/dandelion/ui/window.blp:146 src/dandelion/composer.py:758
 msgid "Publish to all selected profiles"
 msgstr "Auf allen ausgewählten Profilen veröffentlichen"
 
-#: src/dandelion/ui/window.blp:104
+#: src/dandelion/ui/window.blp:147
 msgid "More Publishing Options"
 msgstr "Weitere Optionen zum Veröffentlichen"
 
-#: src/dandelion/ui/window.blp:114 src/dandelion/ui/window.blp:117
+#: src/dandelion/ui/window.blp:157 src/dandelion/ui/window.blp:160
 #: src/dandelion/ui/composer.blp:81 src/dandelion/ui/composer.blp:508
 #: src/dandelion/composer.py:784
 msgid "Preview"
 msgstr "Vorschau"
 
-#: src/dandelion/ui/window.blp:182 src/dandelion/ai_service.py:84
+#: src/dandelion/ui/window.blp:225 src/dandelion/ai_service.py:84
 msgid "_Send"
 msgstr "_Senden"
 
-#: src/dandelion/ui/window.blp:190
+#: src/dandelion/ui/window.blp:234
 msgid "_Schedule…"
 msgstr "_Planen …"
 
-#: src/dandelion/ui/window.blp:195
+#: src/dandelion/ui/window.blp:239
 msgid "In Next _Free Slot"
 msgstr "In nächsten _freien Slot"
 
-#: src/dandelion/ui/window.blp:204
+#: src/dandelion/ui/window.blp:248
 msgid "_New Post"
 msgstr "_Neuer Beitrag"
 
-#: src/dandelion/ui/window.blp:211
+#: src/dandelion/ui/window.blp:255
 msgid "_Roles and Profiles"
 msgstr "_Rollen und Profile"
 
-#: src/dandelion/ui/window.blp:216
+#: src/dandelion/ui/window.blp:260
 msgid "_Preferences"
 msgstr "_Einstellungen"
 
-#: src/dandelion/ui/window.blp:221
+#: src/dandelion/ui/window.blp:265
 msgid "_Keyboard Shortcuts"
 msgstr "_Tastenkürzel"
 
-#: src/dandelion/ui/window.blp:226
+#: src/dandelion/ui/window.blp:270
 msgid "_About Dandelion"
 msgstr "_Info zu Dandelion"
 
-#: src/dandelion/ui/window.blp:235 src/dandelion/ui/window.blp:273
+#: src/dandelion/ui/window.blp:279 src/dandelion/ui/window.blp:317
 msgid "_Duplicate"
 msgstr "_Duplizieren"
 
-#: src/dandelion/ui/window.blp:242 src/dandelion/ui/window.blp:285
+#: src/dandelion/ui/window.blp:286 src/dandelion/ui/window.blp:329
 #: src/dandelion/history.py:190 src/dandelion/preferences.py:575
 msgid "_Delete"
 msgstr "_Löschen"
 
-#: src/dandelion/ui/window.blp:251
+#: src/dandelion/ui/window.blp:295
 msgid "Change _Time…"
 msgstr "_Zeit ändern …"
 
-#: src/dandelion/ui/window.blp:256
+#: src/dandelion/ui/window.blp:300
 msgid "_Pause"
 msgstr "_Pausieren"
 
-#: src/dandelion/ui/window.blp:262
+#: src/dandelion/ui/window.blp:306
 msgid "_Resume"
 msgstr "_Fortsetzen"
 
-#: src/dandelion/ui/window.blp:268 src/dandelion/scheduled.py:212
+#: src/dandelion/ui/window.blp:312 src/dandelion/scheduled.py:318
 msgid "Send _Now"
 msgstr "Jetzt _senden"
 
-#: src/dandelion/ui/window.blp:280 src/dandelion/window.py:261
+#: src/dandelion/ui/window.blp:324 src/dandelion/window.py:266
 msgid "Move to _Drafts"
 msgstr "In _Entwürfe verschieben"
 
-#: src/dandelion/ui/window.blp:294
+#: src/dandelion/ui/window.blp:338
 msgid "Use as New _Draft"
 msgstr "Als neuen _Entwurf verwenden"
 
@@ -421,6 +433,7 @@ msgid "From"
 msgstr "Von"
 
 #: src/dandelion/ui/composer.blp:126 src/dandelion/ui/role-page.blp:5
+#: src/dandelion/ui/scheduled.blp:94
 msgid "Role"
 msgstr "Rolle"
 
@@ -601,7 +614,7 @@ msgid "None"
 msgstr "Keine"
 
 #. Entwürfe; der gerade geöffnete leere Beitrag erscheint als „Neuer Beitrag“
-#: src/dandelion/ui/preferences.blp:85 src/dandelion/archive.py:152
+#: src/dandelion/ui/preferences.blp:85 src/dandelion/archive.py:165
 msgid "Drafts"
 msgstr "Entwürfe"
 
@@ -981,7 +994,7 @@ msgstr "_Fertig"
 #: src/dandelion/ui/alt-text-dialog.blp:18
 #: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1645
 #: src/dandelion/history.py:189 src/dandelion/preferences.py:574
-#: src/dandelion/preferences.py:678 src/dandelion/scheduled.py:298
+#: src/dandelion/preferences.py:678 src/dandelion/scheduled.py:404
 #: src/dandelion/ai_service.py:83
 msgid "_Cancel"
 msgstr "_Abbrechen"
@@ -1055,34 +1068,13 @@ msgstr "Geplante Beiträge werden nur gesendet, solange Dandelion geöffnet ist.
 msgid "_Enable Background Service"
 msgstr "Hintergrunddienst _aktivieren"
 
-#: src/dandelion/ui/scheduled.blp:25
-msgid "Nothing Scheduled"
-msgstr "Nichts geplant"
+#: src/dandelion/ui/scheduled.blp:59
+msgid "Nothing planned on this day."
+msgstr "An diesem Tag ist nichts geplant."
 
-#: src/dandelion/ui/scheduled.blp:26
-msgid "Use “Schedule…” next to the publish button to plan a post."
-msgstr "Mit „Planen …“ neben dem Veröffentlichen-Knopf planst du einen Beitrag."
-
-#: src/dandelion/ui/scheduled.blp:29
-msgid "_Write a Post"
-msgstr "Beitrag _verfassen"
-
-#: src/dandelion/ui/scheduled.blp:64
-msgid "Filter by role"
-msgstr "Nach Rolle filtern"
-
-#: src/dandelion/ui/scheduled.blp:69
-msgid "Filter by platform"
-msgstr "Nach Plattform filtern"
-
-#: src/dandelion/ui/scheduled.blp:79
-msgid "List"
-msgstr "Liste"
-
-#: src/dandelion/ui/scheduled.blp:85 src/dandelion/ui/shortcuts-dialog.blp:58
-#: src/dandelion/window.py:145 src/dandelion/archive.py:148
-msgid "Calendar"
-msgstr "Kalender"
+#: src/dandelion/ui/scheduled.blp:99
+msgid "Platform"
+msgstr "Plattform"
 
 #: src/dandelion/ui/shortcuts-dialog.blp:14
 msgid "Publish"
@@ -1112,9 +1104,14 @@ msgstr "Wiederholen"
 msgid "View"
 msgstr "Ansicht"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:63 src/dandelion/window.py:147
-#: src/dandelion/send_dialog.py:66 src/dandelion/archive.py:185
-#: src/dandelion/post_view.py:70 src/dandelion/post_view.py:80
+#: src/dandelion/ui/shortcuts-dialog.blp:58 src/dandelion/archive.py:161
+msgid "Calendar"
+msgstr "Kalender"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:63 src/dandelion/window.py:150
+#: src/dandelion/send_dialog.py:66 src/dandelion/scheduled.py:274
+#: src/dandelion/archive.py:199 src/dandelion/post_view.py:70
+#: src/dandelion/post_view.py:80
 msgid "Published"
 msgstr "Veröffentlicht"
 
@@ -1152,38 +1149,38 @@ msgstr "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen."
 msgid "translator-credits"
 msgstr "Christoph Langner"
 
-#: src/dandelion/window.py:154
+#: src/dandelion/window.py:157
 msgid "Scheduled Post"
 msgstr "Geplanter Beitrag"
 
-#: src/dandelion/window.py:155
+#: src/dandelion/window.py:158
 msgid "Paused Post"
 msgstr "Pausierter Beitrag"
 
-#: src/dandelion/window.py:156
+#: src/dandelion/window.py:159
 msgid "Missed Post"
 msgstr "Verpasster Beitrag"
 
-#: src/dandelion/window.py:157
+#: src/dandelion/window.py:160
 msgid "Draft"
 msgstr "Entwurf"
 
-#: src/dandelion/window.py:256
+#: src/dandelion/window.py:261
 #, python-brace-format
 msgid "A Scheduled Post Was Not Sent"
 msgid_plural "{n} Scheduled Posts Were Not Sent"
 msgstr[0] "Ein geplanter Beitrag wurde nicht gesendet"
 msgstr[1] "{n} geplante Beiträge wurden nicht gesendet"
 
-#: src/dandelion/window.py:258 src/dandelion/scheduled.py:154
+#: src/dandelion/window.py:263
 msgid "The computer was off or asleep at the planned time."
 msgstr "Der Rechner war zum geplanten Zeitpunkt aus oder im Ruhezustand."
 
-#: src/dandelion/window.py:260
+#: src/dandelion/window.py:265
 msgid "_Decide Later"
 msgstr "_Später entscheiden"
 
-#: src/dandelion/window.py:262
+#: src/dandelion/window.py:267
 msgid "_Send Now"
 msgstr "Jetzt _senden"
 
@@ -1229,8 +1226,8 @@ msgstr "Rolle zu „{name}“ gewechselt"
 #: src/dandelion/composer.py:434 src/dandelion/composer.py:625
 #: src/dandelion/composer.py:1150 src/dandelion/composer.py:1198
 #: src/dandelion/composer.py:1486 src/dandelion/composer.py:1553
-#: src/dandelion/composer.py:1625 src/dandelion/scheduled.py:92
-#: src/dandelion/scheduled.py:334
+#: src/dandelion/composer.py:1625 src/dandelion/scheduled.py:119
+#: src/dandelion/scheduled.py:440
 msgid "_Undo"
 msgstr "_Rückgängig"
 
@@ -1448,7 +1445,7 @@ msgid "This role has no time slots. Add them in the role settings."
 msgstr "Diese Rolle hat keine Zeitslots. Lege sie in den Rolleneinstellungen an."
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:1624
+#: src/dandelion/composer.py:1624 src/dandelion/scheduled.py:161
 #, python-brace-format
 msgid "Scheduled for {when}"
 msgstr "Geplant für {when}"
@@ -1490,14 +1487,17 @@ msgid "Try a different search."
 msgstr "Versuche eine andere Suche."
 
 #. type: ignore[no-untyped-def]
-#: src/dandelion/history.py:85 src/dandelion/scheduled.py:177
+#: src/dandelion/history.py:85 src/dandelion/scheduled.py:273
+#: src/dandelion/scheduled.py:283
 msgid "Post"
 msgstr "Beitrag"
 
-#: src/dandelion/history.py:93
+#: src/dandelion/history.py:93 src/dandelion/scheduled.py:230
 #, python-brace-format
 msgid "{n} published"
-msgstr "{n} veröffentlicht"
+msgid_plural "{n} published"
+msgstr[0] "{n} veröffentlicht"
+msgstr[1] "{n} veröffentlicht"
 
 #: src/dandelion/history.py:95
 #, python-brace-format
@@ -1522,7 +1522,7 @@ msgstr "Auf {platform} löschen"
 msgid "{platform} · deleted"
 msgstr "{platform} · gelöscht"
 
-#: src/dandelion/history.py:156 src/dandelion/archive.py:244
+#: src/dandelion/history.py:156 src/dandelion/archive.py:260
 msgid "Not published"
 msgstr "Nicht veröffentlicht"
 
@@ -2273,7 +2273,7 @@ msgstr "Morgen, 12:00"
 msgid "Monday, 08:00"
 msgstr "Montag, 08:00"
 
-#: src/dandelion/schedule_dialog.py:145 src/dandelion/scheduled.py:80
+#: src/dandelion/schedule_dialog.py:145 src/dandelion/scheduled.py:107
 msgid "This time is in the past."
 msgstr "Dieser Zeitpunkt liegt in der Vergangenheit."
 
@@ -2287,108 +2287,102 @@ msgstr "Wird {when} veröffentlicht."
 msgid "That is {when} in your local time."
 msgstr "Das ist {when} in deiner Ortszeit."
 
-#: src/dandelion/scheduled.py:92
+#: src/dandelion/scheduled.py:119
 #, python-brace-format
 msgid "Moved to {when}"
 msgstr "Verschoben auf {when}"
 
-#: src/dandelion/scheduled.py:112
+#: src/dandelion/scheduled.py:130
+msgid "This day is in the past."
+msgstr "Dieser Tag liegt in der Vergangenheit."
+
+#: src/dandelion/scheduled.py:187
 msgid "All Roles"
 msgstr "Alle Rollen"
 
-#: src/dandelion/scheduled.py:117
+#: src/dandelion/scheduled.py:192
 msgid "All Platforms"
 msgstr "Alle Plattformen"
 
-#: src/dandelion/scheduled.py:153 src/dandelion/archive.py:178
-#: src/dandelion/archive.py:237
-msgid "Missed"
-msgstr "Verpasst"
+#: src/dandelion/scheduled.py:228
+#, python-brace-format
+msgid "{n} scheduled"
+msgid_plural "{n} scheduled"
+msgstr[0] "{n} geplant"
+msgstr[1] "{n} geplant"
 
-#: src/dandelion/scheduled.py:162 src/dandelion/archive.py:176
-msgid "Without Date"
-msgstr "Ohne Datum"
-
-#: src/dandelion/scheduled.py:171
-msgid "No Matches"
-msgstr "Keine Treffer"
-
-#: src/dandelion/scheduled.py:172
-msgid "No scheduled post matches the filter."
-msgstr "Kein geplanter Beitrag passt zum Filter."
-
-#: src/dandelion/scheduled.py:201
+#: src/dandelion/scheduled.py:307
 #, python-brace-format
 msgid "Scheduled on the server: {profiles}"
 msgstr "Auf dem Server geplant: {profiles}"
 
-#: src/dandelion/scheduled.py:205 src/dandelion/scheduled.py:289
-#: src/dandelion/archive.py:180 src/dandelion/archive.py:242
+#: src/dandelion/scheduled.py:311 src/dandelion/scheduled.py:395
+#: src/dandelion/archive.py:194 src/dandelion/archive.py:258
 msgid "Paused"
 msgstr "Pausiert"
 
-#: src/dandelion/scheduled.py:226
+#: src/dandelion/scheduled.py:332
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: src/dandelion/scheduled.py:227
+#: src/dandelion/scheduled.py:333
 msgid "Change Time…"
 msgstr "Zeit ändern …"
 
-#: src/dandelion/scheduled.py:229
+#: src/dandelion/scheduled.py:335
 msgid "Resume"
 msgstr "Fortsetzen"
 
-#: src/dandelion/scheduled.py:231
+#: src/dandelion/scheduled.py:337
 msgid "Pause"
 msgstr "Pausieren"
 
-#: src/dandelion/scheduled.py:233 src/dandelion/notify.py:53
+#: src/dandelion/scheduled.py:339 src/dandelion/notify.py:53
 msgid "Send Now"
 msgstr "Jetzt senden"
 
-#: src/dandelion/scheduled.py:234
+#: src/dandelion/scheduled.py:340
 msgid "Duplicate"
 msgstr "Duplizieren"
 
-#: src/dandelion/scheduled.py:238
+#: src/dandelion/scheduled.py:344
 msgid "Move to Drafts"
 msgstr "In Entwürfe verschieben"
 
-#: src/dandelion/scheduled.py:239
+#: src/dandelion/scheduled.py:345
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/dandelion/scheduled.py:243
+#: src/dandelion/scheduled.py:349
 msgid "Actions"
 msgstr "Aktionen"
 
-#: src/dandelion/scheduled.py:261
+#: src/dandelion/scheduled.py:367
 msgid "Rescheduled"
 msgstr "Neu geplant"
 
-#: src/dandelion/scheduled.py:289
+#: src/dandelion/scheduled.py:395
 msgid "Resumed"
 msgstr "Fortgesetzt"
 
-#: src/dandelion/scheduled.py:295
+#: src/dandelion/scheduled.py:401
 msgid "Publish Now?"
 msgstr "Jetzt veröffentlichen?"
 
-#: src/dandelion/scheduled.py:296
+#: src/dandelion/scheduled.py:402
 msgid "The post will be published immediately instead of at the planned time."
 msgstr "Der Beitrag wird sofort statt zum geplanten Zeitpunkt veröffentlicht."
 
 #. type: ignore[arg-type]
-#: src/dandelion/scheduled.py:317
+#: src/dandelion/scheduled.py:423
 msgid "Copy created as draft"
 msgstr "Kopie als Entwurf angelegt"
 
-#: src/dandelion/scheduled.py:323
+#: src/dandelion/scheduled.py:429
 msgid "Moved to drafts"
 msgstr "In Entwürfe verschoben"
 
-#: src/dandelion/scheduled.py:334
+#: src/dandelion/scheduled.py:440
 msgid "Scheduled post deleted"
 msgstr "Geplanter Beitrag gelöscht"
 
@@ -2575,57 +2569,67 @@ msgstr "{provider} hat eine leere Antwort geliefert."
 msgid "{provider} returned no answer. {reason}"
 msgstr "{provider} hat keine Antwort geliefert. {reason}"
 
-#: src/dandelion/widgets/month_calendar.py:42
-msgid "Previous Month"
-msgstr "Vorheriger Monat"
-
-#: src/dandelion/widgets/month_calendar.py:45
-msgid "Next Month"
-msgstr "Nächster Monat"
-
-#: src/dandelion/widgets/month_calendar.py:51
-msgid "_Today"
-msgstr "_Heute"
-
-#: src/dandelion/widgets/month_calendar.py:135
+#: src/dandelion/widgets/month_calendar.py:155
 #, python-brace-format
 msgid "{day}: {n} post"
 msgid_plural "{day}: {n} posts"
 msgstr[0] "{day}: {n} Beitrag"
 msgstr[1] "{day}: {n} Beiträge"
 
-#: src/dandelion/widgets/month_calendar.py:156
+#: src/dandelion/widgets/month_calendar.py:180
 #, python-brace-format
 msgid "+{n} more"
 msgstr "+{n} weitere"
 
-#: src/dandelion/widgets/month_calendar.py:182
+#: src/dandelion/widgets/month_calendar.py:212
+msgid "published"
+msgstr "veröffentlicht"
+
+#: src/dandelion/widgets/month_calendar.py:215
 msgid "paused"
 msgstr "pausiert"
 
-#: src/dandelion/widgets/month_calendar.py:182
+#: src/dandelion/widgets/month_calendar.py:218
 msgid "missed"
 msgstr "verpasst"
+
+#: src/dandelion/widgets/month_calendar.py:232
+#, python-brace-format
+msgid "{time} free"
+msgstr "{time} frei"
+
+#: src/dandelion/widgets/month_calendar.py:235
+#, python-brace-format
+msgid "Free time slot of “{role}”"
+msgstr "Freies Zeitfenster von „{role}“"
 
 #: src/dandelion/scheduling.py:142
 #, python-brace-format
 msgid "Scheduling on the server failed, Dandelion sends the post itself: {error}"
 msgstr "Planen auf dem Server fehlgeschlagen, Dandelion sendet den Beitrag selbst: {error}"
 
-#: src/dandelion/archive.py:156
+#: src/dandelion/archive.py:169
 msgid "Not saved yet"
 msgstr "Noch nicht gespeichert"
 
-#: src/dandelion/archive.py:169
+#: src/dandelion/archive.py:183
 msgid "Scheduled"
 msgstr "Geplant"
 
-#: src/dandelion/archive.py:200
+#: src/dandelion/archive.py:190
+msgid "Without Date"
+msgstr "Ohne Datum"
+
+#: src/dandelion/archive.py:192 src/dandelion/archive.py:253
+msgid "Missed"
+msgstr "Verpasst"
+
+#: src/dandelion/archive.py:214
 #, python-brace-format
 msgid "Show All ({n})"
 msgstr "Alle anzeigen ({n})"
 
-#: src/dandelion/archive.py:225
+#: src/dandelion/archive.py:239
 msgid "Empty Post"
 msgstr "Leerer Beitrag"
 

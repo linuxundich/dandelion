@@ -7,7 +7,7 @@ from datetime import datetime
 from gettext import gettext as _
 from typing import TYPE_CHECKING
 
-from gi.repository import Adw, Gio, GLib, Gtk
+from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from .core.models import Post, PostState
 from .schedule_dialog import format_when
@@ -62,6 +62,18 @@ class Archive:
             action.connect("activate", lambda _a, _p, cb=cb: self._run(cb))
             self.actions.add_action(action)
         sidebar.insert_action_group("archive", self.actions)
+
+        # Adw.Sidebar kann Einträge nicht selbst herausziehen lassen. Die Quelle
+        # sitzt deshalb an der ganzen Leiste und sucht den Eintrag unter dem Zeiger
+        # über sein Präfix-Widget.
+        self._prefix_keys: dict[Gtk.Widget, Key] = {}
+        self._drag_row: Gtk.Widget | None = None
+        source = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
+        # Capture-Phase: sonst beansprucht die Liste in der Sidebar den Zeiger zuerst
+        source.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        source.connect("prepare", self._drag_prepare)
+        source.connect("drag-begin", self._drag_begin)
+        sidebar.add_controller(source)
 
     # ------------------------------------------------------------------
     def reload(self) -> None:
@@ -141,6 +153,7 @@ class Archive:
         current = self.win.composer.post if self.win.composer.app else None
         self.sidebar.remove_all()
         self.entries = []
+        self._prefix_keys = {}
 
         if not search:
             section = Adw.SidebarSection()
@@ -163,7 +176,8 @@ class Archive:
             role = roles.get(post.role_id)
             subtitle = " · ".join(x for x in (role.name if role else "",
                                               format_time(post.updated_at)) if x)
-            self._add(section, (DRAFT, pid), self._item(post, roles, platforms, None, subtitle))
+            self._add(section, (DRAFT, pid), self._item(post, roles, platforms, None, subtitle,
+                                                        (DRAFT, pid)))
         self._finish(section)
 
         section = self._section(_("Scheduled"), SCHEDULED)
@@ -178,7 +192,7 @@ class Archive:
                 when = _("Missed") + " · " + when
             elif post.state == PostState.PAUSED:
                 when = _("Paused") + " · " + when
-            item = self._item(post, roles, platforms, None, when)
+            item = self._item(post, roles, platforms, None, when, (SCHEDULED, pid))
             self._add(section, (SCHEDULED, pid), item)
         self._finish(section)
 
@@ -221,16 +235,18 @@ class Archive:
         self.entries.append(key)
 
     def _item(self, post: Post, roles, platforms, title: str | None,  # type: ignore[no-untyped-def]
-              subtitle: str) -> Adw.SidebarItem:
+              subtitle: str, key: Key | None = None) -> Adw.SidebarItem:
         item = Adw.SidebarItem(title=title or first_line(post.body, 60) or _("Empty Post"),
                                subtitle=subtitle)
         role = roles.get(post.role_id)
         if role and role.emoji:
-            emoji = Gtk.Label(label=role.emoji)
-            emoji.add_css_class("sidebar-emoji")
-            item.set_prefix(emoji)
+            prefix: Gtk.Widget = Gtk.Label(label=role.emoji)
+            prefix.add_css_class("sidebar-emoji")
         else:
-            item.set_icon_name("document-edit-symbolic")
+            prefix = Gtk.Image(icon_name="document-edit-symbolic")
+        item.set_prefix(prefix)
+        if key is not None:
+            self._prefix_keys[prefix] = key
 
         suffix = Gtk.Box(spacing=4, valign=Gtk.Align.CENTER)
         if post.state == PostState.MISSED:
@@ -263,3 +279,27 @@ class Archive:
         if suffix.get_first_child() is not None:
             item.set_suffix(suffix)
         return item
+
+    # -- Ziehen auf den Kalender ---------------------------------------------
+    def _key_at(self, widget: Gtk.Widget | None) -> tuple[Key | None, Gtk.Widget | None]:
+        """Eintrag zu einem Widget: der kleinste Vorfahr mit genau einem bekannten Präfix."""
+        while widget is not None and widget is not self.sidebar:
+            found = [k for w, k in self._prefix_keys.items() if w.is_ancestor(widget) or w is widget]
+            if len(found) == 1:
+                return found[0], widget
+            if len(found) > 1:
+                return None, None
+            widget = widget.get_parent()
+        return None, None
+
+    def _drag_prepare(self, _source: Gtk.DragSource, x: float,
+                      y: float) -> Gdk.ContentProvider | None:
+        key, row = self._key_at(self.sidebar.pick(x, y, Gtk.PickFlags.DEFAULT))
+        if key is None or key[1] is None:
+            return None
+        self._drag_row = row
+        return Gdk.ContentProvider.new_for_value(str(key[1]))
+
+    def _drag_begin(self, source: Gtk.DragSource, _drag: Gdk.Drag) -> None:
+        if self._drag_row is not None:
+            source.set_icon(Gtk.WidgetPaintable.new(self._drag_row), 0, 0)

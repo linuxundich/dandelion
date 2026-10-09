@@ -14,109 +14,58 @@ template $DandelionScheduledView: Adw.BreakpointBin {
       button-clicked => $on_enable_service();
     }
 
-    Stack stack {
+    ScrolledWindow {
       vexpand: true;
+      hscrollbar-policy: never;
 
-      StackPage {
-        name: "empty";
+      child: Box {
+        orientation: vertical;
+        spacing: 18;
+        margin-top: 12;
+        margin-bottom: 18;
+        margin-start: 18;
+        margin-end: 18;
 
-        child: Adw.StatusPage {
-          icon-name: "alarm-symbolic";
-          title: _("Nothing Scheduled");
-          description: _("Use “Schedule…” next to the publish button to plan a post.");
+        $DandelionMonthCalendar calendar {
+          vexpand: true;
+          post-activated => $on_calendar_activated();
+          post-moved => $on_calendar_moved();
+          month-changed => $on_month_changed();
+          day-selected => $on_day_selected();
+        }
 
-          child: Button {
-            label: _("_Write a Post");
-            use-underline: true;
-            halign: center;
-            action-name: "win.view";
-            action-target: "'composer'";
+        Box day_box {
+          orientation: vertical;
+          spacing: 6;
+          visible: false;
+
+          Label day_title {
+            xalign: 0;
 
             styles [
-              "pill",
+              "heading",
             ]
-          };
-        };
-      }
+          }
 
-      StackPage {
-        name: "list";
+          ListBox day_list {
+            selection-mode: none;
 
-        child: ScrolledWindow {
-          hscrollbar-policy: never;
+            styles [
+              "boxed-list",
+            ]
+          }
 
-          child: Adw.Clamp {
-            maximum-size: 760;
+          Label day_empty {
+            label: _("Nothing planned on this day.");
+            wrap: true;
+            xalign: 0;
 
-            child: Box {
-              orientation: vertical;
-              spacing: 18;
-              margin-top: 12;
-              margin-bottom: 18;
-              margin-start: 12;
-              margin-end: 12;
-
-              Adw.WrapBox {
-                child-spacing: 6;
-                line-spacing: 6;
-
-                DropDown role_filter {
-                  tooltip-text: _("Filter by role");
-                  notify::selected => $on_filter_changed();
-                }
-
-                DropDown platform_filter {
-                  tooltip-text: _("Filter by platform");
-                  notify::selected => $on_filter_changed();
-                }
-
-                Adw.ToggleGroup mode_group {
-                  notify::active-name => $on_mode_changed();
-
-                  Adw.Toggle {
-                    name: "list";
-                    icon-name: "view-list-symbolic";
-                    tooltip: _("List");
-                  }
-
-                  Adw.Toggle {
-                    name: "calendar";
-                    icon-name: "x-office-calendar-symbolic";
-                    tooltip: _("Calendar");
-                  }
-
-                  styles [
-                    "round",
-                  ]
-                }
-              }
-
-              Stack mode_stack {
-                transition-type: none;
-                vhomogeneous: false;
-
-                StackPage {
-                  name: "list";
-
-                  child: Box list_box {
-                    orientation: vertical;
-                    spacing: 18;
-                  };
-                }
-
-                StackPage {
-                  name: "calendar";
-
-                  child: $DandelionMonthCalendar calendar {
-                    post-activated => $on_calendar_activated();
-                    post-moved => $on_calendar_moved();
-                  };
-                }
-              }
-            };
-          };
-        };
-      }
+            styles [
+              "dim-label",
+            ]
+          }
+        }
+      };
     }
   };
 
@@ -125,6 +74,31 @@ template $DandelionScheduledView: Adw.BreakpointBin {
 
     setters {
       calendar.compact: true;
+      calendar.vexpand: false;
+      day_box.visible: true;
     }
   }
+}
+
+Popover filter_popover {
+  child: Box {
+    orientation: vertical;
+    margin-top: 6;
+    margin-bottom: 6;
+    margin-start: 6;
+    margin-end: 6;
+    width-request: 300;
+
+    Adw.PreferencesGroup {
+      Adw.ComboRow role_filter {
+        title: _("Role");
+        notify::selected => $on_filter_changed();
+      }
+
+      Adw.ComboRow platform_filter {
+        title: _("Platform");
+        notify::selected => $on_filter_changed();
+      }
+    }
+  };
 }

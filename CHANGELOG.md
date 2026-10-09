@@ -30,11 +30,19 @@ All notable changes to Dandelion are listed here.
   tile shows a character count only when that profile is over its limit.
 - **Compact preview** is now a switch under Preferences › General instead of
   a toggle in the preview.
-- **F9** now shows or hides the preview; Ctrl+2 opens the calendar, which
-  shows the month view by default.
+- **Calendar page** (phase 4): the month fills the window and shows published
+  posts (dimmed, with a check mark) next to scheduled ones, plus the free time
+  slots of the roles as dashed entries. Month navigation sits in the header
+  bar, role and platform filters in a popover. Clicking a published post opens
+  its detail page. In narrow windows the month shrinks to dots and the posts of
+  the selected day are listed below. The separate list view is gone.
+- **F9** now shows or hides the preview; Ctrl+2 opens the calendar.
 
 ### Added
 
+- **Drag a draft from the sidebar onto a calendar day** to schedule it. The
+  schedule dialog opens with that day and the role's free slot on it (or 9:00)
+  preselected.
 - **Emoji button** in the toolbar.
 - **Detail page for published posts** with the text, images and one row per
   profile to open, copy, delete or retry.

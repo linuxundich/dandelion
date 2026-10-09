@@ -93,6 +93,49 @@ template $DandelionWindow: Adw.ApplicationWindow {
           Adw.HeaderBar header_bar {
             title-widget: Adw.WindowTitle content_title {};
 
+            [start]
+            Box calendar_nav {
+              spacing: 6;
+              visible: false;
+
+              Button {
+                icon-name: "go-previous-symbolic";
+                tooltip-text: _("Previous Month");
+                action-name: "calendar.previous";
+
+                accessibility {
+                  label: _("Previous Month");
+                }
+              }
+
+              Button {
+                icon-name: "go-next-symbolic";
+                tooltip-text: _("Next Month");
+                action-name: "calendar.next";
+
+                accessibility {
+                  label: _("Next Month");
+                }
+              }
+
+              Button today_button {
+                label: _("_Today");
+                use-underline: true;
+                action-name: "calendar.today";
+              }
+            }
+
+            [end]
+            MenuButton filter_button {
+              icon-name: "funnel-symbolic";
+              tooltip-text: _("Filter");
+              visible: false;
+
+              accessibility {
+                label: _("Filter");
+              }
+            }
+
 
             [end]
             Adw.SplitButton publish_button {
@@ -180,6 +223,7 @@ template $DandelionWindow: Adw.ApplicationWindow {
       split_view.collapsed: true;
       sidebar.mode: page;
       publish_button.label: _("_Send");
+      today_button.visible: false;
     }
   }
 }

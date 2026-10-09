@@ -15,5 +15,6 @@
     <file preprocess="xml-stripblanks">ui/scheduled.ui</file>
     <file preprocess="xml-stripblanks">ui/shortcuts-dialog.ui</file>
     <file>style.css</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/funnel-symbolic.svg</file>
   </gresource>
 </gresources>

@@ -218,3 +218,14 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
 /* Einzelansicht eines Beitrags */
 .post-card { padding: 16px 18px; }
 .post-body { font-size: 1.05em; }
+
+/* Kalenderseite */
+.cal-entry.published { opacity: 0.6; }
+.cal-slot {
+  padding: 0 4px;
+  font-size: 0.8em;
+  border-radius: 4px;
+  border: 1px dashed alpha(currentColor, 0.25);
+  color: alpha(currentColor, 0.6);
+}
+.day-cell.selected-day { background: alpha(var(--accent-bg-color), 0.18); }

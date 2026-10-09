@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Ansicht „Geplant“: alle geplanten, pausierten und verpassten Beiträge."""
+"""Kalenderseite und Aktionen für geplante, pausierte und verpasste Beiträge."""
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime, timedelta
+from gettext import ngettext
 from gettext import gettext as _
 from typing import TYPE_CHECKING
 
@@ -12,8 +13,8 @@ from gi.repository import Adw, Gio, GLib, Gtk
 from .core.models import Media, Post, PostState, Target, TargetState, Variant
 from .core.scheduler import to_utc_iso
 from .schedule_dialog import DandelionScheduleDialog
-from .util import label_widget, day_label, first_line
-from .widgets.month_calendar import DandelionMonthCalendar
+from .util import first_line, label_widget
+from .widgets.month_calendar import PUBLISHED_STATES, DandelionMonthCalendar, post_time
 
 if TYPE_CHECKING:
     from .application import DandelionApplication
@@ -24,43 +25,64 @@ STATES = (PostState.MISSED, PostState.SCHEDULED, PostState.PAUSED)
 
 @Gtk.Template(resource_path="/de/linuxundich/Dandelion/ui/scheduled.ui")
 class DandelionScheduledView(Adw.BreakpointBin):
+    """Kalenderseite: Monatsraster mit geplanten und veröffentlichten Beiträgen."""
+
     __gtype_name__ = "DandelionScheduledView"
 
     service_banner: Adw.Banner = Gtk.Template.Child()
-    stack: Gtk.Stack = Gtk.Template.Child()
-    role_filter: Gtk.DropDown = Gtk.Template.Child()
-    platform_filter: Gtk.DropDown = Gtk.Template.Child()
-    list_box: Gtk.Box = Gtk.Template.Child()
-    mode_group: Adw.ToggleGroup = Gtk.Template.Child()
-    mode_stack: Gtk.Stack = Gtk.Template.Child()
     calendar: DandelionMonthCalendar = Gtk.Template.Child()
+    day_box: Gtk.Box = Gtk.Template.Child()
+    day_title: Gtk.Label = Gtk.Template.Child()
+    day_list: Gtk.ListBox = Gtk.Template.Child()
+    day_empty: Gtk.Label = Gtk.Template.Child()
+    filter_popover: Gtk.Popover = Gtk.Template.Child()
+    role_filter: Adw.ComboRow = Gtk.Template.Child()
+    platform_filter: Adw.ComboRow = Gtk.Template.Child()
 
     def setup(self, app: DandelionApplication, win: DandelionWindow) -> None:
         self.app, self.win = app, win
         self._loading = False
+        self._roles: list = [None]
+        self._platforms: list = [None]
+        self._summary = ""
         app.scheduling.connect("changed", lambda *_: self.reload())
         app.scheduling.connect("notify::active", lambda *_: self._sync_banner())
         app.scheduling.connect("notify::available", lambda *_: self._sync_banner())
         self._sync_banner()
-        try:
-            mode = app.settings.get_string("scheduled-view")
-        except Exception:
-            mode = "list"
-        self.mode_group.set_active_name(mode if mode in ("list", "calendar") else "list")
+        group = Gio.SimpleActionGroup()
+        for name, cb in (("previous", lambda: self.calendar.shift(-1)),
+                         ("next", lambda: self.calendar.shift(1)),
+                         ("today", self.calendar.go_today)):
+            action = Gio.SimpleAction.new(name, None)
+            action.connect("activate", lambda *_a, cb=cb: cb())
+            group.add_action(action)
+        win.insert_action_group("calendar", group)
 
-    @Gtk.Template.Callback()
-    def on_mode_changed(self, *_args: object) -> None:
-        mode = self.mode_group.get_active_name() or "list"
-        self.mode_stack.set_visible_child_name(mode)
-        if getattr(self, "app", None):
-            self.app.settings.set_string("scheduled-view", mode)
-            self.reload()
+    # -- Kopfzeile -------------------------------------------------------------
+    def title(self) -> tuple[str, str]:
+        return self.calendar.title(), self._summary
 
+    def filtered(self) -> bool:
+        return bool(self.role_filter.get_selected() or self.platform_filter.get_selected())
+
+    # -- Kalender --------------------------------------------------------------
     @Gtk.Template.Callback()
     def on_calendar_activated(self, _cal: object, post_id: int) -> None:
         post = self.app.store.load_post(post_id)
-        if post:
+        if post is None:
+            return
+        if post.state in PUBLISHED_STATES:
+            self.win.show_post(post.id)  # type: ignore[arg-type]
+        else:
             self._edit(post)
+
+    @Gtk.Template.Callback()
+    def on_month_changed(self, *_args: object) -> None:
+        self.reload()
+
+    @Gtk.Template.Callback()
+    def on_day_selected(self, *_args: object) -> None:
+        self._fill_day_list()
 
     @Gtk.Template.Callback()
     def on_calendar_moved(self, _cal: object, post_id: int, year: int, month: int,
@@ -68,7 +90,12 @@ class DandelionScheduledView(Adw.BreakpointBin):
         from datetime import UTC
         from zoneinfo import ZoneInfo
         post = self.app.store.load_post(post_id)
-        if post is None or not post.scheduled_at:
+        if post is None:
+            return
+        if post.state == PostState.DRAFT:
+            self.schedule_on(post, date(year, month, day))
+            return
+        if not post.scheduled_at or post.state not in STATES:
             return
         tz = ZoneInfo(post.timezone) if post.timezone else None
         old = datetime.fromisoformat(post.scheduled_at)
@@ -91,6 +118,54 @@ class DandelionScheduledView(Adw.BreakpointBin):
         from .schedule_dialog import format_when
         self.win.toast(_("Moved to {when}").format(when=format_when(new)), _("_Undo"), undo)
 
+    def schedule_on(self, post: Post, day: date) -> None:
+        """Ein Entwurf wurde auf einen Tag gezogen: Zeitplan-Dialog mit diesem Tag öffnen."""
+        from zoneinfo import ZoneInfo
+
+        from .core.slots import slot_times
+        from .schedule_dialog import format_when, system_timezone
+        tz = ZoneInfo(self.app.settings.get_string("default-timezone") or system_timezone())
+        now = datetime.now(tz)
+        if day < now.date():
+            self.win.toast(_("This day is in the past."))
+            return
+        composer = self.win.composer
+        if composer.post.id == post.id:
+            composer.save_now()
+            post = self.app.store.load_post(post.id) or post  # type: ignore[arg-type]
+
+        role = self.app.store.role(post.role_id) if post.role_id else None
+        initial = None
+        if role and role.slots:
+            taken = [datetime.fromisoformat(x) for x in self.app.store.scheduled_times(role.id)]
+            start = max(now, datetime(day.year, day.month, day.day, tzinfo=tz))
+            for when in slot_times(role.slots, start, days=0):
+                if when.date() == day and not any(
+                        abs((when - t).total_seconds()) < 60 for t in taken):
+                    initial = when
+                    break
+        if initial is None:
+            initial = datetime(day.year, day.month, day.day, 9, 0, tzinfo=tz)
+            if initial <= now:
+                initial = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+
+        def done(when: datetime, zone: str) -> None:
+            store = self.app.store
+            store.set_post_schedule(post.id, PostState.SCHEDULED, to_utc_iso(when), zone)  # type: ignore[arg-type]
+            if composer.post.id == post.id:
+                fresh = store.load_post(post.id)  # type: ignore[arg-type]
+                if fresh:
+                    composer.load_post(fresh)
+            self._changed()
+            composer.reload_drafts()
+            self.win.toast(_("Scheduled for {when}").format(when=format_when(when, zone)))
+
+        DandelionScheduleDialog(initial=initial, timezone=post.timezone,
+                                service_active=self.app.scheduling.props.active,
+                                on_schedule=done,
+                                on_enable_service=lambda: self.app.scheduling.enable(self.win),
+                                next_slot=self._next_slot(post)).present(self.win)
+
     def _sync_banner(self) -> None:
         s = self.app.scheduling
         self.service_banner.set_revealed(s.props.available and not s.props.active)
@@ -101,7 +176,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
 
     @Gtk.Template.Callback()
     def on_filter_changed(self, *_args: object) -> None:
-        if not self._loading:
+        if not getattr(self, "_loading", True):
             self.reload()
 
     def _fill_filters(self) -> None:
@@ -122,8 +197,6 @@ class DandelionScheduledView(Adw.BreakpointBin):
         if not getattr(self, "app", None):
             return
         self._fill_filters()
-        while (child := self.list_box.get_first_child()) is not None:
-            self.list_box.remove(child)
         store = self.app.store
         profiles = {p.id: p for p in store.profiles()}
         roles = {r.id: r for r in store.roles()}
@@ -134,7 +207,9 @@ class DandelionScheduledView(Adw.BreakpointBin):
 
         posts = [p for pid in store.post_ids(STATES, order="scheduled_at")
                  if (p := store.load_post(pid))]
-        total = len(posts)
+        posts += [p for pid in store.post_ids(PUBLISHED_STATES,
+                                              order="COALESCE(published_at, updated_at) DESC")
+                  if (p := store.load_post(pid))]
         if role:
             posts = [p for p in posts if p.role_id == role.id]
         if platform:
@@ -142,36 +217,67 @@ class DandelionScheduledView(Adw.BreakpointBin):
                 t.enabled and profiles.get(t.profile_id) and
                 profiles[t.profile_id].platform == platform for t in p.targets)]
 
-        if (self.mode_group.get_active_name() or "list") == "calendar":
-            self.calendar.set_posts([(p, roles.get(p.role_id)) for p in posts])
-            self.stack.set_visible_child_name("list")
+        self.calendar.set_posts([(p, roles.get(p.role_id)) for p in posts],
+                                self._free_slots(role))
+        in_month = [p for p in posts if (w := post_time(p)) and
+                    w.month == self.calendar.month and w.year == self.calendar.year]
+        planned = sum(1 for p in in_month if p.state in STATES)
+        published = len(in_month) - planned
+        parts = []
+        if planned:
+            parts.append(ngettext("{n} scheduled", "{n} scheduled", planned).format(n=planned))
+        if published:
+            parts.append(ngettext("{n} published", "{n} published", published).format(
+                n=published))
+        self._summary = " · ".join(parts)
+        self._profiles, self._role_map = profiles, roles
+        self._fill_day_list()
+        if self.win.stack.get_visible_child_name() == "scheduled":
+            self.win.sync_title()
+
+    def _free_slots(self, only_role) -> list:  # type: ignore[no-untyped-def]
+        """Freie Zeitfenster der Rollen im sichtbaren Zeitraum (ab jetzt)."""
+        from zoneinfo import ZoneInfo
+
+        from .core.slots import slot_times
+        from .schedule_dialog import system_timezone
+        tz = ZoneInfo(self.app.settings.get_string("default-timezone") or system_timezone())
+        start, end = self.calendar.month_range()
+        now = datetime.now(tz)
+        begin = max(now, datetime(start.year, start.month, start.day, tzinfo=tz))
+        days = (end - begin.date()).days
+        if days < 0:
+            return []
+        out = []
+        for role in self.app.store.roles():
+            if not role.slots or (only_role and role.id != only_role.id):
+                continue
+            taken = [datetime.fromisoformat(x) for x in self.app.store.scheduled_times(role.id)]
+            for when in slot_times(role.slots, begin, days=days):
+                if when.date() <= end and not any(
+                        abs((when - t).total_seconds()) < 60 for t in taken):
+                    out.append((when, role))
+        return out
+
+    def _fill_day_list(self) -> None:
+        if not hasattr(self, "_profiles"):
             return
-
-        missed = [p for p in posts if p.state == PostState.MISSED]
-        if missed:
-            group = Adw.PreferencesGroup(
-                title=_("Missed"),
-                description=_("The computer was off or asleep at the planned time."))
-            for post in missed:
-                group.add(self._row(post, profiles, roles))
-            self.list_box.append(group)
-
-        group = None
-        current = None
-        for post in (p for p in posts if p.state != PostState.MISSED):
-            day = day_label(post.scheduled_at) if post.scheduled_at else _("Without Date")
-            if day != current:
-                current = day
-                group = Adw.PreferencesGroup(title=GLib.markup_escape_text(day))
-                self.list_box.append(group)
-            group.add(self._row(post, profiles, roles))  # type: ignore[union-attr]
-
-        self.stack.set_visible_child_name("list" if total else "empty")
-        if total and not posts:
-            status = Adw.StatusPage(icon_name="system-search-symbolic", title=_("No Matches"),
-                                    description=_("No scheduled post matches the filter."))
-            status.add_css_class("compact")
-            self.list_box.append(status)
+        self.day_list.remove_all()
+        day = self.calendar.selected
+        self.day_title.set_label(GLib.DateTime.new_local(day.year, day.month, day.day, 0, 0, 0)
+                                 .format("%A, %e. %B") or "")
+        entries = self.calendar.entries_for(day)
+        for _when, post, _role in entries:
+            if post.state in PUBLISHED_STATES:
+                row = Adw.ActionRow(title=GLib.markup_escape_text(first_line(post.body) or
+                                                                  _("Post")),
+                                    subtitle=_("Published"), activatable=True)
+                row.connect("activated", lambda _r, pid=post.id: self.win.show_post(pid))
+            else:
+                row = self._row(post, self._profiles, self._role_map)
+            self.day_list.append(row)
+        self.day_list.set_visible(bool(entries))
+        self.day_empty.set_visible(not entries)
 
     def _row(self, post: Post, profiles, roles) -> Adw.ActionRow:  # type: ignore[no-untyped-def]
         row = Adw.ActionRow(title=GLib.markup_escape_text(first_line(post.body) or _("Post")),

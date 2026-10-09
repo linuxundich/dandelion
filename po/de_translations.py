@@ -785,6 +785,16 @@ DE: dict[str, str | tuple[str, str]] = {
         "Kürzt lange Texte und Linkkarten in der Vorschau",
     "{n} profile not ready": ("{n} Profil nicht bereit", "{n} Profile nicht bereit"),
     "{n} profile ready": ("{n} Profil bereit", "{n} Profile bereit"),
+    # Kalenderseite (Umbau 2026-10)
+    "Filter": "Filtern",
+    "Nothing planned on this day.": "An diesem Tag ist nichts geplant.",
+    "Platform": "Plattform",
+    "{n} published": ("{n} veröffentlicht", "{n} veröffentlicht"),
+    "{n} scheduled": ("{n} geplant", "{n} geplant"),
+    "This day is in the past.": "Dieser Tag liegt in der Vergangenheit.",
+    "published": "veröffentlicht",
+    "{time} free": "{time} frei",
+    "Free time slot of “{role}”": "Freies Zeitfenster von „{role}“",
 }
 
 

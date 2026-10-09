@@ -27,7 +27,7 @@ gnome.compile_resources('dandelion',
 )
 
 install_subdir('.', install_dir: moduledir,
-  exclude_directories: ['ui', '__pycache__', 'core/__pycache__', 'platforms/__pycache__',
+  exclude_directories: ['ui', 'icons', '__pycache__', 'core/__pycache__', 'platforms/__pycache__',
                         'auth/__pycache__', 'net/__pycache__', 'widgets/__pycache__',
                         'ai/__pycache__'],
   exclude_files: ['meson.build', 'dandelion.gresource.xml'],

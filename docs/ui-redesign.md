@@ -170,7 +170,15 @@ Each phase ends with a review by the maintainer before the next one starts.
    saved as `show-preview`.
    Originally planned: Growing width, two columns, default visibility by
    breakpoint, F9, summary header, drop the status strip.
-4. **Calendar page.** Move `DandelionMonthCalendar` into the content,
+4. **Calendar page.** *Done 2026-10-09:* `DandelionMonthCalendar` without its
+   own header (navigation via `calendar.*` actions in the window header,
+   filters in `scheduled.filter_popover`). Dragging out of the sidebar works
+   with a `Gtk.DragSource` on the whole `Adw.Sidebar` in the **capture**
+   phase (bubble phase never fires, the list claims the pointer) that maps the
+   picked widget to an entry through its prefix widget. GSettings key
+   `scheduled-view` removed. The filter button uses an own
+   `funnel-symbolic` icon from the gresource (Adwaita has none).
+   Originally planned: Move `DandelionMonthCalendar` into the content,
    filters in the header, slots, drag source on draft items, drop opens the
    schedule dialog.
 5. **Narrow layouts and polish.** Checks at 360, 600, 860, 1100 and 1920 sp in
