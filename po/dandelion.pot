@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dandelion\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 11:17+0200\n"
+"POT-Creation-Date: 2026-10-09 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,7 +126,7 @@ msgid "Write a post once and see a preview for every profile"
 msgstr ""
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:69
-msgid "Plan posts and manage everything that is scheduled"
+msgid "Plan posts in a month calendar with free time slots"
 msgstr ""
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:73
@@ -318,7 +318,7 @@ msgid "Main Menu"
 msgstr ""
 
 #: src/dandelion/ui/window.blp:48 src/dandelion/ui/window.blp:51
-#: src/dandelion/ui/window.blp:168 src/dandelion/ui/window.blp:172
+#: src/dandelion/ui/window.blp:169 src/dandelion/ui/window.blp:173
 msgid "Search"
 msgstr ""
 
@@ -326,110 +326,110 @@ msgstr ""
 msgid "Search posts"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:76 src/dandelion/history.py:76
+#: src/dandelion/ui/window.blp:77 src/dandelion/history.py:76
 msgid "No Results"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:88 src/dandelion/ui/shortcuts-dialog.blp:53
+#: src/dandelion/ui/window.blp:89 src/dandelion/ui/shortcuts-dialog.blp:53
 msgid "Compose"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:103 src/dandelion/ui/window.blp:107
+#: src/dandelion/ui/window.blp:104 src/dandelion/ui/window.blp:108
 msgid "Previous Month"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:113 src/dandelion/ui/window.blp:117
+#: src/dandelion/ui/window.blp:114 src/dandelion/ui/window.blp:118
 msgid "Next Month"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:122
+#: src/dandelion/ui/window.blp:123
 msgid "_Today"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:131 src/dandelion/ui/window.blp:135
+#: src/dandelion/ui/window.blp:132 src/dandelion/ui/window.blp:136
 msgid "Filter"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:142 src/dandelion/scheduled.py:405
+#: src/dandelion/ui/window.blp:143 src/dandelion/scheduled.py:405
 msgid "_Publish"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:146 src/dandelion/composer.py:758
+#: src/dandelion/ui/window.blp:147 src/dandelion/composer.py:758
 msgid "Publish to all selected profiles"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:147
+#: src/dandelion/ui/window.blp:148
 msgid "More Publishing Options"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:157 src/dandelion/ui/window.blp:160
-#: src/dandelion/ui/composer.blp:81 src/dandelion/ui/composer.blp:508
+#: src/dandelion/ui/window.blp:158 src/dandelion/ui/window.blp:161
+#: src/dandelion/ui/composer.blp:81 src/dandelion/ui/composer.blp:512
 #: src/dandelion/composer.py:784
 msgid "Preview"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:225 src/dandelion/ai_service.py:84
+#: src/dandelion/ui/window.blp:226 src/dandelion/ai_service.py:84
 msgid "_Send"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:234
+#: src/dandelion/ui/window.blp:235
 msgid "_Schedule…"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:239
+#: src/dandelion/ui/window.blp:240
 msgid "In Next _Free Slot"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:248
+#: src/dandelion/ui/window.blp:249
 msgid "_New Post"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:255
+#: src/dandelion/ui/window.blp:256
 msgid "_Roles and Profiles"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:260
+#: src/dandelion/ui/window.blp:261
 msgid "_Preferences"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:265
+#: src/dandelion/ui/window.blp:266
 msgid "_Keyboard Shortcuts"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:270
+#: src/dandelion/ui/window.blp:271
 msgid "_About Dandelion"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:279 src/dandelion/ui/window.blp:317
+#: src/dandelion/ui/window.blp:280 src/dandelion/ui/window.blp:318
 msgid "_Duplicate"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:286 src/dandelion/ui/window.blp:329
+#: src/dandelion/ui/window.blp:287 src/dandelion/ui/window.blp:330
 #: src/dandelion/history.py:190 src/dandelion/preferences.py:575
 msgid "_Delete"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:295
+#: src/dandelion/ui/window.blp:296
 msgid "Change _Time…"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:300
+#: src/dandelion/ui/window.blp:301
 msgid "_Pause"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:306
+#: src/dandelion/ui/window.blp:307
 msgid "_Resume"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:312 src/dandelion/scheduled.py:318
+#: src/dandelion/ui/window.blp:313 src/dandelion/scheduled.py:318
 msgid "Send _Now"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:324 src/dandelion/window.py:266
+#: src/dandelion/ui/window.blp:325 src/dandelion/window.py:266
 msgid "Move to _Drafts"
 msgstr ""
 
-#: src/dandelion/ui/window.blp:338
+#: src/dandelion/ui/window.blp:339
 msgid "Use as New _Draft"
 msgstr ""
 
@@ -492,66 +492,66 @@ msgstr ""
 msgid "_Apply"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:370 src/dandelion/ui/composer.blp:373
+#: src/dandelion/ui/composer.blp:374 src/dandelion/ui/composer.blp:377
 #: src/dandelion/ui/shortcuts-dialog.blp:29 src/dandelion/composer.py:1041
 msgid "Add Images"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:384 src/dandelion/ui/composer.blp:388
+#: src/dandelion/ui/composer.blp:388 src/dandelion/ui/composer.blp:392
 msgid "Insert Emoji"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:398 src/dandelion/ui/composer.blp:402
+#: src/dandelion/ui/composer.blp:402 src/dandelion/ui/composer.blp:406
 msgid "Content Warning"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:413
+#: src/dandelion/ui/composer.blp:417
 msgid ""
 "Split into a thread when the text is too long. A line with only “---” sets a "
 "break by hand."
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:417
+#: src/dandelion/ui/composer.blp:421
 msgid "Thread"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:428 src/dandelion/ui/composer.blp:431
+#: src/dandelion/ui/composer.blp:432 src/dandelion/ui/composer.blp:435
 msgid "Writing Assistant"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:447
+#: src/dandelion/ui/composer.blp:451
 msgid "Problems"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:466
+#: src/dandelion/ui/composer.blp:470
 msgid "Post Options"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:551
+#: src/dandelion/ui/composer.blp:555
 msgid "Show _All"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:625
+#: src/dandelion/ui/composer.blp:629
 msgid "_Manage Roles"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:666 src/dandelion/composer.py:802
+#: src/dandelion/ui/composer.blp:670 src/dandelion/composer.py:802
 msgid "All Profiles"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:669 src/dandelion/ui/role-page.blp:60
+#: src/dandelion/ui/composer.blp:673 src/dandelion/ui/role-page.blp:60
 msgid "Language"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:674
+#: src/dandelion/ui/composer.blp:678
 msgid "Append Signature"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:683
+#: src/dandelion/ui/composer.blp:687
 msgid "Visibility"
 msgstr ""
 
-#: src/dandelion/ui/composer.blp:691
+#: src/dandelion/ui/composer.blp:695
 msgid "Content Label"
 msgstr ""
 
@@ -1041,7 +1041,7 @@ msgid "_Done"
 msgstr ""
 
 #: src/dandelion/ui/alt-text-dialog.blp:18
-#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1645
+#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1646
 #: src/dandelion/history.py:189 src/dandelion/preferences.py:574
 #: src/dandelion/preferences.py:678 src/dandelion/scheduled.py:404
 #: src/dandelion/ai_service.py:83
@@ -1275,8 +1275,8 @@ msgstr ""
 
 #: src/dandelion/composer.py:434 src/dandelion/composer.py:625
 #: src/dandelion/composer.py:1150 src/dandelion/composer.py:1198
-#: src/dandelion/composer.py:1486 src/dandelion/composer.py:1553
-#: src/dandelion/composer.py:1625 src/dandelion/scheduled.py:119
+#: src/dandelion/composer.py:1487 src/dandelion/composer.py:1554
+#: src/dandelion/composer.py:1626 src/dandelion/scheduled.py:119
 #: src/dandelion/scheduled.py:440
 msgid "_Undo"
 msgstr ""
@@ -1398,139 +1398,139 @@ msgid "Draft deleted"
 msgstr ""
 
 #. Der Hintergrunddienst hat den Beitrag inzwischen gesendet
-#: src/dandelion/composer.py:1256 src/dandelion/composer.py:1614
+#: src/dandelion/composer.py:1256 src/dandelion/composer.py:1615
 msgid "This post has been published in the meantime"
 msgstr ""
 
-#: src/dandelion/composer.py:1262
+#: src/dandelion/composer.py:1263
 msgid "Draft saved"
 msgstr ""
 
 #. type: ignore[misc]
-#: src/dandelion/composer.py:1295 src/dandelion/composer.py:1348
+#: src/dandelion/composer.py:1296 src/dandelion/composer.py:1349
 msgid "Shorter"
 msgstr ""
 
-#: src/dandelion/composer.py:1295 src/dandelion/composer.py:1348
+#: src/dandelion/composer.py:1296 src/dandelion/composer.py:1349
 msgid "Longer"
 msgstr ""
 
-#: src/dandelion/composer.py:1296 src/dandelion/composer.py:1348
+#: src/dandelion/composer.py:1297 src/dandelion/composer.py:1349
 msgid "More Casual"
 msgstr ""
 
-#: src/dandelion/composer.py:1296 src/dandelion/composer.py:1349
+#: src/dandelion/composer.py:1297 src/dandelion/composer.py:1350
 msgid "More Factual"
 msgstr ""
 
-#: src/dandelion/composer.py:1300
+#: src/dandelion/composer.py:1301
 msgid "Correct Spelling and Grammar"
 msgstr ""
 
-#: src/dandelion/composer.py:1304
+#: src/dandelion/composer.py:1305
 msgid "Translate"
 msgstr ""
 
-#: src/dandelion/composer.py:1315
+#: src/dandelion/composer.py:1316
 msgid "Adapt for Platform"
 msgstr ""
 
-#: src/dandelion/composer.py:1316
+#: src/dandelion/composer.py:1317
 msgid "Suggest Hashtags"
 msgstr ""
 
-#: src/dandelion/composer.py:1340
+#: src/dandelion/composer.py:1341
 msgid "Write some text first"
 msgstr ""
 
-#: src/dandelion/composer.py:1349
+#: src/dandelion/composer.py:1350
 msgid "Corrected"
 msgstr ""
 
-#: src/dandelion/composer.py:1353
+#: src/dandelion/composer.py:1354
 #, python-brace-format
 msgid "Translation: {language}"
 msgstr ""
 
-#: src/dandelion/composer.py:1355
+#: src/dandelion/composer.py:1356
 #, python-brace-format
 msgid "Adapted for {platform}"
 msgstr ""
 
-#: src/dandelion/composer.py:1357
+#: src/dandelion/composer.py:1358
 msgid "Hashtag Suggestions"
 msgstr ""
 
-#: src/dandelion/composer.py:1360
+#: src/dandelion/composer.py:1361
 msgid "Waiting for the answer"
 msgstr ""
 
-#: src/dandelion/composer.py:1403
+#: src/dandelion/composer.py:1404
 msgid "No suggestions"
 msgstr ""
 
-#: src/dandelion/composer.py:1486
+#: src/dandelion/composer.py:1487
 msgid "Suggestion applied"
-msgstr ""
-
-#: src/dandelion/composer.py:1527
-#, python-brace-format
-msgid "Scheduled for {when}. Changes are saved automatically."
 msgstr ""
 
 #: src/dandelion/composer.py:1528
 #, python-brace-format
-msgid "Paused, planned for {when}."
+msgid "Scheduled for {when}. Changes are saved automatically."
 msgstr ""
 
 #: src/dandelion/composer.py:1529
 #, python-brace-format
+msgid "Paused, planned for {when}."
+msgstr ""
+
+#: src/dandelion/composer.py:1530
+#, python-brace-format
 msgid "Missed, it was planned for {when}."
 msgstr ""
 
-#: src/dandelion/composer.py:1553
+#: src/dandelion/composer.py:1554
 msgid "Schedule removed, the post is a draft again"
 msgstr ""
 
-#: src/dandelion/composer.py:1584
+#: src/dandelion/composer.py:1585
 msgid "This role has no time slots. Add them in the role settings."
 msgstr ""
 
 #. type: ignore[arg-type]
-#: src/dandelion/composer.py:1624 src/dandelion/scheduled.py:161
+#: src/dandelion/composer.py:1625 src/dandelion/scheduled.py:161
 #, python-brace-format
 msgid "Scheduled for {when}"
 msgstr ""
 
-#: src/dandelion/composer.py:1643
+#: src/dandelion/composer.py:1644
 msgid "Publish Despite Warnings?"
 msgstr ""
 
-#: src/dandelion/composer.py:1646
+#: src/dandelion/composer.py:1647
 msgid "_Publish Anyway"
 msgstr ""
 
-#: src/dandelion/composer.py:1679
+#: src/dandelion/composer.py:1680
 msgid "This post is already being published"
 msgstr ""
 
-#: src/dandelion/composer.py:1686
+#: src/dandelion/composer.py:1687
 msgid "Publishing failed"
 msgstr ""
 
-#: src/dandelion/composer.py:1688
+#: src/dandelion/composer.py:1689
 #, python-brace-format
 msgid "Published on {n} profile"
 msgid_plural "Published on {n} profiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/dandelion/composer.py:1691
+#: src/dandelion/composer.py:1692
 #, python-brace-format
 msgid "Published on {ok} of {total} profiles"
 msgstr ""
 
-#: src/dandelion/composer.py:1692
+#: src/dandelion/composer.py:1693
 msgid "_Details"
 msgstr ""
 
@@ -1574,7 +1574,7 @@ msgstr ""
 msgid "{platform} · deleted"
 msgstr ""
 
-#: src/dandelion/history.py:156 src/dandelion/archive.py:260
+#: src/dandelion/history.py:156 src/dandelion/archive.py:264
 msgid "Not published"
 msgstr ""
 
@@ -2388,7 +2388,7 @@ msgid "Scheduled on the server: {profiles}"
 msgstr ""
 
 #: src/dandelion/scheduled.py:311 src/dandelion/scheduled.py:395
-#: src/dandelion/archive.py:194 src/dandelion/archive.py:258
+#: src/dandelion/archive.py:194 src/dandelion/archive.py:262
 msgid "Paused"
 msgstr ""
 
@@ -2712,7 +2712,7 @@ msgstr ""
 msgid "Without Date"
 msgstr ""
 
-#: src/dandelion/archive.py:192 src/dandelion/archive.py:253
+#: src/dandelion/archive.py:192 src/dandelion/archive.py:257
 msgid "Missed"
 msgstr ""
 
@@ -2721,7 +2721,7 @@ msgstr ""
 msgid "Show All ({n})"
 msgstr ""
 
-#: src/dandelion/archive.py:239
+#: src/dandelion/archive.py:243
 msgid "Empty Post"
 msgstr ""
 

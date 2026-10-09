@@ -1258,6 +1258,7 @@ class DandelionComposer(Adw.BreakpointBin):
             return
         if new:
             self.reload_drafts()
+            self.win.sync_title()
         if toast:
             self.win.toast(_("Draft saved"))
 

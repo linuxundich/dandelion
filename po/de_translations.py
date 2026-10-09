@@ -795,6 +795,8 @@ DE: dict[str, str | tuple[str, str]] = {
     "published": "veröffentlicht",
     "{time} free": "{time} frei",
     "Free time slot of “{role}”": "Freies Zeitfenster von „{role}“",
+    "Plan posts in a month calendar with free time slots":
+        "Beiträge im Monatskalender mit freien Zeitfenstern planen",
 }
 
 

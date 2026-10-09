@@ -30,8 +30,11 @@
 - **Scheduling** with a background service that also works while the window is
   closed. Missed posts (computer off or asleep) are reported instead of being
   sent silently. Mastodon posts can optionally be scheduled on the server.
-- **Calendar and time slots:** a month view with drag and drop, and fixed time
-  slots per role (“next free slot”).
+- **One sidebar for everything:** drafts, scheduled and published posts sit in
+  one list, grouped by state, with search and right-click actions.
+- **Calendar and time slots:** a month view with scheduled and published posts
+  and the free time slots of each role. Drag a draft from the sidebar onto a
+  day to schedule it, or drag a scheduled post to another day.
 - **History** with links to every post, retry for failed profiles and deletion
   on the platform.
 - **Optional writing assistant** with Google Gemini, OpenAI, xAI or OpenRouter: rephrase,
@@ -39,11 +42,13 @@
   It only makes suggestions and can be switched off completely.
 - **Secure:** login data and API keys are stored in the system keyring
   (Secret Service), never in plain text.
-- Adaptive layout down to 360 px, keyboard shortcuts, light and dark style.
+- **Adaptive layout** from 360 px phones to wide desktop screens: the
+  preview grows with the window and shows two columns when there is room.
+  Keyboard shortcuts, light and dark style.
 
-| Scheduled posts | Writing assistant |
+| Calendar | Writing assistant |
 |---|---|
-| ![Scheduled](data/screenshots/scheduled.png) | ![Assistant](data/screenshots/assistant.png) |
+| ![Calendar](data/screenshots/scheduled.png) | ![Assistant](data/screenshots/assistant.png) |
 
 ## Networks
 

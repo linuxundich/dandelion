@@ -72,6 +72,7 @@ template $DandelionWindow: Adw.ApplicationWindow {
               setup-menu => $on_sidebar_setup_menu();
 
               placeholder: Adw.StatusPage {
+                visible: false;
                 icon-name: "system-search-symbolic";
                 title: _("No Results");
 

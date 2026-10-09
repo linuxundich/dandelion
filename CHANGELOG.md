@@ -21,6 +21,7 @@ All notable changes to Dandelion are listed here.
   icon buttons. Language, signature, Mastodon visibility and the Bluesky label
   moved into an options popover, grouped by platform; its button shows the
   current language and visibility.
+- **New screenshots** in README and AppStream metadata.
 - **Character count as a ring** with the remaining characters of the strictest
   profile.
 - **The preview grows with the window** (phase 3) and shows its tiles in two
@@ -62,6 +63,8 @@ All notable changes to Dandelion are listed here.
 ### Fixed
 
 - In narrow windows the preview bar no longer covers the editor toolbar.
+- The header shows "Draft" instead of "New Post" as soon as a new post is
+  saved for the first time.
 - The image preview in the alt text dialog and in the platform previews was
   blank for some files (for example WebP).
 

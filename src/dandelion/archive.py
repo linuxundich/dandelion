@@ -214,6 +214,10 @@ class Archive:
                 title=_("Show All ({n})").format(n=total), icon_name="view-list-symbolic"))
         self._finish(section)
 
+        # „Keine Ergebnisse“ nur bei einer Suche, nicht beim ersten Aufbau
+        placeholder = self.sidebar.get_placeholder()
+        if placeholder is not None:
+            placeholder.set_visible(bool(search))
         self.sync_selection()
         return False
 
