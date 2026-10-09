@@ -2,7 +2,7 @@
 
 All notable changes to Dandelion are listed here.
 
-## [Unreleased]
+## 0.3.1 – 2026-10-09
 
 ### Changed
 

@@ -811,6 +811,11 @@ DE: dict[str, str | tuple[str, str]] = {
     "Detail page for published posts": "Detailseite für veröffentlichte Beiträge",
     "OpenRouter as a further AI provider and a word limit for AI alt text":
         "OpenRouter als weiterer KI-Anbieter und eine Wortgrenze für KI-Alt-Texte",
+    # Release 0.3.1
+    "Calendar: month navigation in its own row, no longer next to the back button":
+        "Kalender: Monatswechsel in einer eigenen Zeile, nicht mehr neben dem Zurück-Knopf",
+    "Profile chips show avatars only instead of wrapping into a second row":
+        "Profil-Pillen zeigen nur noch Avatare, statt in eine zweite Zeile umzubrechen",
 }
 
 

@@ -79,6 +79,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.1" date="2026-10-09">
+      <description>
+        <ul>
+          <li>Calendar: month navigation in its own row, no longer next to the back button</li>
+          <li>Profile chips show avatars only instead of wrapping into a second row</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-10-09">
       <description>
         <p>A new window layout that grows with the screen.</p>

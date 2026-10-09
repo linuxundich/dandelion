@@ -1,11 +1,11 @@
 # Backlog
 
-As of 2026-10-09, version 0.3.0. Shipped changes are in
+As of 2026-10-09, version 0.3.1. Shipped changes are in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Release
 
-- [ ] **Upload the AUR package.** PKGBUILD for 0.3.0 is in `build-aux/arch/`;
+- [ ] **Upload the AUR package.** PKGBUILD for 0.3.1 is in `build-aux/arch/`;
       fill in the checksum of the GitHub tarball after pushing the tag.
 - [ ] **Submit to Flathub** (optional). The release manifest
       `build-aux/flatpak/de.linuxundich.Dandelion.release.json` builds from the

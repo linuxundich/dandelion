@@ -1,5 +1,5 @@
 project('dandelion',
-          version: '0.3.0',
+          version: '0.3.1',
     meson_version: '>= 1.4.0',
   default_options: [ 'warning_level=2', 'werror=false', ],
           license: 'GPL-3.0-or-later',
