@@ -81,8 +81,8 @@
         {
           "type": "git",
           "url": "https://github.com/linuxundich/dandelion.git",
-          "tag": "v0.2.2",
-          "commit": "d797ee42ffbd6133ebd70af6ba4e2bf1a95a59ae"
+          "tag": "v0.3.0",
+          "commit": "175b19ed66593dede104c04f745abea7f1c32745"
         }
       ]
     }
