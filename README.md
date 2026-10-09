@@ -23,7 +23,7 @@
 - **Preview** for every profile. Profiles that would look the same share one
   tile, problems are shown right in the tile.
 - **Alt text** is required for Mastodon and suggested everywhere else. The AI
-  assistant (Gemini, OpenAI or Grok, set up in the preferences) can draft it and
+  assistant (Gemini, OpenAI, Grok or OpenRouter, set up in the preferences) can draft it and
   revise it on request.
 - **Threads:** long posts are split into numbered parts on Mastodon, Bluesky and
   X – at paragraphs, sentences or words, or by hand with a `---` line.
@@ -34,7 +34,7 @@
   slots per role (“next free slot”).
 - **History** with links to every post, retry for failed profiles and deletion
   on the platform.
-- **Optional writing assistant** with Google Gemini, OpenAI or xAI: rephrase,
+- **Optional writing assistant** with Google Gemini, OpenAI, xAI or OpenRouter: rephrase,
   correct, translate, adapt to a network, suggest hashtags and describe images.
   It only makes suggestions and can be switched off completely.
 - **Secure:** login data and API keys are stored in the system keyring

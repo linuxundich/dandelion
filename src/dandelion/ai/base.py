@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Gemeinsame Schnittstelle der KI-Anbieter (Gemini, OpenAI, xAI)."""
+"""Gemeinsame Schnittstelle der KI-Anbieter (Gemini, OpenAI, xAI, OpenRouter)."""
 
 from __future__ import annotations
 

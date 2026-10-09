@@ -16,7 +16,7 @@
       <li>Own wording per network or profile where needed</li>
       <li>Alt text is required for Mastodon and suggested everywhere else</li>
       <li>Scheduled posts are sent even when the window is closed</li>
-      <li>Optional writing assistant with Google Gemini, OpenAI or xAI that only makes suggestions</li>
+      <li>Optional writing assistant with Google Gemini, OpenAI, xAI or OpenRouter that only makes suggestions</li>
       <li>Login data is stored in the system keyring</li>
     </ul>
     <p>LinkedIn, Facebook and X only allow posting through a developer app that you register yourself. X charges per post.</p>

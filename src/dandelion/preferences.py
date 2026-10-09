@@ -80,7 +80,7 @@ class DandelionPreferences(Adw.PreferencesDialog):
         self.reload()
 
     # -- KI ---------------------------------------------------------------
-    _PROVIDERS = ("gemini", "openai", "xai")
+    _PROVIDERS = ("gemini", "openai", "xai", "openrouter")
 
     def _setup_ai(self) -> None:
         s = self.app.settings

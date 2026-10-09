@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dandelion\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 09:58+0200\n"
+"POT-Creation-Date: 2026-10-09 10:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,8 +79,8 @@ msgstr ""
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:19
 msgid ""
-"Optional writing assistant with Google Gemini, OpenAI or xAI that only makes "
-"suggestions"
+"Optional writing assistant with Google Gemini, OpenAI, xAI or OpenRouter "
+"that only makes suggestions"
 msgstr ""
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:20
@@ -280,7 +280,7 @@ msgid "Enable AI features"
 msgstr ""
 
 #: data/de.linuxundich.Dandelion.gschema.xml:50
-msgid "AI provider (gemini, openai, xai)"
+msgid "AI provider (gemini, openai, xai, openrouter)"
 msgstr ""
 
 #: data/de.linuxundich.Dandelion.gschema.xml:51
@@ -295,11 +295,15 @@ msgstr ""
 msgid "xAI model"
 msgstr ""
 
-#: data/de.linuxundich.Dandelion.gschema.xml:56
-msgid "Privacy notices already confirmed"
+#: data/de.linuxundich.Dandelion.gschema.xml:54
+msgid "OpenRouter model"
 msgstr ""
 
 #: data/de.linuxundich.Dandelion.gschema.xml:57
+msgid "Privacy notices already confirmed"
+msgstr ""
+
+#: data/de.linuxundich.Dandelion.gschema.xml:58
 msgid "Entries like “openai:text” or “gemini:images”."
 msgstr ""
 
@@ -693,33 +697,33 @@ msgstr ""
 msgid "Provider"
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:195
+#: src/dandelion/ui/preferences.blp:196
 msgid "API Key"
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:201
+#: src/dandelion/ui/preferences.blp:202
 msgid "Get an API Key"
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:207
+#: src/dandelion/ui/preferences.blp:208
 msgid "Model"
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:212
+#: src/dandelion/ui/preferences.blp:213
 msgid "Load Available Models"
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:219
+#: src/dandelion/ui/preferences.blp:220
 msgid "Privacy"
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:220
+#: src/dandelion/ui/preferences.blp:221
 msgid ""
 "Before text or images are sent to a provider for the first time, Dandelion "
 "asks for confirmation. API keys are stored in the system keyring."
 msgstr ""
 
-#: src/dandelion/ui/preferences.blp:223
+#: src/dandelion/ui/preferences.blp:224
 msgid "Show Privacy Notices Again"
 msgstr ""
 
@@ -1861,7 +1865,7 @@ msgstr ""
 #: src/dandelion/alt_text_dialog.py:97
 msgid ""
 "Turn it on under Preferences › AI Assistant and add an API key (Gemini, "
-"OpenAI or Grok)."
+"OpenAI, Grok or OpenRouter)."
 msgstr ""
 
 #: src/dandelion/alt_text_dialog.py:117
@@ -2613,6 +2617,7 @@ msgid "{provider} reported an error (HTTP {status})."
 msgstr ""
 
 #: src/dandelion/ai/openai.py:54 src/dandelion/ai/xai.py:42
+#: src/dandelion/ai/openrouter.py:57
 #, python-brace-format
 msgid "{provider} returned an empty answer."
 msgstr ""

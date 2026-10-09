@@ -65,8 +65,8 @@ msgid "Scheduled posts are sent even when the window is closed"
 msgstr "Geplante Beiträge werden auch bei geschlossenem Fenster gesendet"
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:19
-msgid "Optional writing assistant with Google Gemini, OpenAI or xAI that only makes suggestions"
-msgstr "Optionaler Schreibassistent mit Google Gemini, OpenAI oder xAI, der nur Vorschläge macht"
+msgid "Optional writing assistant with Google Gemini, OpenAI, xAI or OpenRouter that only makes suggestions"
+msgstr "Optionaler Schreibassistent mit Google Gemini, OpenAI, xAI oder OpenRouter, der nur Vorschläge macht"
 
 #: data/de.linuxundich.Dandelion.metainfo.xml.in:20
 msgid "Login data is stored in the system keyring"
@@ -257,8 +257,8 @@ msgid "Enable AI features"
 msgstr "KI-Funktionen aktivieren"
 
 #: data/de.linuxundich.Dandelion.gschema.xml:50
-msgid "AI provider (gemini, openai, xai)"
-msgstr "KI-Anbieter (gemini, openai, xai)"
+msgid "AI provider (gemini, openai, xai, openrouter)"
+msgstr "KI-Anbieter (gemini, openai, xai, openrouter)"
 
 #: data/de.linuxundich.Dandelion.gschema.xml:51
 msgid "Gemini model"
@@ -272,11 +272,15 @@ msgstr "OpenAI-Modell"
 msgid "xAI model"
 msgstr "xAI-Modell"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:56
+#: data/de.linuxundich.Dandelion.gschema.xml:54
+msgid "OpenRouter model"
+msgstr "OpenRouter-Modell"
+
+#: data/de.linuxundich.Dandelion.gschema.xml:57
 msgid "Privacy notices already confirmed"
 msgstr "Bereits bestätigte Datenschutzhinweise"
 
-#: data/de.linuxundich.Dandelion.gschema.xml:57
+#: data/de.linuxundich.Dandelion.gschema.xml:58
 msgid "Entries like “openai:text” or “gemini:images”."
 msgstr "Einträge wie „openai:text“ oder „gemini:images“."
 
@@ -660,31 +664,31 @@ msgstr "KI-Funktionen aktivieren"
 msgid "Provider"
 msgstr "Anbieter"
 
-#: src/dandelion/ui/preferences.blp:195
+#: src/dandelion/ui/preferences.blp:196
 msgid "API Key"
 msgstr "API-Schlüssel"
 
-#: src/dandelion/ui/preferences.blp:201
+#: src/dandelion/ui/preferences.blp:202
 msgid "Get an API Key"
 msgstr "API-Schlüssel erstellen"
 
-#: src/dandelion/ui/preferences.blp:207
+#: src/dandelion/ui/preferences.blp:208
 msgid "Model"
 msgstr "Modell"
 
-#: src/dandelion/ui/preferences.blp:212
+#: src/dandelion/ui/preferences.blp:213
 msgid "Load Available Models"
 msgstr "Verfügbare Modelle laden"
 
-#: src/dandelion/ui/preferences.blp:219
+#: src/dandelion/ui/preferences.blp:220
 msgid "Privacy"
 msgstr "Datenschutz"
 
-#: src/dandelion/ui/preferences.blp:220
+#: src/dandelion/ui/preferences.blp:221
 msgid "Before text or images are sent to a provider for the first time, Dandelion asks for confirmation. API keys are stored in the system keyring."
 msgstr "Bevor Text oder Bilder zum ersten Mal an einen Anbieter gehen, fragt Dandelion nach. API-Schlüssel liegen im Schlüsselbund des Systems."
 
-#: src/dandelion/ui/preferences.blp:223
+#: src/dandelion/ui/preferences.blp:224
 msgid "Show Privacy Notices Again"
 msgstr "Datenschutzhinweise erneut anzeigen"
 
@@ -1793,8 +1797,8 @@ msgid "AI assistant is off"
 msgstr "KI-Assistent ist aus"
 
 #: src/dandelion/alt_text_dialog.py:97
-msgid "Turn it on under Preferences › AI Assistant and add an API key (Gemini, OpenAI or Grok)."
-msgstr "Schalte ihn unter Einstellungen › KI-Assistent ein und trage einen API-Schlüssel ein (Gemini, OpenAI oder Grok)."
+msgid "Turn it on under Preferences › AI Assistant and add an API key (Gemini, OpenAI, Grok or OpenRouter)."
+msgstr "Schalte ihn unter Einstellungen › KI-Assistent ein und trage einen API-Schlüssel ein (Gemini, OpenAI, Grok oder OpenRouter)."
 
 #: src/dandelion/alt_text_dialog.py:117
 #, python-brace-format
@@ -2522,6 +2526,7 @@ msgid "{provider} reported an error (HTTP {status})."
 msgstr "{provider} hat einen Fehler gemeldet (HTTP {status})."
 
 #: src/dandelion/ai/openai.py:54 src/dandelion/ai/xai.py:42
+#: src/dandelion/ai/openrouter.py:57
 #, python-brace-format
 msgid "{provider} returned an empty answer."
 msgstr "{provider} hat eine leere Antwort geliefert."

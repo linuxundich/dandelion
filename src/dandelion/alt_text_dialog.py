@@ -95,7 +95,7 @@ class DandelionAltTextDialog(Adw.Dialog):
         if self._ai_generate is None:
             self.ai_status.set_label(_("AI assistant is off"))
             self.ai_result.set_label(_("Turn it on under Preferences › AI Assistant and "
-                                       "add an API key (Gemini, OpenAI or Grok)."))
+                                       "add an API key (Gemini, OpenAI, Grok or OpenRouter)."))
             self.ai_spinner.set_visible(False)
             self.ai_accept.set_sensitive(False)
             self.ai_chat_entry.set_visible(False)

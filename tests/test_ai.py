@@ -151,3 +151,21 @@ def test_alt_text_revision_includes_previous_and_request(http, run):
                        "Ein langer Text.", "kürzer"))
     prompt = http.requests[-1].json["input"][0]["content"][0]["text"]
     assert "Ein langer Text." in prompt and "kürzer" in prompt
+
+
+def test_openrouter(http, run):
+    http.add("GET", "https://openrouter.ai/api/v1/models", {"data": [
+        {"id": "b/vision", "architecture": {"input_modalities": ["text", "image"],
+                                            "output_modalities": ["text"]}},
+        {"id": "a/text-only", "architecture": {"input_modalities": ["text"],
+                                               "output_modalities": ["text"]}}]})
+    p = create("openrouter", http)
+    assert run(p.list_models("k")) == ["b/vision"]
+    http.add("POST", "https://openrouter.ai/api/v1/chat/completions",
+             {"choices": [{"message": {"content": "Eine Pusteblume."}}]})
+    ctx = Context(p, "or-key", "google/gemini-3.6-flash")
+    assert run(tasks.alt_text(ctx, ImageInput("image/png", b"P"), None, "German")) == \
+        "Eine Pusteblume."
+    req = http.requests[-1]
+    assert req.headers["Authorization"] == "Bearer or-key"
+    assert req.json["reasoning"] == {"effort": "low"}

@@ -7,12 +7,14 @@ from ..net.http import HttpClient
 from .base import AIError, AIProvider, ImageInput
 from .gemini import Gemini
 from .openai import OpenAI
+from .openrouter import OpenRouter
 from .xai import XAI
 
 PROVIDERS: dict[str, type[AIProvider]] = {
     Gemini.id: Gemini,
     OpenAI.id: OpenAI,
     XAI.id: XAI,
+    OpenRouter.id: OpenRouter,
 }
 
 

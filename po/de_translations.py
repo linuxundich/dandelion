@@ -563,7 +563,8 @@ DE: dict[str, str | tuple[str, str]] = {
     "Facebook rejected the post: {reason}": "Facebook hat den Beitrag abgelehnt: {reason}",
     "Videos are not supported for Facebook yet.": "Videos werden für Facebook noch nicht unterstützt.",
     # Phase 7: KI-Assistent
-    "AI provider (gemini, openai, xai)": "KI-Anbieter (gemini, openai, xai)",
+    "AI provider (gemini, openai, xai, openrouter)": "KI-Anbieter (gemini, openai, xai, openrouter)",
+    "OpenRouter model": "OpenRouter-Modell",
     "Gemini model": "Gemini-Modell",
     "OpenAI model": "OpenAI-Modell",
     "xAI model": "xAI-Modell",
@@ -593,8 +594,8 @@ DE: dict[str, str | tuple[str, str]] = {
         "Zum Beispiel: locker, duzt die Leser, technisch, aber verständlich",
     "_Describe Image": "Bild _beschreiben",
     "AI assistant is off": "KI-Assistent ist aus",
-    "Turn it on under Preferences › AI Assistant and add an API key (Gemini, OpenAI or Grok).":
-        "Schalte ihn unter Einstellungen › KI-Assistent ein und trage einen API-Schlüssel ein (Gemini, OpenAI oder Grok).",
+    "Turn it on under Preferences › AI Assistant and add an API key (Gemini, OpenAI, Grok or OpenRouter).":
+        "Schalte ihn unter Einstellungen › KI-Assistent ein und trage einen API-Schlüssel ein (Gemini, OpenAI, Grok oder OpenRouter).",
     "Ask for changes, e.g. “shorter” or “mention the cable”":
         "Änderung wünschen, z. B. „kürzer“ oder „Kabel erwähnen“",
     "Send": "Senden",
@@ -655,8 +656,8 @@ DE: dict[str, str | tuple[str, str]] = {
         "Alt-Texte sind für Mastodon Pflicht und werden überall sonst empfohlen",
     "Scheduled posts are sent even when the window is closed":
         "Geplante Beiträge werden auch bei geschlossenem Fenster gesendet",
-    "Optional writing assistant with Google Gemini, OpenAI or xAI that only makes suggestions":
-        "Optionaler Schreibassistent mit Google Gemini, OpenAI oder xAI, der nur Vorschläge macht",
+    "Optional writing assistant with Google Gemini, OpenAI, xAI or OpenRouter that only makes suggestions":
+        "Optionaler Schreibassistent mit Google Gemini, OpenAI, xAI oder OpenRouter, der nur Vorschläge macht",
     "Login data is stored in the system keyring": "Anmeldedaten liegen im Schlüsselbund des Systems",
     "LinkedIn, Facebook and X only allow posting through a developer app that you register yourself. X charges per post.":
         "LinkedIn, Facebook und X erlauben das Posten nur über eine selbst registrierte Entwickler-App. X berechnet Gebühren pro Beitrag.",

@@ -6,6 +6,8 @@ All notable changes to Dandelion are listed here.
 
 ### Added
 
+- **OpenRouter** as a fourth AI provider next to Gemini, OpenAI and xAI: one
+  key for many models. The model list only shows models that accept images.
 - **Alt text chat:** after a suggestion from Gemini, OpenAI or Grok you can ask
   for changes ("shorter", "mention the cable") and get a revised suggestion.
   The "Describe Image" button is always shown; without an API key it explains
