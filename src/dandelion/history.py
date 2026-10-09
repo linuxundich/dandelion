@@ -37,7 +37,7 @@ class DandelionHistoryView(Adw.Bin):
         self.search_bar.set_search_mode(not self.search_bar.get_search_mode())
 
     def _sync_search_button(self, *_args: object) -> None:
-        self.win.search_button.set_active(self.search_bar.get_search_mode())
+        self.win.history_search_button.set_active(self.search_bar.get_search_mode())
 
     @Gtk.Template.Callback()
     def on_search_changed(self, *_args: object) -> None:
@@ -101,67 +101,73 @@ class DandelionHistoryView(Adw.Bin):
             row.set_expanded(True)
 
         for t in post.targets:
-            p = profiles.get(t.profile_id)
-            if p is None:
-                continue
-            platform = self.app.registry.get(p.platform).name \
-                if p.platform in self.app.registry else p.platform
-            sub = Adw.ActionRow(title=GLib.markup_escape_text(p.full_handle))
-            sub.set_subtitle_selectable(True)
-            if t.state == TargetState.PUBLISHED:
-                sub.set_subtitle(platform)
-                img = Gtk.Image(icon_name="object-select-symbolic")
-                img.add_css_class("success")
-                sub.add_prefix(img)
-                if t.remote_url:
-                    open_btn = Gtk.Button(icon_name="adw-external-link-symbolic",
-                                          valign=Gtk.Align.CENTER, tooltip_text=_("Open Post"))
-                    open_btn.add_css_class("flat")
-                    label_widget(open_btn, open_btn.get_tooltip_text() or "")
-                    open_btn.connect("clicked", lambda _b, u=t.remote_url: Gtk.UriLauncher.new(
-                        u).launch(self.get_root(), None, None))
-                    sub.add_suffix(open_btn)
-                    copy_btn = Gtk.Button(icon_name="edit-copy-symbolic", valign=Gtk.Align.CENTER,
-                                          tooltip_text=_("Copy Link"))
-                    copy_btn.add_css_class("flat")
-                    label_widget(copy_btn, copy_btn.get_tooltip_text() or "")
-                    copy_btn.connect("clicked", lambda _b, u=t.remote_url: self._copy(u))
-                    sub.add_suffix(copy_btn)
-                delete = Gtk.Button(icon_name="user-trash-symbolic", valign=Gtk.Align.CENTER,
-                                    tooltip_text=_("Delete on {platform}").format(platform=platform))
-                delete.add_css_class("flat")
-                label_widget(delete, delete.get_tooltip_text() or "")
-                delete.connect("clicked", lambda _b, pp=post, prof=p, name=platform:
-                               self._confirm_delete(pp.id, prof, name))
-                sub.add_suffix(delete)
-            elif t.state == TargetState.DELETED:
-                sub.set_subtitle(_("{platform} · deleted").format(platform=platform))
-                sub.add_prefix(Gtk.Image(icon_name="user-trash-symbolic"))
-            elif t.state == TargetState.SENDING:
-                sub.set_subtitle(_("Publishing"))
-                sub.add_prefix(Adw.Spinner())
-            else:
-                sub.set_subtitle(GLib.markup_escape_text(
-                    f"{platform} · {t.last_error or _('Not published')}"))
-                img = Gtk.Image(icon_name="dialog-error-symbolic")
-                img.add_css_class("error")
-                sub.add_prefix(img)
-                retry = Gtk.Button(label=_("_Retry"), use_underline=True, valign=Gtk.Align.CENTER)
-                retry.connect("clicked", lambda _b, pp=post, prof=p:
-                              self.win.composer.retry(pp.id, {prof.id}))
-                sub.add_suffix(retry)
-            row.add_row(sub)
+            sub = self.target_row(post, t, profiles)
+            if sub is not None:
+                row.add_row(sub)
 
         reuse = Adw.ButtonRow(title=_("Use as New Draft"), start_icon_name="edit-copy-symbolic")
-        reuse.connect("activated", lambda *_: self._reuse(post))
+        reuse.connect("activated", lambda *_: self.reuse(post))
         row.add_row(reuse)
         return row
+
+    def target_row(self, post, t, profiles) -> Adw.ActionRow | None:  # type: ignore[no-untyped-def]
+        """Zeile für ein Profil: Status, Link öffnen/kopieren, löschen, wiederholen."""
+        p = profiles.get(t.profile_id)
+        if p is None:
+            return None
+        platform = self.app.registry.get(p.platform).name \
+            if p.platform in self.app.registry else p.platform
+        sub = Adw.ActionRow(title=GLib.markup_escape_text(p.full_handle))
+        sub.set_subtitle_selectable(True)
+        if t.state == TargetState.PUBLISHED:
+            sub.set_subtitle(platform)
+            img = Gtk.Image(icon_name="object-select-symbolic")
+            img.add_css_class("success")
+            sub.add_prefix(img)
+            if t.remote_url:
+                open_btn = Gtk.Button(icon_name="adw-external-link-symbolic",
+                                      valign=Gtk.Align.CENTER, tooltip_text=_("Open Post"))
+                open_btn.add_css_class("flat")
+                label_widget(open_btn, open_btn.get_tooltip_text() or "")
+                open_btn.connect("clicked", lambda _b, u=t.remote_url: Gtk.UriLauncher.new(
+                    u).launch(self.get_root(), None, None))
+                sub.add_suffix(open_btn)
+                copy_btn = Gtk.Button(icon_name="edit-copy-symbolic", valign=Gtk.Align.CENTER,
+                                      tooltip_text=_("Copy Link"))
+                copy_btn.add_css_class("flat")
+                label_widget(copy_btn, copy_btn.get_tooltip_text() or "")
+                copy_btn.connect("clicked", lambda _b, u=t.remote_url: self._copy(u))
+                sub.add_suffix(copy_btn)
+            delete = Gtk.Button(icon_name="user-trash-symbolic", valign=Gtk.Align.CENTER,
+                                tooltip_text=_("Delete on {platform}").format(platform=platform))
+            delete.add_css_class("flat")
+            label_widget(delete, delete.get_tooltip_text() or "")
+            delete.connect("clicked", lambda _b, pp=post, prof=p, name=platform:
+                           self._confirm_delete(pp.id, prof, name))
+            sub.add_suffix(delete)
+        elif t.state == TargetState.DELETED:
+            sub.set_subtitle(_("{platform} · deleted").format(platform=platform))
+            sub.add_prefix(Gtk.Image(icon_name="user-trash-symbolic"))
+        elif t.state == TargetState.SENDING:
+            sub.set_subtitle(_("Publishing"))
+            sub.add_prefix(Adw.Spinner())
+        else:
+            sub.set_subtitle(GLib.markup_escape_text(
+                f"{platform} · {t.last_error or _('Not published')}"))
+            img = Gtk.Image(icon_name="dialog-error-symbolic")
+            img.add_css_class("error")
+            sub.add_prefix(img)
+            retry = Gtk.Button(label=_("_Retry"), use_underline=True, valign=Gtk.Align.CENTER)
+            retry.connect("clicked", lambda _b, pp=post, prof=p:
+                          self.win.composer.retry(pp.id, {prof.id}))
+            sub.add_suffix(retry)
+        return sub
 
     def _copy(self, url: str) -> None:
         Gdk.Display.get_default().get_clipboard().set(url)
         self.win.toast(_("Link copied"))
 
-    def _reuse(self, post) -> None:  # type: ignore[no-untyped-def]
+    def reuse(self, post) -> None:  # type: ignore[no-untyped-def]
         from .core.models import Media, Post, Target, Variant
         new = Post(role_id=post.role_id, body=post.body, content_warning=post.content_warning,
                    language=post.language, visibility=post.visibility,
@@ -173,7 +179,7 @@ class DandelionHistoryView(Adw.Bin):
                    targets=[Target(t.profile_id) for t in post.targets])
         self.win.composer.save_now()
         self.win.composer.load_post(new)
-        self.win.stack.set_visible_child_name("composer")
+        self.win.show_view("composer")
 
     def _confirm_delete(self, post_id: int, profile, platform: str) -> None:  # type: ignore[no-untyped-def]
         dialog = Adw.AlertDialog(
@@ -192,7 +198,7 @@ class DandelionHistoryView(Adw.Bin):
             async def run() -> None:
                 await self.app.publisher.delete_remote(post_id, profile.id)
                 self.win.toast(_("Post deleted on {platform}").format(platform=platform))
-                self.reload()
+                self.win.posts_changed()
 
             spawn(run(), on_error=lambda e: self.win.toast(
                 getattr(e, "message", None) or _("The post could not be deleted")))

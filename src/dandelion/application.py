@@ -43,8 +43,7 @@ class DandelionApplication(Adw.Application):
         self._add_action("shortcuts", self.on_shortcuts, ["<primary>question"])
         self.set_accels_for_action("win.new-post", ["<primary>n"])
         self.set_accels_for_action("win.publish", ["<primary>Return"])
-        self.set_accels_for_action("win.toggle-drafts", ["F9"])
-        self.set_accels_for_action("win.toggle-preview", ["<primary><shift>p"])
+        self.set_accels_for_action("win.toggle-preview", ["F9", "<primary><shift>p"])
         self.set_accels_for_action("win.add-media", ["<primary>o"])
         self.set_accels_for_action("win.save-draft", ["<primary>s"])
         self.set_accels_for_action("win.choose-role", ["<primary>r"])
@@ -114,7 +113,7 @@ class DandelionApplication(Adw.Application):
     def _show_view(self, name: str) -> None:
         win = self._window()
         if win:
-            win.stack.set_visible_child_name(name)
+            win.show_view(name)
 
     def _on_send_post(self, _action: Gio.SimpleAction, param: GLib.Variant) -> None:
         from .core.publisher import AlreadySending

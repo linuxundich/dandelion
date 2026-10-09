@@ -210,7 +210,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
             icon.add_css_class("warning")
             row.add_suffix(icon)
             send = Gtk.Button(label=_("Send _Now"), use_underline=True, valign=Gtk.Align.CENTER)
-            send.connect("clicked", lambda *_: self._send_now(post, confirm=False))
+            send.connect("clicked", lambda *_: self.send_now(post, confirm=False))
             row.add_suffix(send)
 
         group = Gio.SimpleActionGroup()
@@ -224,19 +224,19 @@ class DandelionScheduledView(Adw.BreakpointBin):
 
         main = Gio.Menu()
         add("edit", _("Edit"), self._edit, main)
-        add("reschedule", _("Change Time…"), self._reschedule, main)
+        add("reschedule", _("Change Time…"), self.reschedule, main)
         if post.state == PostState.PAUSED:
-            add("pause", _("Resume"), self._toggle_pause, main)
+            add("pause", _("Resume"), self.toggle_pause, main)
         elif post.state == PostState.SCHEDULED:
-            add("pause", _("Pause"), self._toggle_pause, main)
+            add("pause", _("Pause"), self.toggle_pause, main)
         if post.state != PostState.MISSED:
-            add("send", _("Send Now"), self._send_now, main)
-        add("duplicate", _("Duplicate"), self._duplicate, main)
+            add("send", _("Send Now"), self.send_now, main)
+        add("duplicate", _("Duplicate"), self.duplicate, main)
         menu.append_section(None, main)
         danger = Gio.Menu()
         if post.state == PostState.MISSED:
-            add("discard", _("Move to Drafts"), self._to_drafts, danger)
-        add("delete", _("Delete"), self._delete, danger)
+            add("discard", _("Move to Drafts"), self.to_drafts, danger)
+        add("delete", _("Delete"), self.delete_post, danger)
         menu.append_section(None, danger)
         row.insert_action_group("row", group)
         more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=menu,
@@ -254,7 +254,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
     def _edit(self, post: Post) -> None:
         self.win.composer.edit_post(post.id)
 
-    def _reschedule(self, post: Post) -> None:
+    def reschedule(self, post: Post) -> None:
         def done(when: datetime, tz: str) -> None:
             self.app.store.set_post_schedule(post.id, PostState.SCHEDULED, to_utc_iso(when), tz)  # type: ignore[arg-type]
             self._changed()
@@ -282,13 +282,13 @@ class DandelionScheduledView(Adw.BreakpointBin):
                  if x != post.scheduled_at]
         return next_free_slot(role.slots, taken, datetime.now(tz))
 
-    def _toggle_pause(self, post: Post) -> None:
+    def toggle_pause(self, post: Post) -> None:
         state = PostState.SCHEDULED if post.state == PostState.PAUSED else PostState.PAUSED
         self.app.store.set_post_schedule(post.id, state, post.scheduled_at)  # type: ignore[arg-type]
         self._changed()
         self.win.toast(_("Paused") if state == PostState.PAUSED else _("Resumed"))
 
-    def _send_now(self, post: Post, confirm: bool = True) -> None:
+    def send_now(self, post: Post, confirm: bool = True) -> None:
         if not confirm:
             self.win.composer.retry(post.id, None)  # type: ignore[arg-type]
             return
@@ -303,7 +303,7 @@ class DandelionScheduledView(Adw.BreakpointBin):
                        self.win.composer.retry(post.id, None))  # type: ignore[arg-type]
         dialog.present(self.win)
 
-    def _duplicate(self, post: Post) -> None:
+    def duplicate(self, post: Post) -> None:
         copy = Post(role_id=post.role_id, body=post.body, content_warning=post.content_warning,
                     language=post.language, visibility=post.visibility,
                     bluesky_label=post.bluesky_label, use_signature=post.use_signature,
@@ -316,13 +316,13 @@ class DandelionScheduledView(Adw.BreakpointBin):
         self.win.composer.edit_post(copy.id)  # type: ignore[arg-type]
         self.win.toast(_("Copy created as draft"))
 
-    def _to_drafts(self, post: Post) -> None:
+    def to_drafts(self, post: Post) -> None:
         self.app.store.set_post_schedule(post.id, PostState.DRAFT, None)  # type: ignore[arg-type]
         self._changed()
         self.win.composer.reload_drafts()
         self.win.toast(_("Moved to drafts"))
 
-    def _delete(self, post: Post) -> None:
+    def delete_post(self, post: Post) -> None:
         store = self.app.store
         store.mark_post_deleted(post.id, True)  # type: ignore[arg-type]
         self._changed()

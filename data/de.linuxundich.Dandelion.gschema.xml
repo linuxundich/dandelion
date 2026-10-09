@@ -14,9 +14,8 @@
     <key name="window-width" type="i"><default>1100</default><summary>Window width</summary></key>
     <key name="window-height" type="i"><default>760</default><summary>Window height</summary></key>
     <key name="window-maximized" type="b"><default>false</default><summary>Window maximized</summary></key>
-    <key name="drafts-sidebar-visible" type="b"><default>false</default><summary>Show the drafts sidebar</summary></key>
     <key name="show-preview" type="b"><default>true</default><summary>Show the preview column</summary></key>
-    <key name="scheduled-view" type="s"><default>'list'</default><summary>View of scheduled posts (list or calendar)</summary></key>
+    <key name="scheduled-view" type="s"><default>'calendar'</default><summary>View of scheduled posts (list or calendar)</summary></key>
     <key name="preview-compact" type="b"><default>true</default><summary>Show compact preview tiles</summary></key>
     <key name="last-role" type="s"><default>''</default><summary>UUID of the last used role</summary></key>
 

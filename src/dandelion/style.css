@@ -221,3 +221,11 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
 .cal-entry.role-purple { box-shadow: inset 3px 0 var(--accent-purple); }
 .cal-entry.role-slate  { box-shadow: inset 3px 0 var(--accent-slate); }
 .cal-dot { border-radius: 999px; min-width: 6px; min-height: 6px; }
+
+/* Seitenleiste */
+.sidebar-emoji { font-size: 1.15em; min-width: 16px; }
+.platform-dot.sidebar-dot { min-width: 7px; min-height: 7px; box-shadow: none; }
+
+/* Einzelansicht eines Beitrags */
+.post-card { padding: 16px 18px; }
+.post-body { font-size: 1.05em; }

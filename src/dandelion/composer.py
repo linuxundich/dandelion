@@ -60,9 +60,6 @@ def _rgba_hex(rgba: Gdk.RGBA) -> str:
 class DandelionComposer(Adw.BreakpointBin):
     __gtype_name__ = "DandelionComposer"
 
-    drafts_split: Adw.OverlaySplitView = Gtk.Template.Child()
-    drafts_stack: Gtk.Stack = Gtk.Template.Child()
-    drafts_list: Gtk.ListBox = Gtk.Template.Child()
     main_stack: Gtk.Stack = Gtk.Template.Child()
     layout_view: Adw.MultiLayoutView = Gtk.Template.Child()
     preview_split: Adw.OverlaySplitView = Gtk.Template.Child()
@@ -183,8 +180,6 @@ class DandelionComposer(Adw.BreakpointBin):
         self.density_group.set_active_name(
             "compact" if self.settings.get_boolean("preview-compact") else "full")
         self._loading = False
-        self.drafts_split.set_show_sidebar(self.settings.get_boolean("drafts-sidebar-visible"))
-        self.drafts_split.connect("notify::show-sidebar", self._on_drafts_shown)
         self._style.connect("notify::accent-color-rgba", lambda *_: self._update_tags_color())
         self._style.connect("notify::dark", self._on_dark_changed)
         self._apply_scheme(self._inherit_buffer)
@@ -1140,22 +1135,11 @@ class DandelionComposer(Adw.BreakpointBin):
     # ------------------------------------------------------------------
     # Entwürfe
     # ------------------------------------------------------------------
-    def set_drafts_visible(self, visible: bool) -> None:
-        self.drafts_split.set_show_sidebar(visible)
-
     def set_preview_visible(self, visible: bool) -> None:
         if self.layout_view.get_layout_name() == "narrow":
             self.sheet.set_open(visible)
         else:
             self.preview_split.set_show_sidebar(visible)
-
-    def _on_drafts_shown(self, *_args: object) -> None:
-        shown = self.drafts_split.get_show_sidebar()
-        action = self.win.lookup_action("toggle-drafts") if self.win else None
-        if action and action.get_state().get_boolean() != shown:
-            action.set_state(GLib.Variant.new_boolean(shown))
-        if shown:
-            self.reload_drafts()
 
     def _on_layout_changed(self) -> None:
         narrow = self.layout_view.get_layout_name() == "narrow"
@@ -1163,46 +1147,10 @@ class DandelionComposer(Adw.BreakpointBin):
             chip.set_compact(narrow)
 
     def reload_drafts(self) -> None:
-        self.drafts_list.remove_all()
-        ids = self.store.post_ids([PostState.DRAFT])
-        roles = {r.id: r for r in self.roles}
-        for pid in ids:
-            post = self.store.load_post(pid)
-            if post is None or (post.is_empty() and post.id != self.post.id):
-                continue
-            row = Adw.ActionRow(activatable=True)
-            row.post_id = pid  # type: ignore[attr-defined]
-            title = first_line(post.body) or _("Empty Post")
-            row.set_title(GLib.markup_escape_text(title))
-            role = roles.get(post.role_id)
-            row.set_subtitle(" · ".join(x for x in (role.emoji + " " + role.name if role else "",
-                                                     format_time(post.updated_at)) if x))
-            row.set_title_lines(2)
-            delete = Gtk.Button(icon_name="user-trash-symbolic", valign=Gtk.Align.CENTER,
-                                tooltip_text=_("Delete Draft"))
-            delete.add_css_class("flat")
-            label_widget(delete, delete.get_tooltip_text() or "")
-            delete.connect("clicked", lambda _b, p=pid: self._delete_draft(p))
-            row.add_suffix(delete)
-            self.drafts_list.append(row)
-            if pid == self.post.id:
-                self.drafts_list.select_row(row)
-        self.drafts_stack.set_visible_child_name("list" if self.drafts_list.get_first_child()
-                                                 else "empty")
+        if self.win:
+            self.win.archive.reload()
 
-    @Gtk.Template.Callback()
-    def on_draft_activated(self, _list: Gtk.ListBox, row: Adw.ActionRow) -> None:
-        pid = row.post_id  # type: ignore[attr-defined]
-        if pid == self.post.id:
-            return
-        self.save_now()
-        post = self.store.load_post(pid)
-        if post:
-            self.load_post(post)
-        if self.drafts_split.get_collapsed():
-            self.drafts_split.set_show_sidebar(False)
-
-    def _delete_draft(self, post_id: int) -> None:
+    def delete_draft(self, post_id: int) -> None:
         self.store.mark_post_deleted(post_id, True)
         if post_id == self.post.id:
             self.new_post(save_current=False)
@@ -1222,7 +1170,7 @@ class DandelionComposer(Adw.BreakpointBin):
                     targets=self._default_targets(self.role))
         self.load_post(post)
         if self.win:
-            self.win.stack.set_visible_child_name("composer")
+            self.win.show_view("composer")
         self.text_view.grab_focus()
 
     def load_post(self, post: Post) -> None:
@@ -1536,6 +1484,8 @@ class DandelionComposer(Adw.BreakpointBin):
         post = self.post
         if post.state == PostState.DRAFT or not post.scheduled_at:
             self.schedule_banner.set_revealed(False)
+            if self.win:
+                self.win.sync_title()
             return
         when = format_when(datetime.fromisoformat(post.scheduled_at), post.timezone)
         title = {
@@ -1545,6 +1495,8 @@ class DandelionComposer(Adw.BreakpointBin):
         }.get(post.state, "{when}").format(when=when)
         self.schedule_banner.set_title(title)
         self.schedule_banner.set_revealed(True)
+        if self.win:
+            self.win.sync_title()
 
     @Gtk.Template.Callback()
     def on_unschedule(self, *_args: object) -> None:
@@ -1566,11 +1518,13 @@ class DandelionComposer(Adw.BreakpointBin):
         self.win.toast(_("Schedule removed, the post is a draft again"), _("_Undo"), undo)
 
     def edit_post(self, post_id: int) -> None:
-        self.save_now()
-        post = self.store.load_post(post_id)
-        if post:
+        if post_id != self.post.id:
+            self.save_now()
+            post = self.store.load_post(post_id)
+            if post is None:
+                return
             self.load_post(post)
-            self.win.stack.set_visible_child_name("composer")
+        self.win.show_view("composer")
 
     def next_slot(self, exclude_iso: str | None = None) -> datetime | None:
         """Nächster freier Zeitslot der aktuellen Rolle (oder None)."""

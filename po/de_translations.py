@@ -754,6 +754,22 @@ DE: dict[str, str | tuple[str, str]] = {
         "Bilder für Alt-Texte werden vor dem Senden verkleinert",
     "Gemini thought summaries no longer end up in suggestions":
         "Gedanken-Zusammenfassungen von Gemini landen nicht mehr in Vorschlägen",
+    # Seitenleiste (Umbau 2026-10)
+    "Search posts": "Beiträge durchsuchen",
+    "Search Posts": "Beiträge durchsuchen",
+    "_Duplicate": "_Duplizieren",
+    "Change _Time…": "_Zeit ändern …",
+    "_Pause": "_Pausieren",
+    "_Resume": "_Fortsetzen",
+    "Use as New _Draft": "Als neuen _Entwurf verwenden",
+    "Scheduled Post": "Geplanter Beitrag",
+    "Paused Post": "Pausierter Beitrag",
+    "Missed Post": "Verpasster Beitrag",
+    "Draft": "Entwurf",
+    "Not saved yet": "Noch nicht gespeichert",
+    "Show All ({n})": "Alle anzeigen ({n})",
+    "Partly Published": "Teilweise veröffentlicht",
+    "Not Published": "Nicht veröffentlicht",
 }
 
 

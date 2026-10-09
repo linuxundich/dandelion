@@ -4,7 +4,22 @@ All notable changes to Dandelion are listed here.
 
 ## [Unreleased]
 
+### Changed
+
+- **New window layout with a sidebar** (UI redesign, phase 1): drafts,
+  scheduled and published posts and the calendar now sit in one sidebar at
+  full window height, grouped by state. The view switcher at the top and the
+  separate drafts panel are gone. Right-click an entry for its actions
+  (change time, pause, send now, duplicate, delete, use as new draft).
+- **Search** (Ctrl+F) looks through drafts, scheduled and published posts at
+  once.
+- **F9** now shows or hides the preview; Ctrl+2 opens the calendar, which
+  shows the month view by default.
+
 ### Added
+
+- **Detail page for published posts** with the text, images and one row per
+  profile to open, copy, delete or retry.
 
 - **Word limit for AI alt text**, 20 words by default, adjustable (0 = no
   limit) under Preferences › AI. The prompt asks for it, and longer answers are

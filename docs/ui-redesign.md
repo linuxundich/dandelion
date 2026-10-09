@@ -144,7 +144,12 @@ a layout for very wide windows.
 
 Each phase ends with a review by the maintainer before the next one starts.
 
-1. **Window shell and sidebar.** NavigationSplitView, `Adw.Sidebar` with
+1. **Window shell and sidebar.** *Done 2026-10-09:* `archive.py` fills the
+   `Adw.Sidebar`, `post_view.py` is the published detail page; the sidebar
+   switches to page mode when collapsed; F9 toggles the preview. Phase 1 kept
+   the composer's preview breakpoint at 700 sp and the old list/calendar view
+   as the calendar page.
+   Originally planned: NavigationSplitView, `Adw.Sidebar` with
    the four sections and context menus, content stack (composer, published
    detail, published list, calendar placeholder). Remove the view switcher
    and the inner drafts split. Settings: drop `drafts-sidebar-visible`,
@@ -164,7 +169,9 @@ Each phase ends with a review by the maintainer before the next one starts.
 ## Risks
 
 - **Drag source on sidebar items.** `Adw.Sidebar` offers drop targets
-  (`drop`, `drop-enter`) but no API to drag an item out. If a `Gtk.DragSource`
+  (`drop`, `drop-enter`) but no API to drag an item out (confirmed in phase 1).
+  Idea for phase 4: a `Gtk.DragSource` on the whole sidebar that picks the item
+  under the pointer via its prefix widget. If a `Gtk.DragSource`
   cannot be attached to its rows, the sidebar falls back to a `Gtk.ListBox`
   with the `navigation-sidebar` style class, which looks the same.
 - **Runtime.** `Adw.Sidebar` needs libadwaita 1.9; the Flatpak runtime is

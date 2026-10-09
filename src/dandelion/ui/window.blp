@@ -7,115 +7,178 @@ template $DandelionWindow: Adw.ApplicationWindow {
   title: "Dandelion";
 
   content: Adw.ToastOverlay toast_overlay {
-    child: Adw.ToolbarView {
-      [top]
-      Adw.HeaderBar header_bar {
-        title-widget: Adw.ViewSwitcher switcher {
-          stack: stack;
-          policy: wide;
+    child: Adw.NavigationSplitView split_view {
+      min-sidebar-width: 240;
+      max-sidebar-width: 300;
+      sidebar-width-fraction: 0.22;
+
+      sidebar: Adw.NavigationPage {
+        title: "Dandelion";
+        tag: "sidebar";
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            [start]
+            Button {
+              icon-name: "document-new-symbolic";
+              tooltip-text: _("New Post");
+
+              accessibility {
+                label: _("New Post");
+              }
+              action-name: "win.new-post";
+            }
+
+            [end]
+            MenuButton {
+              primary: true;
+              icon-name: "open-menu-symbolic";
+              tooltip-text: _("Main Menu");
+
+              accessibility {
+                label: _("Main Menu");
+              }
+              menu-model: primary_menu;
+            }
+
+            [end]
+            ToggleButton search_button {
+              icon-name: "system-search-symbolic";
+              tooltip-text: _("Search");
+
+              accessibility {
+                label: _("Search");
+              }
+              action-name: "win.search";
+            }
+          }
+
+          [top]
+          SearchBar search_bar {
+            child: SearchEntry search_entry {
+              hexpand: true;
+              placeholder-text: _("Search posts");
+              search-changed => $on_search_changed();
+              stop-search => $on_stop_search();
+            };
+          }
+
+          content: ScrolledWindow {
+            hscrollbar-policy: never;
+
+            child: Adw.Sidebar sidebar {
+              activated => $on_sidebar_activated();
+              setup-menu => $on_sidebar_setup_menu();
+
+              placeholder: Adw.StatusPage {
+                icon-name: "system-search-symbolic";
+                title: _("No Results");
+
+                styles [
+                  "compact",
+                ]
+              };
+            };
+          };
         };
-
-        [start]
-        ToggleButton drafts_button {
-          icon-name: "sidebar-show-symbolic";
-          tooltip-text: _("Drafts");
-
-          accessibility {
-            label: _("Drafts");
-          }
-          action-name: "win.toggle-drafts";
-        }
-
-        [start]
-        Button {
-          icon-name: "document-new-symbolic";
-          tooltip-text: _("New Post");
-
-          accessibility {
-            label: _("New Post");
-          }
-          action-name: "win.new-post";
-        }
-
-        [end]
-        MenuButton {
-          primary: true;
-          icon-name: "open-menu-symbolic";
-          tooltip-text: _("Main Menu");
-
-          accessibility {
-            label: _("Main Menu");
-          }
-          menu-model: primary_menu;
-        }
-
-        [end]
-        Adw.SplitButton publish_button {
-          label: _("_Publish");
-          use-underline: true;
-          action-name: "win.publish";
-          menu-model: publish_menu;
-          tooltip-text: _("Publish to all selected profiles");
-          dropdown-tooltip: _("More Publishing Options");
-
-          styles [
-            "suggested-action",
-          ]
-        }
-
-        [end]
-        ToggleButton search_button {
-          icon-name: "system-search-symbolic";
-          tooltip-text: _("Search");
-
-          accessibility {
-            label: _("Search");
-          }
-          visible: false;
-          action-name: "win.search";
-        }
-      }
-
-      content: Adw.ViewStack stack {
-        Adw.ViewStackPage {
-          name: "composer";
-          title: _("Compose");
-          icon-name: "document-edit-symbolic";
-
-          child: $DandelionComposer composer {};
-        }
-
-        Adw.ViewStackPage scheduled_page {
-          name: "scheduled";
-          title: _("Scheduled");
-          icon-name: "alarm-symbolic";
-
-          child: $DandelionScheduledView scheduled {};
-        }
-
-        Adw.ViewStackPage {
-          name: "history";
-          title: _("Published");
-          icon-name: "mail-send-symbolic";
-
-          child: $DandelionHistoryView history {};
-        }
       };
 
-      [bottom]
-      Adw.ViewSwitcherBar switcher_bar {
-        stack: stack;
-      }
+      content: Adw.NavigationPage content_page {
+        title: _("Compose");
+        tag: "content";
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar header_bar {
+            title-widget: Adw.WindowTitle content_title {};
+
+
+            [end]
+            Adw.SplitButton publish_button {
+              label: _("_Publish");
+              use-underline: true;
+              action-name: "win.publish";
+              menu-model: publish_menu;
+              tooltip-text: _("Publish to all selected profiles");
+              dropdown-tooltip: _("More Publishing Options");
+
+              styles [
+                "suggested-action",
+              ]
+            }
+
+            [end]
+            ToggleButton preview_button {
+              icon-name: "sidebar-show-right-symbolic";
+              tooltip-text: _("Preview");
+
+              accessibility {
+                label: _("Preview");
+              }
+              action-name: "win.toggle-preview";
+            }
+
+            [end]
+            ToggleButton history_search_button {
+              icon-name: "system-search-symbolic";
+              tooltip-text: _("Search");
+              visible: false;
+
+              accessibility {
+                label: _("Search");
+              }
+              action-name: "win.search-history";
+            }
+          }
+
+          content: Stack stack {
+            transition-type: none;
+
+            StackPage {
+              name: "composer";
+
+              child: $DandelionComposer composer {};
+            }
+
+            StackPage {
+              name: "post";
+
+              child: $DandelionPostView post_view {};
+            }
+
+            StackPage {
+              name: "scheduled";
+
+              child: $DandelionScheduledView scheduled {};
+            }
+
+            StackPage {
+              name: "history";
+
+              child: $DandelionHistoryView history {};
+            }
+          };
+        };
+      };
     };
   };
+
+  Adw.Breakpoint {
+    condition ("max-width: 760sp")
+
+    setters {
+      split_view.collapsed: true;
+      sidebar.mode: page;
+    }
+  }
 
   Adw.Breakpoint {
     condition ("max-width: 550sp")
 
     setters {
-      switcher_bar.reveal: true;
-      header_bar.title-widget: null;
-      header_bar.show-title: false;
+      split_view.collapsed: true;
+      sidebar.mode: page;
       publish_button.label: _("_Send");
     }
   }
@@ -162,6 +225,74 @@ menu primary_menu {
     item {
       label: _("_About Dandelion");
       action: "app.about";
+    }
+  }
+}
+
+menu draft_menu {
+  section {
+    item {
+      label: _("_Duplicate");
+      action: "archive.duplicate";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Delete");
+      action: "archive.delete-draft";
+    }
+  }
+}
+
+menu scheduled_menu {
+  section {
+    item {
+      label: _("Change _Time…");
+      action: "archive.reschedule";
+    }
+
+    item {
+      label: _("_Pause");
+      action: "archive.pause";
+      hidden-when: "action-disabled";
+    }
+
+    item {
+      label: _("_Resume");
+      action: "archive.resume";
+      hidden-when: "action-disabled";
+    }
+
+    item {
+      label: _("Send _Now");
+      action: "archive.send-now";
+    }
+
+    item {
+      label: _("_Duplicate");
+      action: "archive.duplicate";
+    }
+  }
+
+  section {
+    item {
+      label: _("Move to _Drafts");
+      action: "archive.to-drafts";
+    }
+
+    item {
+      label: _("_Delete");
+      action: "archive.delete-scheduled";
+    }
+  }
+}
+
+menu published_menu {
+  section {
+    item {
+      label: _("Use as New _Draft");
+      action: "archive.reuse";
     }
   }
 }

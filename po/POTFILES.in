@@ -4,6 +4,7 @@ data/de.linuxundich.Dandelion.gschema.xml
 src/dandelion/ui/window.blp
 src/dandelion/ui/composer.blp
 src/dandelion/ui/history.blp
+src/dandelion/ui/post-view.blp
 src/dandelion/ui/preferences.blp
 src/dandelion/ui/role-page.blp
 src/dandelion/ui/profile-page.blp
@@ -46,3 +47,5 @@ src/dandelion/ai/openrouter.py
 src/dandelion/ai/gemini.py
 src/dandelion/widgets/month_calendar.py
 src/dandelion/scheduling.py
+src/dandelion/archive.py
+src/dandelion/post_view.py

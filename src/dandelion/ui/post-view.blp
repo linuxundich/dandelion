@@ -1,0 +1,59 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $DandelionPostView: Adw.Bin {
+  child: Adw.PreferencesPage {
+    Adw.PreferencesGroup {
+      Box {
+        orientation: vertical;
+        spacing: 12;
+
+        Label cw_label {
+          visible: false;
+          wrap: true;
+          xalign: 0;
+
+          styles [
+            "preview-cw",
+          ]
+        }
+
+        Label body_label {
+          wrap: true;
+          wrap-mode: word_char;
+          xalign: 0;
+          selectable: true;
+
+          styles [
+            "post-body",
+          ]
+        }
+
+        FlowBox media_box {
+          visible: false;
+          selection-mode: none;
+          max-children-per-line: 6;
+          column-spacing: 8;
+          row-spacing: 8;
+        }
+
+        styles [
+          "card",
+          "post-card",
+        ]
+      }
+    }
+
+    Adw.PreferencesGroup targets_group {
+      title: _("Profiles");
+    }
+
+    Adw.PreferencesGroup {
+      Adw.ButtonRow {
+        title: _("Use as New Draft");
+        start-icon-name: "edit-copy-symbolic";
+        activated => $on_reuse();
+      }
+    }
+  };
+}
