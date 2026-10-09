@@ -4,6 +4,12 @@ All notable changes to Dandelion are listed here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Profile chips never wrap:** they show the full handle as long as the
+  "From … to …" line fits in one row and switch to avatars only as soon as it
+  does not, instead of breaking into a second row.
+
 ### Fixed
 
 - **Calendar header:** month navigation moved out of the header bar into a row

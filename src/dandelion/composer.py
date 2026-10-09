@@ -352,9 +352,10 @@ class DandelionComposer(Adw.BreakpointBin):
             chip.set_active(pid in enabled)
             chip.connect("toggled", self._on_chip_toggled)
             self._add_chip_menu(chip)
-            chip.set_compact(self.layout_view.get_layout_name() == "narrow")
             self.chips[pid] = chip
             self.chips_box.append(chip)
+            # Volle Breite merken, solange der Handle noch sichtbar ist
+            chip.full_width = chip.measure(Gtk.Orientation.HORIZONTAL, -1)[1]  # type: ignore[attr-defined]
             self._chip_widgets.append(chip)
         others = [p for p in self.profiles.values() if p.id not in shown]
         if others:
@@ -377,6 +378,8 @@ class DandelionComposer(Adw.BreakpointBin):
             menu_button.set_popover(pop)
             self.chips_box.append(menu_button)
             self._chip_widgets.append(menu_button)
+        self._chips_compact = None
+        self._fit_chips()
 
     def _add_chip_menu(self, chip: ProfileChip) -> None:
         group = Gio.SimpleActionGroup()
@@ -887,6 +890,9 @@ class DandelionComposer(Adw.BreakpointBin):
     def _on_text_width(self, adj: Gtk.Adjustment) -> None:
         """Hält die Textspalte bei breitem Fenster mittig und lesbar breit."""
         width = int(adj.get_page_size())
+        if width != getattr(self, "_editor_width", 0):
+            self._editor_width = width
+            self._fit_chips()
         margin = max(16, (width - 728) // 2)
         if margin != self.placeholder_label.get_margin_start():
             self.text_view.set_left_margin(margin)
@@ -1169,10 +1175,32 @@ class DandelionComposer(Adw.BreakpointBin):
         else:
             self.preview_split.set_show_sidebar(visible)
 
+    def _fit_chips(self) -> None:
+        """Profile mit Handle zeigen, solange alles in eine Zeile passt, sonst nur Avatare.
+
+        Die Zeile soll nie umbrechen: Lieber kompakt als zweizeilig.
+        """
+        width = getattr(self, "_editor_width", 0)
+        if not width or not self.chips:
+            return
+        available = min(width, 760) - 32
+        needed = 0
+        count = 0
+        child = self.chips_box.get_first_child()
+        while child is not None:
+            if child.get_visible():
+                needed += getattr(child, "full_width", None) or \
+                    child.measure(Gtk.Orientation.HORIZONTAL, -1)[1]
+                count += 1
+            child = child.get_next_sibling()
+        needed += 6 * max(0, count - 1)
+        compact = needed > available
+        if compact != getattr(self, "_chips_compact", None):
+            self._chips_compact = compact
+            for chip in self.chips.values():
+                chip.set_compact(compact)
+
     def _on_layout_changed(self) -> None:
-        narrow = self.layout_view.get_layout_name() == "narrow"
-        for chip in self.chips.values():
-            chip.set_compact(narrow)
         self._sync_bottom_space()
         self._on_preview_shown()
 
