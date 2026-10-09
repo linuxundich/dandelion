@@ -23,6 +23,9 @@ As of 2026-10-03, version 0.2.2. Shipped changes are in
 
 ## Features
 
+- [ ] **UI redesign** after [docs/ui-redesign.md](docs/ui-redesign.md): sidebar
+      archive, editor surface, growing preview, calendar page. Phases 1–5,
+      each reviewed before the next.
 - [ ] **Videos** for Bluesky, X, LinkedIn and Facebook. So far videos only go
       to Mastodon.
 - [ ] **Bluesky OAuth** as an alternative to the app password, with the
