@@ -22,7 +22,9 @@
   text is used.
 - **Preview** for every profile. Profiles that would look the same share one
   tile, problems are shown right in the tile.
-- **Alt text** is required for Mastodon and suggested everywhere else.
+- **Alt text** is required for Mastodon and suggested everywhere else. The AI
+  assistant (Gemini, OpenAI or Grok, set up in the preferences) can draft it and
+  revise it on request.
 - **Threads:** long posts are split into numbered parts on Mastodon, Bluesky and
   X – at paragraphs, sentences or words, or by hand with a `---` line.
 - **Scheduling** with a background service that also works while the window is

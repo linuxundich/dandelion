@@ -112,9 +112,29 @@ def thumbnail_png(path: str | Path, size: int) -> bytes | None:
     return bytes(data) if ok else None
 
 
+def preview_png(path: str | Path, max_dim: int) -> bytes | None:
+    """Bild auf höchstens ``max_dim`` Pixel verkleinert, Ausrichtung angewendet, als PNG.
+
+    Geht über GdkPixbuf wie die Miniaturen; ``Gtk.Picture.set_filename`` zeigte
+    manche Dateien (z. B. WebP) nicht an.
+    """
+    try:
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(path))
+    except GLib.Error:
+        return None
+    pixbuf = pixbuf.apply_embedded_orientation() or pixbuf
+    w, h = pixbuf.get_width(), pixbuf.get_height()
+    scale = min(1.0, max_dim / max(w, h))
+    if scale < 1.0:
+        pixbuf = pixbuf.scale_simple(max(1, round(w * scale)), max(1, round(h * scale)),
+                                     GdkPixbuf.InterpType.BILINEAR)
+    ok, data = pixbuf.save_to_bufferv("png", [], [])
+    return bytes(data) if ok else None
+
+
 def load_bytes(path: str | Path) -> bytes:
     return Path(path).read_bytes()
 
 
-__all__ = ["MediaInfo", "probe", "import_file", "import_bytes", "shrink_to", "load_bytes",
+__all__ = ["MediaInfo", "probe", "import_file", "import_bytes", "shrink_to", "preview_png", "load_bytes",
            "GLib"]

@@ -8,6 +8,7 @@ from gettext import ngettext
 
 from gi.repository import Adw, Gdk, GLib, Gtk, Pango
 
+from ..core import imaging
 from ..core.counting import find_hashtags, find_mentions, find_urls
 from ..core.graphemes import iter_graphemes
 from ..net.linkcard import LinkCard
@@ -236,7 +237,9 @@ class PreviewTile(Gtk.Box):
         else:
             height = 180 if n == 1 else 120
         for i, m in enumerate(shown):
-            pic = Gtk.Picture.new_for_filename(m.path)
+            png = imaging.preview_png(m.path, 800)
+            pic = Gtk.Picture.new_for_paintable(
+                Gdk.Texture.new_from_bytes(GLib.Bytes.new(png)) if png else None)
             pic.set_content_fit(Gtk.ContentFit.COVER)
             pic.set_can_shrink(True)
             pic.set_size_request(-1, height if n != 3 or i == 0 else height // 2 - 2)

@@ -139,6 +139,28 @@ template $DandelionAltTextDialog: Adw.Dialog {
 
             Box {
               spacing: 6;
+
+              Entry ai_chat_entry {
+                hexpand: true;
+                visible: false;
+                placeholder-text: _("Ask for changes, e.g. “shorter” or “mention the cable”");
+                activate => $on_ai_chat();
+              }
+
+              Button ai_chat_send {
+                visible: false;
+                icon-name: "paper-plane-symbolic";
+                tooltip-text: _("Send");
+                clicked => $on_ai_chat();
+
+                styles [
+                  "flat",
+                ]
+              }
+            }
+
+            Box {
+              spacing: 6;
               halign: end;
 
               Button {

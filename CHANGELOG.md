@@ -2,6 +2,22 @@
 
 All notable changes to Dandelion are listed here.
 
+## [Unreleased]
+
+### Added
+
+- **Alt text chat:** after a suggestion from Gemini, OpenAI or Grok you can ask
+  for changes ("shorter", "mention the cable") and get a revised suggestion.
+  The "Describe Image" button is always shown; without an API key it explains
+  how to turn the assistant on.
+- **Drag and drop** of images and videos from the file manager works anywhere
+  in the composer, not only at the edge of the editor.
+
+### Fixed
+
+- The image preview in the alt text dialog and in the platform previews was
+  blank for some files (for example WebP).
+
 ## 0.2.2 – 2026-10-03
 
 ### Changed

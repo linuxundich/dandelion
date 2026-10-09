@@ -119,7 +119,8 @@ async def hashtags(ctx: Context, text: str, platform_id: str | None = None,
 
 
 async def alt_text(ctx: Context, image: ImageInput, max_chars: int | None,
-                   language: str, context_text: str = "") -> str:
+                   language: str, context_text: str = "", previous: str = "",
+                   instruction: str = "") -> str:
     limit = f" Use at most {max_chars} characters." if max_chars else ""
     system = (
         "You write alt text for images in social media posts, for people who cannot see "
@@ -129,6 +130,11 @@ async def alt_text(ctx: Context, image: ImageInput, max_chars: int | None,
     prompt = "Write the alt text for this image."
     if context_text.strip():
         prompt += f"\n\nThe post it belongs to:\n{context_text.strip()[:1500]}"
+    if previous.strip() and instruction.strip():
+        # Rückfrage im Chat: Der Dienst ist zustandslos, also stehen der letzte
+        # Vorschlag und die Bitte im selben Auftrag.
+        prompt += (f"\n\nYour previous suggestion:\n{previous.strip()}\n\n"
+                   f"Revise it according to this request: {instruction.strip()[:500]}")
     answer = await ctx.provider.complete(ctx.api_key, ctx.model, system, prompt, [image])
     result = clean(answer)
     if max_chars and len(result) > max_chars:

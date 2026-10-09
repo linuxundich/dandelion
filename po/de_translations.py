@@ -592,6 +592,12 @@ DE: dict[str, str | tuple[str, str]] = {
     "For example: casual, addresses readers informally, technical but easy to understand":
         "Zum Beispiel: locker, duzt die Leser, technisch, aber verständlich",
     "_Describe Image": "Bild _beschreiben",
+    "AI assistant is off": "KI-Assistent ist aus",
+    "Turn it on under Preferences › AI Assistant and add an API key (Gemini, OpenAI or Grok).":
+        "Schalte ihn unter Einstellungen › KI-Assistent ein und trage einen API-Schlüssel ein (Gemini, OpenAI oder Grok).",
+    "Ask for changes, e.g. “shorter” or “mention the cable”":
+        "Änderung wünschen, z. B. „kürzer“ oder „Kabel erwähnen“",
+    "Send": "Senden",
     "Shorter": "Kürzer",
     "Longer": "Länger",
     "More Casual": "Lockerer",

@@ -142,3 +142,12 @@ def test_other_bad_requests_are_not_retried(http, run):
     with pytest.raises(AIError) as e:
         run(tasks.rephrase(ctx, "Lang.", "shorter"))
     assert e.value.status == 400 and len(http.requests) == 1
+
+
+def test_alt_text_revision_includes_previous_and_request(http, run):
+    http.add("POST", "https://api.openai.com/v1/responses", {"output_text": "Kürzer."})
+    ctx = Context(create("openai", http), "k", "gpt-6-luna")
+    run(tasks.alt_text(ctx, ImageInput("image/png", b"PNG"), None, "German", "",
+                       "Ein langer Text.", "kürzer"))
+    prompt = http.requests[-1].json["input"][0]["content"][0]["text"]
+    assert "Ein langer Text." in prompt and "kürzer" in prompt

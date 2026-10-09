@@ -171,9 +171,12 @@ class DandelionComposer(Adw.BreakpointBin):
         self._attach_spelling(self.buffers[MAIN])
         self.text_view.connect("paste-clipboard", self._on_paste)
 
+        # Auf dem ganzen Fenster, in der Capture-Phase: sonst schluckt die
+        # Textansicht das Ablegen, und nur der Editorrand nähme Dateien an.
         drop = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.COPY)
+        drop.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
         drop.connect("drop", self._on_drop)
-        self.editor_scroller.add_controller(drop)
+        self.add_controller(drop)
 
         self.preview_split.set_show_sidebar(self.settings.get_boolean("show-preview"))
         self._loading = True
@@ -1507,7 +1510,8 @@ class DandelionComposer(Adw.BreakpointBin):
         self._show_variant()
         self._changed()
 
-    async def ai_alt_text(self, media: Media, limit: int | None) -> str:
+    async def ai_alt_text(self, media: Media, limit: int | None, previous: str = "",
+                          instruction: str = "") -> str:
         """Alt-Text-Vorschlag für ein Bild (vom Alt-Text-Dialog aufgerufen)."""
         from .ai import ImageInput, tasks
         data = imaging.load_bytes(media.path)
@@ -1522,7 +1526,7 @@ class DandelionComposer(Adw.BreakpointBin):
         code = self.post.language or (self.role.language if self.role else None) or "de"
         language = dict(LANGUAGES).get(code, code)
         return await tasks.alt_text(ctx, ImageInput(mime, data), limit, language,
-                                    self.post.body)
+                                    self.post.body, previous, instruction)
 
     # ------------------------------------------------------------------
     # Planen
