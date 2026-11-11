@@ -1,18 +1,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Dienst für das Deck: wählt den Reader je Netzwerk, füllt den Cache."""
+"""Dienst für das Deck: wählt den Reader je Netzwerk, füllt Cache und Lesestände."""
 
 from __future__ import annotations
 
 from ..core.models import Profile
 from ..core.store import Store
 from ..platforms import Registry
+from ..platforms.bluesky import Bluesky
 from ..platforms.mastodon import Mastodon
-from .base import FeedPost, Reader
+from .base import HOME, MESSAGES, NOTIFICATIONS, FeedConversation, FeedItem, Reader
+from .bluesky import BlueskyReader
 from .cache import KEEP_PER_FEED, FeedCache
 from .mastodon import MastodonReader
 
-HOME = "home"
 PAGE = 40
+UNREAD_FEEDS = (HOME, NOTIFICATIONS, MESSAGES)
 
 
 class ReaderService:
@@ -21,40 +23,110 @@ class ReaderService:
         self.registry = registry
         self.cache = FeedCache(store)
         self._readers: dict[str, Reader] = {}
+        self._cursors: dict[tuple[int, str], str | None] = {}
 
+    # -- Reader -------------------------------------------------------------
     def reader_for(self, profile: Profile) -> Reader | None:
         """Der Reader des Netzwerks oder `None`, wenn es dort nichts zu lesen gibt."""
-        if profile.platform == "mastodon":
-            if "mastodon" not in self._readers:
-                platform = self.registry.get("mastodon")
-                assert isinstance(platform, Mastodon)
-                self._readers["mastodon"] = MastodonReader(platform)
-            return self._readers["mastodon"]
-        return None
+        if profile.platform not in self._readers:
+            platform = self.registry.get(profile.platform) if profile.platform in self.registry else None
+            if isinstance(platform, Mastodon):
+                self._readers[profile.platform] = MastodonReader(platform)
+            elif isinstance(platform, Bluesky):
+                self._readers[profile.platform] = BlueskyReader(platform)
+            else:
+                return None
+        return self._readers[profile.platform]
 
     def can_read(self, profile: Profile) -> bool:
-        return profile.platform == "mastodon"
+        return profile.platform in ("mastodon", "bluesky")
 
-    def cached_home(self, profile: Profile) -> list[FeedPost]:
+    def feeds(self, profile: Profile) -> tuple[str, ...]:
+        reader = self.reader_for(profile)
+        return reader.feeds if reader else ()
+
+    # -- Einträge -----------------------------------------------------------
+    def cached(self, profile: Profile, feed: str) -> list[FeedItem]:
         reader = self.reader_for(profile)
         if reader is None or profile.id is None:
             return []
-        return [reader.parse(r) for r in self.cache.load(profile.id, HOME, KEEP_PER_FEED)]
+        return [reader.parse(feed, r) for r in self.cache.load(profile.id, feed, KEEP_PER_FEED)]
 
-    async def refresh_home(self, profile: Profile) -> list[FeedPost]:
-        """Holt die neuesten Beiträge und gibt die ganze Spalte zurück."""
+    def _store(self, reader: Reader, profile: Profile, feed: str, raw: list[dict]) -> None:
+        keyed = [(*reader.key(feed, r), r) for r in raw]
+        self.cache.save(profile.id, feed, keyed)  # type: ignore[arg-type]
+
+    async def refresh(self, profile: Profile, feed: str) -> list[FeedItem]:
+        """Holt die neuesten Einträge und gibt den ganzen Cache des Feeds zurück."""
         reader = self.reader_for(profile)
         if reader is None or profile.id is None:
             return []
-        raw, _posts = await reader.fetch_home(profile, limit=PAGE)
-        self.cache.save(profile.id, HOME, raw)
-        return self.cached_home(profile)
+        page = await reader.fetch(profile, feed, limit=PAGE)
+        self._store(reader, profile, feed, page.raw)
+        if not reader.cursor_is_id and (profile.id, feed) not in self._cursors:
+            self._cursors[(profile.id, feed)] = page.cursor
+        await self._init_marker(reader, profile, feed)
+        return self.cached(profile, feed)
 
-    async def load_older(self, profile: Profile) -> list[FeedPost]:
+    async def load_older(self, profile: Profile, feed: str) -> list[FeedItem]:
         reader = self.reader_for(profile)
         if reader is None or profile.id is None:
             return []
-        oldest = self.cache.oldest_id(profile.id, HOME)
-        raw, _posts = await reader.fetch_home(profile, before=oldest, limit=PAGE)
-        self.cache.save(profile.id, HOME, raw)
-        return self.cached_home(profile)
+        key = (profile.id, feed)
+        if reader.cursor_is_id:
+            cursor = self.cache.oldest_id(profile.id, feed)
+        else:
+            if self._cursors.get(key) is None:       # nach einem Neustart: erst Seite eins
+                first = await reader.fetch(profile, feed, limit=PAGE)
+                self._store(reader, profile, feed, first.raw)
+                self._cursors[key] = first.cursor
+            cursor = self._cursors.get(key)
+        if cursor is None:
+            return self.cached(profile, feed)
+        page = await reader.fetch(profile, feed, cursor=cursor, limit=PAGE)
+        self._store(reader, profile, feed, page.raw)
+        if not reader.cursor_is_id:
+            self._cursors[key] = page.cursor
+        return self.cached(profile, feed)
+
+    # -- Lesestand ----------------------------------------------------------
+    async def _init_marker(self, reader: Reader, profile: Profile, feed: str) -> None:
+        """Erster Abruf: Lesestand vom Server oder „alles bisher gilt als gelesen“."""
+        pid = profile.id
+        if pid is None or feed == MESSAGES or self.cache.marker(pid, feed) is not None:
+            return
+        server_id = await reader.fetch_marker(profile, feed)
+        ts = self.cache.created_at_of(pid, feed, server_id) if server_id else None
+        if ts is None:
+            newest = self.cache.newest(pid, feed)
+            ts = newest[1] if newest else None
+        if ts:
+            self.cache.set_marker(pid, feed, ts)
+
+    def marker(self, profile: Profile, feed: str) -> str | None:
+        return self.cache.marker(profile.id, feed) if profile.id is not None else None
+
+    def unread(self, profile: Profile, feed: str) -> int:
+        pid = profile.id
+        if pid is None:
+            return 0
+        if feed == MESSAGES:
+            return sum(1 for c in self.cached(profile, feed)
+                       if isinstance(c, FeedConversation) and c.unread)
+        ts = self.cache.marker(pid, feed)
+        return self.cache.count_newer(pid, feed, ts) if ts else 0
+
+    def unread_total(self, profile: Profile) -> int:
+        return sum(self.unread(profile, f) for f in self.feeds(profile))
+
+    async def mark_read(self, profile: Profile, feed: str) -> None:
+        """Setzt den Lesestand auf den neuesten Eintrag und meldet ihn dem Netzwerk."""
+        reader = self.reader_for(profile)
+        pid = profile.id
+        if reader is None or pid is None or feed == MESSAGES:
+            return
+        newest = self.cache.newest(pid, feed)
+        if newest is None:
+            return
+        self.cache.set_marker(pid, feed, newest[1])
+        await reader.push_marker(profile, feed, newest[0])

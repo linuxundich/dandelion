@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Mastodon lesen: Home-Timeline über die REST-Schnittstelle."""
+"""Mastodon lesen: Home-Timeline, Benachrichtigungen und Konversationen."""
 
 from __future__ import annotations
 
@@ -7,13 +7,29 @@ from ..core.models import Profile
 from ..platforms.base import PlatformError
 from ..platforms.mastodon import Mastodon
 from .base import (
+    HOME,
+    MESSAGES,
+    NOTIFICATIONS,
     FeedAccount,
     FeedCard,
+    FeedConversation,
+    FeedItem,
     FeedMedia,
+    FeedPoll,
     FeedPost,
+    Page,
     ReadScopeMissing,
     Reader,
+    norm_ts,
 )
+
+#: Mastodon-Typ → Anlass im gemeinsamen Format
+REASONS = {"mention": "mention", "status": "status", "reblog": "boost", "follow": "follow",
+           "follow_request": "follow_request", "favourite": "favourite", "poll": "poll",
+           "update": "update", "quote": "quote"}
+NOTIFICATION_TYPES = list(REASONS)
+PATHS = {HOME: "/api/v1/timelines/home", NOTIFICATIONS: "/api/v1/notifications",
+         MESSAGES: "/api/v1/conversations"}
 
 
 def _account(data: dict) -> FeedAccount:
@@ -29,6 +45,13 @@ def _media(data: dict) -> FeedMedia:
         kind = "other"
     return FeedMedia(kind, data.get("url") or data.get("remote_url") or "",
                      data.get("preview_url"), data.get("description") or "")
+
+
+def _poll(data: dict) -> FeedPoll:
+    return FeedPoll([(o.get("title", ""), int(o.get("votes_count") or 0))
+                     for o in data.get("options", [])],
+                    int(data.get("votes_count") or 0), bool(data.get("expired")),
+                    bool(data.get("multiple")))
 
 
 def parse_status(raw: dict) -> FeedPost:
@@ -50,31 +73,89 @@ def parse_status(raw: dict) -> FeedPost:
         sensitive=bool(status.get("sensitive")), url=status.get("url") or status.get("uri") or "",
         language=status.get("language"),
         media=[_media(m) for m in status.get("media_attachments", [])], card=card,
+        poll=_poll(status["poll"]) if status.get("poll") else None,
         boosted_by=boosted_by, replies=int(status.get("replies_count") or 0),
         boosts=int(status.get("reblogs_count") or 0),
-        likes=int(status.get("favourites_count") or 0), has_poll=bool(status.get("poll")))
+        likes=int(status.get("favourites_count") or 0))
+
+
+def parse_notification(raw: dict) -> FeedPost:
+    reason = REASONS.get(raw.get("type", ""), "other")
+    actor = _account(raw["account"])
+    status = parse_status(raw["status"]) if raw.get("status") else None
+    if status is not None and reason in ("mention", "status", "update", "quote"):
+        status.id = str(raw["id"])
+        status.reason = reason
+        return status
+    return FeedPost(id=str(raw["id"]), network="mastodon", account=actor,
+                    created_at=raw.get("created_at") or "", reason=reason, subject=status)
+
+
+def parse_conversation(raw: dict) -> FeedConversation:
+    last = parse_status(raw["last_status"]) if raw.get("last_status") else None
+    return FeedConversation(
+        id=str(raw["id"]), created_at=last.created_at if last else "",
+        accounts=[_account(a) for a in raw.get("accounts", [])], last=last,
+        unread=bool(raw.get("unread")))
 
 
 class MastodonReader(Reader):
     network = "mastodon"
+    feeds = (HOME, NOTIFICATIONS, MESSAGES)
+    cursor_is_id = True
 
     def __init__(self, platform: Mastodon) -> None:
         self.platform = platform
 
-    def parse(self, raw: dict) -> FeedPost:
+    def parse(self, feed: str, raw: dict) -> FeedItem:
+        if feed == NOTIFICATIONS:
+            return parse_notification(raw)
+        if feed == MESSAGES:
+            return parse_conversation(raw)
         return parse_status(raw)
 
-    async def fetch_home(self, profile: Profile, *, before: str | None = None,
-                         limit: int = 40) -> tuple[list[dict], list[FeedPost]]:
-        params: dict[str, object] = {"limit": limit}
-        if before:
-            params["max_id"] = before
+    def key(self, feed: str, raw: dict) -> tuple[str, str]:
+        if feed == MESSAGES:
+            last = raw.get("last_status") or {}
+            return str(raw["id"]), norm_ts(last.get("created_at") or "")
+        return str(raw["id"]), norm_ts(raw.get("created_at") or "")
+
+    async def _get(self, profile: Profile, path: str, params: dict) -> list | dict:
         try:
-            resp = await self.platform._api(profile, "GET", "/api/v1/timelines/home", params=params)
+            resp = await self.platform._api(profile, "GET", path, params=params)
         except PlatformError as e:
             if e.auth and "scope" in e.detail.lower():
-                raise ReadScopeMissing(
-                    e.message, e.detail, auth=True) from e
+                raise ReadScopeMissing(e.message, e.detail, auth=True) from e
             raise
-        raw = resp.json() or []
-        return raw, [parse_status(r) for r in raw]
+        return resp.json() or []
+
+    async def fetch(self, profile: Profile, feed: str, *, cursor: str | None = None,
+                    limit: int = 40) -> Page:
+        params: dict[str, object] = {"limit": limit}
+        if cursor:
+            params["max_id"] = cursor
+        if feed == NOTIFICATIONS:
+            params["types[]"] = NOTIFICATION_TYPES
+        raw = await self._get(profile, PATHS[feed], params)
+        assert isinstance(raw, list)
+        items = [self.parse(feed, r) for r in raw]
+        return Page(raw, items, raw[-1]["id"] if raw else None)
+
+    async def fetch_marker(self, profile: Profile, feed: str) -> str | None:
+        if feed not in (HOME, NOTIFICATIONS):
+            return None
+        try:
+            data = await self._get(profile, "/api/v1/markers", {"timeline[]": [feed]})
+        except PlatformError:
+            return None
+        marker = data.get(feed) if isinstance(data, dict) else None
+        return str(marker["last_read_id"]) if marker and marker.get("last_read_id") else None
+
+    async def push_marker(self, profile: Profile, feed: str, item_id: str) -> None:
+        if feed not in (HOME, NOTIFICATIONS):
+            return
+        try:
+            await self.platform._api(profile, "POST", "/api/v1/markers",
+                                     form={f"{feed}[last_read_id]": item_id})
+        except PlatformError:
+            pass

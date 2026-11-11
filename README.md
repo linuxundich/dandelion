@@ -40,6 +40,10 @@
 - **Optional writing assistant** with Google Gemini, OpenAI, xAI or OpenRouter: rephrase,
   correct, translate, adapt to a network, suggest hashtags and describe images.
   It only makes suggestions and can be switched off completely.
+- **Read mode (preview):** a deck with one column per Mastodon or Bluesky
+  profile of a role: home timeline, notifications and messages, with images,
+  polls, link cards and unread counts. Reading only for now; replying,
+  boosting and favouriting follow.
 - **Secure:** login data and API keys are stored in the system keyring
   (Secret Service), never in plain text.
 - **Adaptive layout** from 360 px phones to wide desktop screens: the

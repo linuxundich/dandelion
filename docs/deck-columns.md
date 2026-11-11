@@ -3,10 +3,11 @@
 Concept, 2026-11-11 · based on Dandelion 0.3.1. Status: **proposal, nothing built**.
 Mockups: [deck-mockups.html](deck-mockups.html).
 
-**Status 2026-11-11:** phase 1 is implemented. Deviations: columns use a
-`Gtk.ListBox` with at most 60 + 40 per step rows instead of a `Gtk.ListView`
-(enough for phase 1, revisit in phase 2); the column shows only *Home* and no
-tab strip yet.
+**Status 2026-11-11:** phases 1 and 2 are implemented. Deviations: the feed
+lists use a `Gtk.ListBox` with at most 60 + 40 per step rows instead of a
+`Gtk.ListView`; read positions are stored as timestamps and mapped to the
+server markers (Mastodon) or `updateSeen` (Bluesky); Bluesky has no *Messages*
+tab yet (phase 6).
 
 ## Goal
 

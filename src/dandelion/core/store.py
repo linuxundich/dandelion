@@ -29,7 +29,7 @@ from .models import (
     now_iso,
 )
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 #: Zustände, in denen ein Beitrag noch bearbeitet werden darf
 EDITABLE_STATES = ("draft", "scheduled", "paused", "missed")
@@ -39,6 +39,14 @@ class PostLocked(Exception):
     """Der Beitrag wird gerade gesendet oder ist schon veröffentlicht."""
 
 _MIGRATIONS: dict[int, str] = {
+    4: """
+CREATE TABLE read_marker (
+  profile_id    INTEGER NOT NULL REFERENCES profile(id) ON DELETE CASCADE,
+  feed          TEXT NOT NULL,
+  read_until    TEXT NOT NULL,
+  PRIMARY KEY (profile_id, feed)
+);
+""",
     3: """
 CREATE TABLE feed_item (
   profile_id    INTEGER NOT NULL REFERENCES profile(id) ON DELETE CASCADE,

@@ -6,14 +6,25 @@ All notable changes to Dandelion are listed here.
 
 ### Added
 
-- **Read mode (first step of the deck, see [docs/deck-columns.md](docs/deck-columns.md)):**
+- **Read mode (the deck, see [docs/deck-columns.md](docs/deck-columns.md)):**
   the sidebar has a new *Write | Read* switch. *Read* lists your roles; each
-  role shows one column per Mastodon profile with its home timeline (accounts
-  you follow). Posts show text, content warnings, boosts, counts and a note for
-  attachments, polls and link cards. New posts arrive every 60 seconds while the
-  deck is visible; when you have scrolled down they wait behind a "N new posts"
-  button. The last 400 posts per column are cached in the database.
+  role shows one column per Mastodon or Bluesky profile. A column has the tabs
+  *Home*, *Notifications* and *Messages* (Mastodon; Bluesky has the first two).
   `F5` refreshes all columns, `Ctrl+4` opens the deck.
+- **Posts** show text, links, hashtags, boosts and reposts, images in a grid with
+  an ALT badge and description tooltip, video previews, polls with results, link
+  cards, quoted posts and content warnings or Bluesky labels that fold out.
+- **Notifications** list mentions, replies and quotes like posts and favourites,
+  boosts, new followers and ended polls as compact lines with an excerpt. A
+  *All | Mentions* switch filters them.
+- **Messages** (Mastodon) lists direct conversations with an unread dot.
+- **Unread counts:** a blue bar marks new entries, the *Notifications* and
+  *Messages* tabs show a badge and every role in the sidebar shows its total.
+  A list counts as read after two seconds at the top. The read position syncs
+  with Mastodon (markers) and Bluesky (`updateSeen`).
+- New posts arrive every 60 seconds while the deck is visible; when you have
+  scrolled down they wait behind a "N new items" button. The last 400 entries per
+  list are cached in the database, avatars and images in the cache folder.
 - Profiles that were signed in before reading existed show "Allow Reading"
   with a button to sign in again.
 

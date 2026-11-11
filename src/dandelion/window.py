@@ -92,6 +92,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self._mode_sync = False
         self._last_write_view = "composer"
         self._read_roles: dict[Gtk.ListBoxRow, Role] = {}
+        self._read_badges: dict[Gtk.ListBoxRow, Gtk.Label] = {}
         self._read_role_id: int | None = None
         self.filter_button.set_popover(self.scheduled.filter_popover)
         app.scheduling.connect("changed", lambda *_: self.posts_changed())
@@ -167,6 +168,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         while (row := self.read_roles.get_first_child()) is not None:
             self.read_roles.remove(row)
         self._read_roles = {}
+        self._read_badges = {}
         for role in roles:
             box = Gtk.Box(spacing=10)
             emoji = Gtk.Label(label=role.emoji or "💬")
@@ -174,7 +176,11 @@ class DandelionWindow(Adw.ApplicationWindow):
             box.append(emoji)
             name = Gtk.Label(label=role.name, xalign=0, hexpand=True)
             box.append(name)
+            badge = Gtk.Label(visible=False, valign=Gtk.Align.CENTER)
+            badge.add_css_class("unread-badge")
+            box.append(badge)
             row = Gtk.ListBoxRow(child=box)
+            self._read_badges[row] = badge
             row.update_property([Gtk.AccessibleProperty.LABEL], [role.name])
             self.read_roles.append(row)
             self._read_roles[row] = role
@@ -182,6 +188,24 @@ class DandelionWindow(Adw.ApplicationWindow):
             self._read_role_id = ids[0] if ids else None
             self.deck.set_role(roles[0] if roles else None)
         self._select_read_role()
+        self.update_read_badges()
+
+    def update_read_badges(self) -> None:
+        """Zeigt je Rolle die Zahl ungelesener Einträge aller lesbaren Profile."""
+        app = self.get_application()
+        for row, role in self._read_roles.items():
+            total = 0
+            for rp in app.store.role_profiles(role.id):  # type: ignore[arg-type]
+                p = app.store.profile(rp.profile_id)
+                if p is not None and app.reader.can_read(p):
+                    total += app.reader.unread_total(p)
+            badge = self._read_badges[row]
+            badge.set_visible(total > 0)
+            badge.set_label("99+" if total > 99 else str(total))
+            row.update_property(
+                [Gtk.AccessibleProperty.LABEL],
+                [f"{role.name}, " + ngettext("{n} unread", "{n} unread", total).format(n=total)
+                 if total else role.name])
 
     def _select_read_role(self) -> None:
         for row, role in self._read_roles.items():

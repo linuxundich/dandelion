@@ -236,3 +236,28 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
 .feed-list > row:hover { background: alpha(currentColor, 0.04); }
 .feed-row { padding: 10px 12px; border-bottom: 1px solid alpha(currentColor, 0.12); }
 .deck-column .numeric { font-feature-settings: "tnum"; }
+.feed-row.unread { box-shadow: inset 3px 0 var(--accent-bg-color); }
+.feed-media { border-radius: 10px; }
+.feed-media picture { border-radius: 10px; }
+.feed-play {
+  background: alpha(black, 0.55);
+  color: white;
+  border-radius: 999px;
+  padding: 12px;
+}
+.feed-card {
+  border: 1px solid alpha(currentColor, 0.15);
+  border-radius: 10px;
+}
+.feed-card picture { border-radius: 10px 10px 0 0; }
+.feed-excerpt { border-left: 2px solid alpha(currentColor, 0.2); padding-left: 9px; }
+.unread-dot { background: var(--accent-bg-color); border-radius: 999px; }
+.unread-badge {
+  background: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+progressbar.feed-poll trough, progressbar.feed-poll progress { min-height: 6px; }
