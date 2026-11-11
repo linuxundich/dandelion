@@ -3,6 +3,11 @@
 
 from __future__ import annotations
 
+import re
+import urllib.parse
+from gettext import gettext as _
+
+
 from ..core.models import Profile
 from ..platforms.base import PlatformError
 from ..platforms.mastodon import Mastodon
@@ -18,6 +23,7 @@ from .base import (
     FeedItem,
     FeedMedia,
     FeedPoll,
+    FeedSource,
     FeedPost,
     Page,
     ReadScopeMissing,
@@ -32,7 +38,21 @@ REASONS = {"mention": "mention", "status": "status", "reblog": "boost", "follow"
            "update": "update", "quote": "quote"}
 NOTIFICATION_TYPES = list(REASONS)
 PATHS = {HOME: "/api/v1/timelines/home", NOTIFICATIONS: "/api/v1/notifications",
-         MESSAGES: "/api/v1/conversations"}
+         MESSAGES: "/api/v1/conversations", "bookmarks": "/api/v1/bookmarks",
+         "favourites": "/api/v1/favourites"}
+LINK_NEXT = re.compile(r'<[^>]*[?&]max_id=([^&>]+)[^>]*>;\s*rel="next"')
+
+
+def path_for(feed: str) -> str:
+    """REST-Pfad einer Liste; `list:ID` und `tag:NAME` sind eigene Spalten."""
+    if feed in PATHS:
+        return PATHS[feed]
+    kind, _, key = feed.partition(":")
+    if kind == "list" and key:
+        return f"/api/v1/timelines/list/{urllib.parse.quote(key, safe='')}"
+    if kind == "tag" and key:
+        return f"/api/v1/timelines/tag/{urllib.parse.quote(key, safe='')}"
+    raise ValueError(feed)
 
 
 def _account(data: dict) -> FeedAccount:
@@ -108,7 +128,6 @@ def parse_conversation(raw: dict) -> FeedConversation:
 class MastodonReader(Reader):
     network = "mastodon"
     feeds = (HOME, NOTIFICATIONS, MESSAGES)
-    cursor_is_id = True
 
     def __init__(self, platform: Mastodon) -> None:
         self.platform = platform
@@ -126,14 +145,20 @@ class MastodonReader(Reader):
             return str(raw["id"]), norm_ts(last.get("created_at") or "")
         return str(raw["id"]), norm_ts(raw.get("created_at") or "")
 
-    async def _get(self, profile: Profile, path: str, params: dict) -> list | dict:
+    async def _response(self, profile: Profile, path: str, params: dict):  # type: ignore[no-untyped-def]
         try:
-            resp = await self.platform._api(profile, "GET", path, params=params)
+            return await self.platform._api(profile, "GET", path, params=params)
         except PlatformError as e:
             if e.auth and "scope" in e.detail.lower():
                 raise ReadScopeMissing(e.message, e.detail, auth=True) from e
             raise
-        return resp.json() or []
+
+    async def _get(self, profile: Profile, path: str, params: dict) -> list | dict:
+        return (await self._response(profile, path, params)).json() or []
+
+    def cursor_in_cache(self, feed: str) -> bool:
+        # Lesezeichen und Favoriten blättern mit eigenen IDs aus dem Link-Header
+        return feed not in ("bookmarks", "favourites")
 
     async def fetch(self, profile: Profile, feed: str, *, cursor: str | None = None,
                     limit: int = 40) -> Page:
@@ -142,10 +167,27 @@ class MastodonReader(Reader):
             params["max_id"] = cursor
         if feed == NOTIFICATIONS:
             params["types[]"] = NOTIFICATION_TYPES
-        raw = await self._get(profile, PATHS[feed], params)
+        resp = await self._response(profile, path_for(feed), params)
+        raw = resp.json() or []
         assert isinstance(raw, list)
         items = [self.parse(feed, r) for r in raw]
-        return Page(raw, items, raw[-1]["id"] if raw else None)
+        cursor = raw[-1]["id"] if raw else None
+        if not self.cursor_in_cache(feed):
+            m = LINK_NEXT.search(resp.headers.get("link", ""))
+            cursor = m.group(1) if m else None
+        return Page(raw, items, cursor)
+
+    async def sources(self, profile: Profile) -> list[FeedSource]:
+        out: list[FeedSource] = []
+        for lst in await self._get(profile, "/api/v1/lists", {}) or []:
+            out.append(FeedSource("list", f"list:{lst['id']}", lst.get("title") or lst["id"],
+                                  _("List")))
+        for tag in await self._get(profile, "/api/v1/followed_tags", {}) or []:
+            out.append(FeedSource("tag", f"tag:{tag['name']}", f"#{tag['name']}",
+                                  _("Followed hashtag")))
+        out.append(FeedSource("bookmarks", "bookmarks", _("Bookmarks")))
+        out.append(FeedSource("favourites", "favourites", _("Favourites")))
+        return out
 
     async def fetch_marker(self, profile: Profile, feed: str) -> str | None:
         if feed not in (HOME, NOTIFICATIONS):

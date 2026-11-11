@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import html
 import re
+import urllib.parse
 from gettext import gettext as _
 from gettext import ngettext
 
@@ -224,7 +225,10 @@ def quote_widget(quote: FeedPost) -> Gtk.Widget:
     return box
 
 
-def post_details(post: FeedPost, avatars: AvatarCache) -> Gtk.Box:
+TAG_URL = re.compile(r"^https?://[^/]+/(?:tags|hashtag)/([^/?#]+)")
+
+
+def post_details(post: FeedPost, avatars: AvatarCache, actions=None) -> Gtk.Box:  # type: ignore[no-untyped-def]
     """Text, Medien, Umfrage, Linkkarte und Zitat eines Beitrags."""
     details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
     if post_markup(post):
@@ -232,6 +236,14 @@ def post_details(post: FeedPost, avatars: AvatarCache) -> Gtk.Box:
                             use_markup=True, halign=Gtk.Align.FILL)
         # to_markup und facets_markup liefern immer wohlgeformtes Markup (siehe Tests)
         content.set_markup(post_markup(post))
+        if actions is not None:
+            def on_link(_label: Gtk.Label, uri: str) -> bool:
+                m = TAG_URL.match(uri)
+                if not m:
+                    return False                      # andere Links öffnet GTK selbst
+                actions.hashtag(urllib.parse.unquote(m.group(1)))
+                return True
+            content.connect("activate-link", on_link)
         details.append(content)
     media = media_widget(post.media, avatars)
     if media:
@@ -363,11 +375,16 @@ def _more_button(post: FeedPost, actions) -> Gtk.MenuButton:  # type: ignore[no-
 
 def action_bar(post: FeedPost, actions) -> Gtk.Box:  # type: ignore[no-untyped-def]
     bar = Gtk.Box(spacing=2, margin_top=2, margin_start=-8)
-    bar.append(_action_button("mail-reply-sender-symbolic", post.replies, _("Reply"),
-                              lambda: actions.reply(post)))
-    bar.append(_toggle_button(post, "boost", actions, _("Boost")))
-    bar.append(_toggle_button(post, "favourite", actions, _("Favourite")))
-    bar.append(_toggle_button(post, "bookmark", actions, _("Bookmark")))
+    reply = _action_button("mail-reply-sender-symbolic", post.replies, _("Reply"),
+                           lambda: actions.reply(post))
+    boost = _toggle_button(post, "boost", actions, _("Boost"))
+    fav = _toggle_button(post, "favourite", actions, _("Favourite"))
+    mark = _toggle_button(post, "bookmark", actions, _("Bookmark"))
+    for b in (reply, boost, fav, mark):
+        bar.append(b)
+    #: für die Tastatur (r, b, f, m, o), siehe DandelionDeck._on_key
+    bar.buttons = {"reply": reply, "boost": boost, "favourite": fav, "bookmark": mark,
+                   "open": lambda: open_url(bar, post.url)}
     spacer = Gtk.Box(hexpand=True)
     bar.append(spacer)
     bar.append(_more_button(post, actions))
@@ -399,7 +416,7 @@ def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False,
     body.append(head)
     body.append(_dim(f"@{post.account.acct}", "caption", ellipsize=True))
 
-    details = post_details(post, avatars)
+    details = post_details(post, avatars, actions)
     details.set_margin_top(4)
     if post.spoiler or (post.sensitive and post.media):
         revealer = Gtk.Revealer(child=details)
@@ -420,7 +437,9 @@ def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False,
         body.append(details)
 
     if actions is not None and post.ref:
-        body.append(action_bar(post, actions))
+        bar = action_bar(post, actions)
+        root.action_buttons = bar.buttons
+        body.append(bar)
     else:
         counts = Gtk.Box(spacing=16, margin_top=4)
         for icon, n, tip in (("mail-reply-sender-symbolic", post.replies, _("Replies")),

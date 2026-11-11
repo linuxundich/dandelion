@@ -139,6 +139,18 @@ template $DandelionWindow: Adw.ApplicationWindow {
             title-widget: Adw.WindowTitle content_title {};
 
             [end]
+            Button columns_button {
+              icon-name: "view-grid-symbolic";
+              tooltip-text: _("Columns");
+              visible: false;
+              action-name: "win.edit-columns";
+
+              accessibility {
+                label: _("Columns");
+              }
+            }
+
+            [end]
             Button refresh_button {
               icon-name: "view-refresh-symbolic";
               tooltip-text: _("Refresh All Columns");

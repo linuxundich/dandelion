@@ -24,6 +24,7 @@ from .base import (
     FeedItem,
     FeedMedia,
     FeedPost,
+    FeedSource,
     Page,
     Reader,
     Relationship,
@@ -182,7 +183,9 @@ def parse_notification(raw: dict, subjects: dict[str, dict]) -> FeedPost:
 class BlueskyReader(Reader):
     network = "bluesky"
     feeds = (HOME, NOTIFICATIONS)
-    cursor_is_id = False
+
+    def cursor_in_cache(self, feed: str) -> bool:
+        return False
 
     def __init__(self, platform: Bluesky) -> None:
         self.platform = platform
@@ -213,10 +216,81 @@ class BlueskyReader(Reader):
             for r in raw:
                 r["_subjects"] = {u: subjects[u] for u in [r.get("reasonSubject")] if u in subjects}
         else:
-            data = (await self.platform._xrpc(
-                profile, "GET", "app.bsky.feed.getTimeline", params=params)).json()
-            raw = data.get("feed", [])
+            data = await self._feed(profile, feed, params)
+            raw = data["items"]
         return Page(raw, [self.parse(feed, r) for r in raw], data.get("cursor"))
+
+    async def _feed(self, profile: Profile, feed: str, params: dict) -> dict:
+        """Beiträge einer Liste: Home, Feed, Liste, Hashtag-Suche, Lesezeichen oder Likes.
+
+        Gibt `{"items": [{"post": …}, …], "cursor": …}` zurück.
+        """
+        call = self.platform._xrpc
+        kind, _sep, key = feed.partition(":")
+        if feed == HOME:
+            data = (await call(profile, "GET", "app.bsky.feed.getTimeline", params=params)).json()
+            return {"items": data.get("feed", []), "cursor": data.get("cursor")}
+        if kind == "feed":
+            data = (await call(profile, "GET", "app.bsky.feed.getFeed",
+                               params={**params, "feed": key})).json()
+            return {"items": data.get("feed", []), "cursor": data.get("cursor")}
+        if kind == "list":
+            data = (await call(profile, "GET", "app.bsky.feed.getListFeed",
+                               params={**params, "list": key})).json()
+            return {"items": data.get("feed", []), "cursor": data.get("cursor")}
+        if kind == "tag":
+            data = (await call(profile, "GET", "app.bsky.feed.searchPosts",
+                               params={**params, "q": f"#{key}", "sort": "latest"})).json()
+            return {"items": [{"post": p} for p in data.get("posts", [])],
+                    "cursor": data.get("cursor")}
+        if feed == "bookmarks":
+            data = (await call(profile, "GET", "app.bsky.bookmark.getBookmarks",
+                               params=params)).json()
+            return {"items": [{"post": b["item"]} for b in data.get("bookmarks", [])
+                              if (b.get("item") or {}).get("record")],
+                    "cursor": data.get("cursor")}
+        if feed == "favourites":
+            data = (await call(profile, "GET", "app.bsky.feed.getActorLikes",
+                               params={**params, "actor": profile.remote_id})).json()
+            return {"items": data.get("feed", []), "cursor": data.get("cursor")}
+        raise ValueError(feed)
+
+    async def sources(self, profile: Profile) -> list[FeedSource]:
+        out: list[FeedSource] = []
+        call = self.platform._xrpc
+        try:
+            prefs = (await call(profile, "GET", "app.bsky.actor.getPreferences")).json()
+        except PlatformError:
+            prefs = {}
+        saved: list[dict] = []
+        for pref in prefs.get("preferences", []):
+            if pref.get("$type", "").endswith("savedFeedsPrefV2"):
+                saved = pref.get("items", [])
+        feed_uris = [i["value"] for i in saved if i.get("type") == "feed"]
+        names: dict[str, str] = {}
+        if feed_uris:
+            try:
+                gens = (await call(profile, "GET", "app.bsky.feed.getFeedGenerators",
+                                   params={"feeds": feed_uris})).json()
+                names = {g["uri"]: g.get("displayName", "") for g in gens.get("feeds", [])}
+            except PlatformError:
+                pass
+        for uri in feed_uris:
+            out.append(FeedSource("feed", f"feed:{uri}", names.get(uri) or uri, _("Feed")))
+        for item in saved:
+            if item.get("type") != "list":
+                continue
+            title = item["value"]
+            try:
+                data = (await call(profile, "GET", "app.bsky.graph.getList",
+                                   params={"list": item["value"], "limit": 1})).json()
+                title = (data.get("list") or {}).get("name") or title
+            except PlatformError:
+                pass
+            out.append(FeedSource("list", f"list:{item['value']}", title, _("List")))
+        out.append(FeedSource("bookmarks", "bookmarks", _("Bookmarks")))
+        out.append(FeedSource("favourites", "favourites", _("Likes")))
+        return out
 
     async def _subjects(self, profile: Profile, notifications: list[dict]) -> dict[str, dict]:
         """Beiträge, auf die sich Likes und Reposts beziehen (höchstens 25 je Anfrage)."""

@@ -64,6 +64,10 @@ class FeedCache:
             "UPDATE feed_item SET raw_json = ? WHERE profile_id = ? AND feed = ? AND remote_id = ?",
             (json.dumps(raw, ensure_ascii=False), profile_id, feed, remote_id))
 
+    def delete(self, profile_id: int, feed: str, remote_id: str) -> None:
+        self.db.execute("DELETE FROM feed_item WHERE profile_id = ? AND feed = ? AND remote_id = ?",
+                        (profile_id, feed, remote_id))
+
     def oldest_id(self, profile_id: int, feed: str) -> str | None:
         row = self.db.execute(
             "SELECT remote_id FROM feed_item WHERE profile_id = ? AND feed = ?"

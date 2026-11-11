@@ -150,6 +150,16 @@ FeedItem = FeedPost | FeedConversation
 
 
 @dataclass
+class FeedSource:
+    """Eine Liste, die man als Spalte hinzufügen kann."""
+
+    kind: str           # list | tag | feed | bookmarks | favourites
+    feed: str           # Schlüssel, zum Beispiel "list:12" oder "tag:gnome"
+    title: str
+    subtitle: str = ""
+
+
+@dataclass
 class Page:
     """Eine Antwort des Netzwerks: Rohdaten für den Cache, geparste Einträge, nächster Cursor."""
 
@@ -167,8 +177,13 @@ class Reader(ABC):
 
     network: str
     feeds: tuple[str, ...] = (HOME,)
-    #: Mastodon blättert mit der ID des ältesten Eintrags, Bluesky mit einem Cursor
-    cursor_is_id: bool = True
+
+    def cursor_in_cache(self, feed: str) -> bool:
+        """Blättert dieses Netzwerk mit der ID des ältesten Eintrags im Cache?
+
+        Sonst liefert die Antwort einen Cursor, den der Dienst sich merkt.
+        """
+        return True
 
     @abstractmethod
     async def fetch(self, profile: Profile, feed: str, *, cursor: str | None = None,
@@ -189,6 +204,10 @@ class Reader(ABC):
 
     async def push_marker(self, profile: Profile, feed: str, item_id: str) -> None:
         """Meldet den Lesestand dem Server, falls das Netzwerk das kennt."""
+
+    async def sources(self, profile: Profile) -> list[FeedSource]:
+        """Listen, Hashtags und Merklisten, die als Spalte möglich sind."""
+        return []
 
     # -- Handeln ------------------------------------------------------------
     def patch_raw(self, feed: str, raw: dict, post: FeedPost) -> None:

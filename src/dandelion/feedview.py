@@ -81,6 +81,26 @@ class FeedActions:
             return False
         return True
 
+    def hashtag(self, tag: str) -> None:
+        """Ein Hashtag im Text wurde angeklickt: als Spalte öffnen oder im Browser."""
+        from .widgets.feed_rows import open_url
+        dialog = Adw.AlertDialog(heading=f"#{tag}",
+                                 body=_("Open this hashtag as a column in the deck?"))
+        dialog.add_response("cancel", _("_Cancel"))
+        dialog.add_response("browser", _("Open in _Browser"))
+        dialog.add_response("column", _("Open as _Column"))
+        dialog.set_response_appearance("column", Adw.ResponseAppearance.SUGGESTED)
+        dialog.set_default_response("column")
+        dialog.set_close_response("cancel")
+
+        def on_response(_d: Adw.AlertDialog, response: str) -> None:
+            if response == "column":
+                self.view.column.deck.add_feed_column(self.view.profile, f"tag:{tag}", f"#{tag}")
+            elif response == "browser":
+                open_url(self.view, self.view.profile_tag_url(tag))
+        dialog.connect("response", on_response)
+        dialog.present(self.win)
+
     def account(self, widget: Gtk.Widget, account: FeedAccount) -> None:
         popover = AccountPopover(self.view, account)
         popover.set_parent(widget)
@@ -104,6 +124,8 @@ class FeedView(Gtk.Box):
         self._exhausted = False
         self._read_timer = 0
         self._status_handler = 0
+        #: Lesestand und Zähler gibt es nur für Home, Benachrichtigungen und Nachrichten
+        self.tracks_read = feed in ("home", NOTIFICATIONS, MESSAGES)
 
         if feed == NOTIFICATIONS:
             self.filter = Adw.ToggleGroup(homogeneous=True, margin_start=12, margin_end=12,
@@ -145,7 +167,7 @@ class FeedView(Gtk.Box):
         self.status_button.add_css_class("pill")
         self.status.set_child(self.status_button)
         self.stack.add_named(self.status, "status")
-        title, text = EMPTY[feed]
+        title, text = EMPTY.get(feed, (_("No Posts"), _("Nothing in this list yet.")))
         self.empty = Adw.StatusPage(icon_name="mail-unread-symbolic", title=title, description=text)
         self.empty.add_css_class("compact")
         self.stack.add_named(self.empty, "empty")
@@ -189,7 +211,7 @@ class FeedView(Gtk.Box):
         self.items = items
         self.pending = 0
         self.new_bar.set_reveal_child(False)
-        self.snapshot = self.service.marker(self.profile, self.feed)
+        self.snapshot = self.service.marker(self.profile, self.feed) if self.tracks_read else None
         self._render()
         self.column.update_badges()
         self._schedule_read()
@@ -237,13 +259,22 @@ class FeedView(Gtk.Box):
 
         spawn(run())
 
+    def profile_tag_url(self, tag: str) -> str:
+        if self.profile.platform == "bluesky":
+            return f"https://bsky.app/hashtag/{tag}"
+        return f"https://{self.profile.server}/tags/{tag}"
+
     # -- Lesestand ----------------------------------------------------------
     def unread_count(self) -> int:
-        return self.service.unread(self.profile, self.feed)
+        return self.service.unread(self.profile, self.feed) if self.tracks_read else 0
+
+    def merge_cache(self) -> None:
+        """Übernimmt Neues aus dem Cache, etwa nach einem Stream-Ereignis."""
+        self._merge_new(self.service.cached(self.profile, self.feed))
 
     def _schedule_read(self) -> None:
         """Markiert die Liste als gelesen, wenn sie oben steht und einige Sekunden sichtbar war."""
-        if self.feed == MESSAGES or self._read_timer or not self.get_mapped():
+        if not self.tracks_read or self.feed == MESSAGES or self._read_timer or not self.get_mapped():
             return
         if self.unread_count() == 0:
             return

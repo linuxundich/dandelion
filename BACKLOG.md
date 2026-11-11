@@ -31,15 +31,20 @@ Concept and phases in [docs/deck-columns.md](docs/deck-columns.md).
       markers and unread counts; Bluesky home and notifications
 - [x] Phase 3: favourite, boost, bookmark, reply and quote sheet, quick post,
       follow, mute, block
-- [ ] Phase 4: streaming, lists, hashtags, "open as column", column setup page
+- [x] Phase 4: streaming, lists, hashtags, "open as column", column setup page,
+      keyboard navigation
 - [ ] Phase 5: narrow layout polish, filters, accessibility pass, 0.4.0
-- [ ] Add Ctrl+4 and F5 to the shortcuts dialog
 - [ ] Check the narrow layout (360 px) by eye; only reasoned so far
 - [ ] Replace the `Gtk.ListBox` in the feed lists by a `Gtk.ListView` if long
       lists or many images feel slow
 - [ ] Cap the image cache folder (avatars and previews grow without limit)
 - [ ] Open images in a viewer instead of the browser
 - [ ] Show the thread context of replies
+- [ ] Streaming for lists and hashtags (own streams while their column is visible)
+- [ ] Remove deleted posts from an open list when the stream reports a deletion
+- [ ] Column widths and switching a column's feed in place (only own columns for now)
+- [ ] Check the Mastodon stream and the Bluesky list calls against real servers (only
+      a local WebSocket and fakes so far)
 - [ ] Reply from the Messages tab (conversations) and mark them read
 - [ ] Mastodon quotes (Mastodon 4.5 `quoted_status_id`) once servers support them
 - [ ] Attach images to a quick post (use the full composer for now)

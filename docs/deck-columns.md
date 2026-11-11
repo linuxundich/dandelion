@@ -3,12 +3,13 @@
 Concept, 2026-11-11 · based on Dandelion 0.3.1. Status: **proposal, nothing built**.
 Mockups: [deck-mockups.html](deck-mockups.html).
 
-**Status 2026-11-11:** phases 1 to 3 are implemented (nothing tried against a
+**Status 2026-11-11:** phases 1 to 4 are implemented (nothing tried against a
 real account yet). Deviations: the feed
 lists use a `Gtk.ListBox` with at most 60 + 40 per step rows instead of a
 `Gtk.ListView`; read positions are stored as timestamps and mapped to the
 server markers (Mastodon) or `updateSeen` (Bluesky); Bluesky has no *Messages*
-tab yet (phase 6).
+tab yet (phase 6). Lists, hashtags and bookmarks are own columns (not switched in
+place inside a profile column); the column setup is a dialog, not a page.
 
 ## Goal
 

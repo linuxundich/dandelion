@@ -3,9 +3,11 @@
 
 from __future__ import annotations
 
+import json
+from collections.abc import Callable
 from uuid import uuid4
 
-from ..core.models import Profile, TargetPart
+from ..core.models import DeckColumnSpec, Profile, Role, TargetPart
 from ..core.store import Store
 from ..platforms import Registry
 from ..platforms.bluesky import Bluesky
@@ -19,12 +21,13 @@ from .base import (
     FeedConversation,
     FeedItem,
     FeedPost,
+    FeedSource,
     Reader,
     Relationship,
 )
 from .bluesky import BlueskyReader
 from .cache import KEEP_PER_FEED, FeedCache
-from .mastodon import MastodonReader
+from .mastodon import NOTIFICATION_TYPES, MastodonReader
 
 PAGE = 40
 UNREAD_FEEDS = (HOME, NOTIFICATIONS, MESSAGES)
@@ -37,6 +40,7 @@ class ReaderService:
         self.cache = FeedCache(store)
         self._readers: dict[str, Reader] = {}
         self._cursors: dict[tuple[int, str], str | None] = {}
+        self._streams: dict[int, object] = {}
 
     # -- Reader -------------------------------------------------------------
     def reader_for(self, profile: Profile) -> Reader | None:
@@ -76,7 +80,7 @@ class ReaderService:
             return []
         page = await reader.fetch(profile, feed, limit=PAGE)
         self._store(reader, profile, feed, page.raw)
-        if not reader.cursor_is_id and (profile.id, feed) not in self._cursors:
+        if not reader.cursor_in_cache(feed) and (profile.id, feed) not in self._cursors:
             self._cursors[(profile.id, feed)] = page.cursor
         await self._init_marker(reader, profile, feed)
         return self.cached(profile, feed)
@@ -86,7 +90,7 @@ class ReaderService:
         if reader is None or profile.id is None:
             return []
         key = (profile.id, feed)
-        if reader.cursor_is_id:
+        if reader.cursor_in_cache(feed):
             cursor = self.cache.oldest_id(profile.id, feed)
         else:
             if self._cursors.get(key) is None:       # nach einem Neustart: erst Seite eins
@@ -98,7 +102,7 @@ class ReaderService:
             return self.cached(profile, feed)
         page = await reader.fetch(profile, feed, cursor=cursor, limit=PAGE)
         self._store(reader, profile, feed, page.raw)
-        if not reader.cursor_is_id:
+        if not reader.cursor_in_cache(feed):
             self._cursors[key] = page.cursor
         return self.cached(profile, feed)
 
@@ -106,7 +110,7 @@ class ReaderService:
     async def _init_marker(self, reader: Reader, profile: Profile, feed: str) -> None:
         """Erster Abruf: Lesestand vom Server oder „alles bisher gilt als gelesen“."""
         pid = profile.id
-        if pid is None or feed == MESSAGES or self.cache.marker(pid, feed) is not None:
+        if pid is None or feed not in (HOME, NOTIFICATIONS) or self.cache.marker(pid, feed) is not None:
             return
         server_id = await reader.fetch_marker(profile, feed)
         ts = self.cache.created_at_of(pid, feed, server_id) if server_id else None
@@ -189,3 +193,75 @@ class ReaderService:
         if reader is None:
             raise PlatformError("not supported")
         return reader
+
+    # -- Spalten ------------------------------------------------------------
+    def default_columns(self, role: Role) -> list[DeckColumnSpec]:
+        """Ohne gespeicherte Spalten: eine Profilspalte je lesbarem Profil der Rolle."""
+        specs = []
+        for rp in self.store.role_profiles(role.id):  # type: ignore[arg-type]
+            profile = self.store.profile(rp.profile_id)
+            if profile is not None and self.can_read(profile):
+                specs.append(DeckColumnSpec(role.id, profile.id, "profile",  # type: ignore[arg-type]
+                                            position=len(specs)))
+        return specs
+
+    def columns(self, role: Role) -> list[DeckColumnSpec]:
+        """Die Spalten einer Rolle: gespeicherte, sonst die Standardspalten."""
+        stored = [c for c in self.store.deck_columns(role.id)  # type: ignore[arg-type]
+                  if (p := self.store.profile(c.profile_id)) is not None and self.can_read(p)]
+        return stored or self.default_columns(role)
+
+    def save_columns(self, role: Role, specs: list[DeckColumnSpec]) -> None:
+        """Speichert die Spalten; eine leere Liste stellt die Standardspalten wieder her."""
+        self.store.save_deck_columns(role.id, specs)  # type: ignore[arg-type]
+
+    async def sources(self, profile: Profile) -> list[FeedSource]:
+        return await self._need_reader(profile).sources(profile)
+
+    # -- Streaming (Mastodon) ------------------------------------------------
+    def handle_stream_event(self, profile: Profile, event: dict) -> str | None:
+        """Wertet ein Ereignis des Streams aus; gibt die geänderte Liste zurück oder `None`."""
+        reader = self.reader_for(profile)
+        if reader is None or profile.id is None or profile.platform != "mastodon":
+            return None
+        kind, payload = event.get("event"), event.get("payload")
+        try:
+            if kind in ("update", "status.update") and payload:
+                raw = json.loads(payload)
+                self._store(reader, profile, HOME, [raw])
+                return HOME
+            if kind == "notification" and payload:
+                raw = json.loads(payload)
+                if raw.get("type") not in NOTIFICATION_TYPES:
+                    return None
+                self._store(reader, profile, NOTIFICATIONS, [raw])
+                return NOTIFICATIONS
+            if kind == "delete" and payload:
+                self.cache.delete(profile.id, HOME, str(payload))
+                return HOME
+        except (ValueError, KeyError, TypeError):
+            return None
+        return None
+
+    def is_live(self, profile: Profile) -> bool:
+        stream = self._streams.get(profile.id) if profile.id is not None else None
+        return bool(stream and stream.connected)
+
+    def start_stream(self, profile: Profile, callback: Callable[[Profile, str | None], None]) -> None:
+        """Hält eine Verbindung für Home und Benachrichtigungen offen (nur Mastodon)."""
+        if profile.platform != "mastodon" or profile.id is None or profile.id in self._streams:
+            return
+        from .stream import MastodonStream
+        platform = self.registry.get("mastodon")
+        stream = MastodonStream(self.registry.http, platform, self, profile, callback)  # type: ignore[arg-type]
+        self._streams[profile.id] = stream
+        stream.start()
+
+    def stop_stream(self, profile_id: int) -> None:
+        stream = self._streams.pop(profile_id, None)
+        if stream:
+            stream.stop()
+
+    def stop_streams(self, keep: set[int] | None = None) -> None:
+        for pid in [p for p in self._streams if keep is None or p not in keep]:
+            self.stop_stream(pid)

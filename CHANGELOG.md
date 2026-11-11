@@ -43,6 +43,23 @@ All notable changes to Dandelion are listed here.
 - Bluesky replies keep the thread root; Bluesky quotes embed the post.
   Mastodon quotes are not offered yet.
 
+- **Live updates for Mastodon:** while the deck is visible, every Mastodon
+  profile keeps a streaming connection open. New posts, edits, deletions and
+  notifications appear at once; the connection is rebuilt with growing delays
+  and reloads what was missed. Polling continues for messages and extra
+  columns; Bluesky is polled every 60 seconds.
+- **More columns:** besides profile columns a role can show single lists:
+  Mastodon lists, followed hashtags, bookmarks and favourites; Bluesky saved
+  feeds, lists, bookmarks and likes. The grid button in the header opens the
+  column setup (reorder, remove, add; sources are loaded when a profile is
+  opened). Columns are stored per role; without any, every profile gets one.
+- **Hashtags in posts** can be opened as a column (or in the browser) with one
+  click.
+- **Keyboard:** `j` and `k` move through posts, `h` and `l` between columns,
+  `1` `2` `3` between tabs, `g` to the top, `r` reply, `b` boost, `f` favourite,
+  `m` bookmark, `o` open in browser, `n` new post. Choosing a role moves the
+  focus into the deck. The shortcuts dialog lists them.
+
 ### Changed
 
 - Mastodon logins now ask for the `read` scope and the write scopes for

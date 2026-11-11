@@ -19,6 +19,7 @@ src/dandelion/window.py
 src/dandelion/deck.py
 src/dandelion/feedview.py
 src/dandelion/quickpost.py
+src/dandelion/columns_dialog.py
 src/dandelion/account_popover.py
 src/dandelion/widgets/feed_rows.py
 src/dandelion/reader/bluesky.py

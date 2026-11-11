@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Deck: je Profil einer Rolle eine Spalte mit der Home-Timeline.
+"""Deck: die Spalten einer Rolle (siehe docs/deck-columns.md).
 
-Phase 1 des Lese-Modus (siehe docs/deck-columns.md): nur lesen, Mastodon,
-Abfrage alle 60 Sekunden, solange das Deck sichtbar ist.
+Eine Profilspalte zeigt Home, Benachrichtigungen und Nachrichten eines Profils, eine
+Listenspalte genau eine Liste (Liste, Hashtag, Lesezeichen, Feed). Mastodon hält
+eine Live-Verbindung offen, alles andere wird alle 60 Sekunden abgefragt.
 """
 
 from __future__ import annotations
@@ -11,9 +12,9 @@ import logging
 from gettext import gettext as _
 from typing import TYPE_CHECKING
 
-from gi.repository import Adw, GLib, Gtk, Pango
+from gi.repository import Adw, Gdk, GLib, Gtk, Pango
 
-from .core.models import Profile, Role
+from .core.models import DeckColumnSpec, Profile, Role
 from .feedview import FeedView
 from .reader.base import HOME, MESSAGES, NOTIFICATIONS
 from .widgets.avatars import AvatarCache
@@ -33,14 +34,16 @@ FEED_TITLES = {HOME: _("Home"), NOTIFICATIONS: _("Notifications"), MESSAGES: _("
 
 
 class DeckColumn(Gtk.Box):
-    """Eine Spalte für ein Profil mit den Reitern Home, Benachrichtigungen und Nachrichten."""
+    """Eine Spalte: Profilspalte mit Reitern oder eine einzelne Liste."""
 
-    def __init__(self, deck: DandelionDeck, profile: Profile) -> None:
+    def __init__(self, deck: DandelionDeck, profile: Profile, spec: DeckColumnSpec) -> None:
         super().__init__(orientation=Gtk.Orientation.VERTICAL, width_request=COLUMN_WIDTH)
         self.add_css_class("deck-column")
         self.deck = deck
         self.profile = profile
+        self.spec = spec
         self.views: dict[str, FeedView] = {}
+        single = spec.kind == "feed"
 
         head = Gtk.Box(spacing=10, margin_top=10, margin_bottom=6, margin_start=12, margin_end=6)
         avatar = Adw.Avatar(size=32, text=profile.title, show_initials=True)
@@ -49,7 +52,8 @@ class DeckColumn(Gtk.Box):
         overlay.add_overlay(platform_badge(profile.platform))
         head.append(overlay)
         who = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True, valign=Gtk.Align.CENTER)
-        title = Gtk.Label(label=profile.title, xalign=0, ellipsize=Pango.EllipsizeMode.END)
+        title = Gtk.Label(label=spec.title if single else profile.title, xalign=0,
+                          ellipsize=Pango.EllipsizeMode.END)
         title.add_css_class("heading")
         who.append(title)
         handle = Gtk.Label(label=profile.full_handle, xalign=0, ellipsize=Pango.EllipsizeMode.END)
@@ -57,11 +61,12 @@ class DeckColumn(Gtk.Box):
         handle.add_css_class("caption")
         who.append(handle)
         head.append(who)
-        self.new_post_button = Gtk.Button(icon_name="document-edit-symbolic", valign=Gtk.Align.CENTER,
-                                          tooltip_text=_("New Post as {name}").format(name=profile.title))
+        self.new_post_button = Gtk.Button(
+            icon_name="document-edit-symbolic", valign=Gtk.Align.CENTER,
+            tooltip_text=_("New Post as {name}").format(name=profile.title))
         self.new_post_button.add_css_class("flat")
         self.new_post_button.update_property([Gtk.AccessibleProperty.LABEL], [_("New Post")])
-        self.new_post_button.connect("clicked", lambda *_a: self._new_post())
+        self.new_post_button.connect("clicked", lambda *_a: self.new_post())
         head.append(self.new_post_button)
         self.refresh_button = Gtk.Button(icon_name="view-refresh-symbolic", valign=Gtk.Align.CENTER,
                                          tooltip_text=_("Refresh"))
@@ -69,14 +74,21 @@ class DeckColumn(Gtk.Box):
         self.refresh_button.update_property([Gtk.AccessibleProperty.LABEL], [_("Refresh")])
         self.refresh_button.connect("clicked", lambda *_a: self.refresh(manual=True))
         head.append(self.refresh_button)
+        if single:
+            close = Gtk.Button(icon_name="window-close-symbolic", valign=Gtk.Align.CENTER,
+                               tooltip_text=_("Remove Column"))
+            close.add_css_class("flat")
+            close.update_property([Gtk.AccessibleProperty.LABEL], [_("Remove Column")])
+            close.connect("clicked", lambda *_a: deck.remove_column(spec))
+            head.append(close)
         self.append(head)
 
         self.stack = Adw.ViewStack(vexpand=True)
-        feeds = deck.service.feeds(profile)
+        feeds = (spec.feed,) if single else deck.service.feeds(profile)
         for feed in feeds:
             view = FeedView(self, feed)
             self.views[feed] = view
-            page = self.stack.add_titled(view, feed, FEED_TITLES[feed])
+            page = self.stack.add_titled(view, feed, FEED_TITLES.get(feed, spec.title))
             page.set_name(feed)
         if len(feeds) > 1:
             switcher = Adw.InlineViewSwitcher(stack=self.stack, margin_start=12, margin_end=12,
@@ -87,25 +99,29 @@ class DeckColumn(Gtk.Box):
         self.update_badges()
         self.refresh(manual=True)
 
-    def _new_post(self) -> None:
+    def new_post(self) -> None:
         from .quickpost import ComposeSheet
         ComposeSheet(self.deck.app, self.deck.win, self.profile, "new",
                      on_sent=lambda: self.refresh()).present(self.deck.win)
 
+    def current_view(self) -> FeedView:
+        return self.stack.get_visible_child()  # type: ignore[return-value]
+
     def update_badges(self) -> None:
         for feed, view in self.views.items():
-            if feed == HOME:
+            if feed == HOME or self.spec.kind == "feed":
                 continue
             page = self.stack.get_page(view)
             n = view.unread_count()
             page.set_badge_number(n)
             page.set_needs_attention(n > 0)
 
-    def unread_total(self) -> int:
-        return self.deck.service.unread_total(self.profile)
-
-    def refresh(self, manual: bool = False) -> None:
-        for view in self.views.values():
+    def refresh(self, manual: bool = False, skip_live: bool = False) -> None:
+        """`skip_live`: Home und Benachrichtigungen kommen schon über den Stream."""
+        live = skip_live and self.deck.service.is_live(self.profile)
+        for feed, view in self.views.items():
+            if live and feed in (HOME, NOTIFICATIONS):
+                continue
             view.refresh(manual=manual)
 
 
@@ -124,8 +140,8 @@ class DandelionDeck(Gtk.Box):
                                            child=self.columns_box, vexpand=True, hexpand=True)
         self.empty = Adw.StatusPage(icon_name="mail-unread-symbolic",
                                     title=_("Nothing to Read Here"),
-                                    description=_("Add a Mastodon profile to this role to see "
-                                                  "its timeline."))
+                                    description=_("Add a Mastodon or Bluesky profile to this role "
+                                                  "to see its timeline."))
         self.empty_button = Gtk.Button(label=_("Roles and Profiles"), halign=Gtk.Align.CENTER)
         self.empty_button.add_css_class("pill")
         self.empty_button.add_css_class("suggested-action")
@@ -138,12 +154,16 @@ class DandelionDeck(Gtk.Box):
         self.connect("map", self._on_map)
         self.connect("unmap", self._on_unmap)
 
+        keys = Gtk.EventControllerKey(propagation_phase=Gtk.PropagationPhase.CAPTURE)
+        keys.connect("key-pressed", self._on_key)
+        self.add_controller(keys)
+
     def setup(self, app: DandelionApplication, win: DandelionWindow) -> None:
         self.app, self.win = app, win
         self.service = app.reader
         self.avatars = AvatarCache(app.http)
 
-    # -- Rolle --------------------------------------------------------------
+    # -- Rolle und Spalten --------------------------------------------------
     def set_role(self, role: Role | None) -> None:
         self.role = role
         self.reload()
@@ -153,21 +173,63 @@ class DandelionDeck(Gtk.Box):
         while (child := self.columns_box.get_first_child()) is not None:
             self.columns_box.remove(child)
         self.columns = []
-        profiles: list[Profile] = []
-        if self.role is not None:
-            for rp in self.app.store.role_profiles(self.role.id):  # type: ignore[arg-type]
-                p = self.app.store.profile(rp.profile_id)
-                if p is not None and self.service.can_read(p):
-                    profiles.append(p)
-        for p in profiles:
-            column = DeckColumn(self, p)
-            if len(profiles) == 1:
+        specs = self.service.columns(self.role) if self.role is not None else []
+        for spec in specs:
+            profile = self.app.store.profile(spec.profile_id)
+            if profile is None:
+                continue
+            column = DeckColumn(self, profile, spec)
+            if len(specs) == 1:
                 column.set_hexpand(True)
+            if self.columns:
+                self.columns_box.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
             self.columns.append(column)
             self.columns_box.append(column)
-            if p is not profiles[-1]:
-                self.columns_box.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
-        self.stack.set_visible_child_name("columns" if profiles else "empty")
+        self.stack.set_visible_child_name("columns" if self.columns else "empty")
+        self._sync_streams()
+        self.win.sync_title()
+
+    def column_count(self) -> int:
+        return len(self.columns)
+
+    def _stored_specs(self) -> list[DeckColumnSpec]:
+        return list(self.service.columns(self.role)) if self.role is not None else []
+
+    def add_feed_column(self, profile: Profile, feed: str, title: str) -> None:
+        """Hängt eine Liste (Hashtag, Liste, Lesezeichen …) als eigene Spalte an."""
+        if self.role is None:
+            return
+        specs = self._stored_specs()
+        if any(s.kind == "feed" and s.profile_id == profile.id and s.feed == feed for s in specs):
+            self.win.toast(_("{title} is already a column").format(title=title))
+            return
+        specs.append(DeckColumnSpec(self.role.id, profile.id, "feed", feed, title))  # type: ignore[arg-type]
+        self.service.save_columns(self.role, specs)
+        self.reload()
+        self.win.toast(_("Column added: {title}").format(title=title))
+        GLib.idle_add(self._scroll_to_end)
+
+    def remove_column(self, spec: DeckColumnSpec) -> None:
+        if self.role is None:
+            return
+        specs = [s for s in self._stored_specs()
+                 if not (s.kind == spec.kind and s.profile_id == spec.profile_id
+                         and s.feed == spec.feed)]
+        self.service.save_columns(self.role, specs)
+        self.reload()
+
+    def edit_columns(self) -> None:
+        if self.role is None:
+            return
+        from .columns_dialog import ColumnsDialog
+        dialog = ColumnsDialog(self, self.role)
+        dialog.connect("closed", lambda *_a: self.reload())
+        dialog.present(self.win)
+
+    def _scroll_to_end(self) -> bool:
+        adj = self.scroller.get_hadjustment()
+        adj.set_value(adj.get_upper())
+        return GLib.SOURCE_REMOVE
 
     def unread_changed(self) -> None:
         """Ein Lesestand oder Zähler hat sich geändert: Rollenliste auffrischen."""
@@ -180,24 +242,124 @@ class DandelionDeck(Gtk.Box):
                 return GLib.SOURCE_REMOVE
             GLib.idle_add(run)
 
-    def column_count(self) -> int:
-        return len(self.columns)
-
     def refresh_all(self, manual: bool = True) -> None:
         for column in self.columns:
-            column.refresh(manual=manual)
+            column.refresh(manual=manual, skip_live=not manual)
 
-    # -- Abfrage ------------------------------------------------------------
+    # -- Live-Verbindung und Abfrage ----------------------------------------
+    def _sync_streams(self) -> None:
+        if not self.get_mapped():
+            self.service.stop_streams()
+            return
+        wanted = {c.profile.id for c in self.columns
+                  if c.spec.kind == "profile" and c.profile.platform == "mastodon"}
+        self.service.stop_streams(keep=wanted)  # type: ignore[arg-type]
+        for column in self.columns:
+            if column.profile.id in wanted:
+                self.service.start_stream(column.profile, self._on_stream)
+
+    def _on_stream(self, profile: Profile, feed: str | None) -> None:
+        """Neues vom Stream: Liste aus dem Cache ergänzen, bei `None` (neu verbunden) nachladen."""
+        for column in self.columns:
+            if column.profile.id != profile.id or column.spec.kind != "profile":
+                continue
+            if feed is None:
+                for f in (HOME, NOTIFICATIONS):
+                    if f in column.views:
+                        column.views[f].refresh(manual=False)
+            elif feed in column.views:
+                column.views[feed].merge_cache()
+        self.unread_changed()
+
     def _on_map(self, *_args: object) -> None:
         if not self._timer:
             self._timer = GLib.timeout_add_seconds(POLL_SECONDS, self._poll)
         self.refresh_all(manual=False)
+        self._sync_streams()
 
     def _on_unmap(self, *_args: object) -> None:
         if self._timer:
             GLib.source_remove(self._timer)
             self._timer = 0
+        self.service.stop_streams()
 
     def _poll(self) -> bool:
         self.refresh_all(manual=False)
         return GLib.SOURCE_CONTINUE
+
+    # -- Tastatur -----------------------------------------------------------
+    def _focused_row(self) -> tuple[Gtk.ListBoxRow | None, FeedView | None, DeckColumn | None]:
+        widget = self.win.get_focus()
+        row = view = column = None
+        while widget is not None and widget is not self:
+            if isinstance(widget, Gtk.ListBoxRow) and row is None:
+                row = widget
+            elif isinstance(widget, FeedView) and view is None:
+                view = widget
+            elif isinstance(widget, DeckColumn):
+                column = widget
+                break
+            widget = widget.get_parent()
+        return row, view, column
+
+    def _focus_row(self, view: FeedView, index: int) -> bool:
+        row = view.listbox.get_row_at_index(max(index, 0))
+        if row is None:
+            return False
+        row.grab_focus()
+        return True
+
+    def focus_first(self) -> bool:
+        if self.columns:
+            self._focus_row(self.columns[0].current_view(), 0)
+        return GLib.SOURCE_REMOVE
+
+    def _on_key(self, _ctrl: Gtk.EventControllerKey, keyval: int, _code: int,
+                state: Gdk.ModifierType) -> bool:
+        if state & (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.ALT_MASK
+                    | Gdk.ModifierType.SUPER_MASK) or not self.columns:
+            return False
+        focus = self.win.get_focus()
+        if isinstance(focus, (Gtk.Editable, Gtk.TextView)):
+            return False
+        key = (Gdk.keyval_name(keyval) or "").lower()
+        row, view, column = self._focused_row()
+        if column is None:
+            column = self.columns[0]
+        view = view or column.current_view()
+        index = row.get_index() if row is not None else -1
+
+        if key in ("j", "k"):
+            self._focus_row(view, index + 1 if key == "j" else index - 1)
+        elif key == "g":
+            self._focus_row(view, 0)
+            view.scroller.get_vadjustment().set_value(0)
+        elif key in ("h", "l"):
+            i = self.columns.index(column) + (1 if key == "l" else -1)
+            if 0 <= i < len(self.columns):
+                self._focus_row(self.columns[i].current_view(), max(index, 0))
+        elif key in ("1", "2", "3"):
+            feeds = list(column.views)
+            n = int(key) - 1
+            if n < len(feeds):
+                column.stack.set_visible_child_name(feeds[n])
+        elif key == "n":
+            column.new_post()
+        elif row is not None and key in ("r", "f", "b", "m", "o"):
+            self._row_action(row, key)
+        else:
+            return False
+        return True
+
+    def _row_action(self, row: Gtk.ListBoxRow, key: str) -> None:
+        buttons = getattr(row.get_child(), "action_buttons", None)
+        if not buttons:
+            return
+        if key == "r":
+            buttons["reply"].emit("clicked")
+        elif key == "o":
+            buttons["open"]()
+        else:
+            toggle = buttons[{"f": "favourite", "b": "boost", "m": "bookmark"}[key]]
+            if toggle.get_sensitive():
+                toggle.set_active(not toggle.get_active())

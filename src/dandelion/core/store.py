@@ -15,6 +15,7 @@ from collections.abc import Iterable
 from pathlib import Path
 
 from .models import (
+    DeckColumnSpec,
     Media,
     Post,
     PostState,
@@ -29,7 +30,7 @@ from .models import (
     now_iso,
 )
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 #: Zustände, in denen ein Beitrag noch bearbeitet werden darf
 EDITABLE_STATES = ("draft", "scheduled", "paused", "missed")
@@ -39,6 +40,18 @@ class PostLocked(Exception):
     """Der Beitrag wird gerade gesendet oder ist schon veröffentlicht."""
 
 _MIGRATIONS: dict[int, str] = {
+    5: """
+CREATE TABLE deck_column (
+  id            INTEGER PRIMARY KEY,
+  role_id       INTEGER NOT NULL REFERENCES role(id) ON DELETE CASCADE,
+  profile_id    INTEGER NOT NULL REFERENCES profile(id) ON DELETE CASCADE,
+  kind          TEXT NOT NULL,
+  feed          TEXT NOT NULL DEFAULT '',
+  title         TEXT NOT NULL DEFAULT '',
+  position      INTEGER NOT NULL
+);
+CREATE INDEX deck_column_role ON deck_column(role_id, position);
+""",
     4: """
 CREATE TABLE read_marker (
   profile_id    INTEGER NOT NULL REFERENCES profile(id) ON DELETE CASCADE,
@@ -392,6 +405,25 @@ class Store:
 
     def delete_profile(self, profile_id: int) -> None:
         self.db.execute("DELETE FROM profile WHERE id = ?", (profile_id,))
+
+    # ------------------------------------------------------------------
+    # Deck-Spalten
+    # ------------------------------------------------------------------
+    def deck_columns(self, role_id: int) -> list[DeckColumnSpec]:
+        """Gespeicherte Spalten einer Rolle; leer heißt: Standard (ein Profilspalte je Profil)."""
+        rows = self.db.execute(
+            "SELECT * FROM deck_column WHERE role_id = ? ORDER BY position, id", (role_id,))
+        return [DeckColumnSpec(r["role_id"], r["profile_id"], r["kind"], r["feed"], r["title"],
+                               r["position"], r["id"]) for r in rows]
+
+    def save_deck_columns(self, role_id: int, specs: Iterable[DeckColumnSpec]) -> None:
+        with self.transaction():
+            self.db.execute("DELETE FROM deck_column WHERE role_id = ?", (role_id,))
+            for pos, spec in enumerate(specs):
+                self.db.execute(
+                    "INSERT INTO deck_column (role_id, profile_id, kind, feed, title, position)"
+                    " VALUES (?,?,?,?,?,?)",
+                    (role_id, spec.profile_id, spec.kind, spec.feed, spec.title, pos))
 
     # ------------------------------------------------------------------
     # Rolle ↔ Profil

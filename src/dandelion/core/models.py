@@ -197,3 +197,20 @@ class Post:
 
     def is_empty(self) -> bool:
         return not self.body.strip() and not self.media and not any(v.body.strip() for v in self.variants)
+
+
+@dataclass
+class DeckColumnSpec:
+    """Eine gespeicherte Spalte im Deck einer Rolle.
+
+    `kind` ist "profile" (Home, Benachrichtigungen, Nachrichten eines Profils) oder
+    "feed" (eine einzelne Liste wie `list:12`, `tag:gnome`, `bookmarks`).
+    """
+
+    role_id: int
+    profile_id: int
+    kind: str = "profile"
+    feed: str = ""
+    title: str = ""
+    position: int = 0
+    id: int | None = None

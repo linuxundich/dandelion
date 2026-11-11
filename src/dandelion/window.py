@@ -34,6 +34,7 @@ class DandelionWindow(Adw.ApplicationWindow):
     read_roles: Gtk.ListBox = Gtk.Template.Child()
     deck: DandelionDeck = Gtk.Template.Child()
     refresh_button: Gtk.Button = Gtk.Template.Child()
+    columns_button: Gtk.Button = Gtk.Template.Child()
     composer: DandelionComposer = Gtk.Template.Child()
     post_view: DandelionPostView = Gtk.Template.Child()
     history: DandelionHistoryView = Gtk.Template.Child()
@@ -68,6 +69,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self._action("search", lambda *_: self.toggle_search())
         self._action("search-history", lambda *_: self.history.toggle_search())
         self._action("refresh-deck", lambda *_: self.deck.refresh_all(manual=True))
+        self._action("edit-columns", lambda *_: self.deck.edit_columns())
 
         preview = Gio.SimpleAction.new_stateful(
             "toggle-preview", None, GLib.Variant.new_boolean(self.settings.get_boolean("show-preview")))
@@ -158,6 +160,8 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.stack.set_visible_child_name("deck")
         self.split_view.set_show_content(show_content)
         self.sync_title()
+        if show_content:
+            GLib.idle_add(self.deck.focus_first)
 
     def _fill_read_roles(self, force: bool = False) -> None:
         roles = self.get_application().store.roles()
@@ -226,6 +230,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.stack.set_visible_child_name("deck")
         self.split_view.set_show_content(True)
         self.sync_title()
+        GLib.idle_add(self.deck.focus_first)           # damit j, k, r, f, b sofort gehen
 
     def reload_read(self) -> None:
         """Nach Änderungen an Rollen und Profilen."""
@@ -334,6 +339,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.history_search_button.set_visible(name == "history")
         self.filter_button.set_visible(name == "scheduled")
         self.refresh_button.set_visible(name == "deck")
+        self.columns_button.set_visible(name == "deck")
         if name == "history":
             self.history.reload()
         elif name == "scheduled":
