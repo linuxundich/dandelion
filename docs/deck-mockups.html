@@ -1,0 +1,312 @@
+<title>Dandelion Deck</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: libadwaita-style window mockups on a quiet desk; one tab per screen. Colors follow the app's GNOME palette. */
+:root{
+  --desk:#e4e4e7; --win:#fafafb; --side:#ebebee; --card:#fff; --fg:#1d1d20; --dim:#6a6a72; --line:rgba(0,0,0,.11);
+  --accent:#3584e4; --accent-bg:rgba(53,132,228,.13); --hover:rgba(0,0,0,.05);
+  --blue:#3584e4; --orange:#e66100; --purple:#9141ac; --teal:#1b8f8f; --green:#2ec27e; --red:#e01b24;
+  --shadow:0 8px 30px rgba(0,0,0,.16);
+  --ui:"Adwaita Sans","Cantarell","Inter","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#151517; --win:#242427; --side:#2d2d31; --card:#303034; --fg:#f2f2f4; --dim:#9d9da6; --line:rgba(255,255,255,.12);
+  --accent:#78aeed; --accent-bg:rgba(120,174,237,.18); --hover:rgba(255,255,255,.07);
+  --shadow:0 8px 30px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#151517; --win:#242427; --side:#2d2d31; --card:#303034; --fg:#f2f2f4; --dim:#9d9da6; --line:rgba(255,255,255,.12);
+  --accent:#78aeed; --accent-bg:rgba(120,174,237,.18); --hover:rgba(255,255,255,.07);
+  --shadow:0 8px 30px rgba(0,0,0,.5); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--desk);color:var(--fg);font:14px/1.4 var(--ui);padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.intro{max-width:1100px;margin:0 auto 16px}
+.intro h1{font-size:22px;margin:0 0 4px;font-weight:700}
+.intro p{margin:0;color:var(--dim);max-width:70ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;max-width:1100px;margin:14px auto 16px}
+.tabs button{padding:6px 14px;border-radius:8px;background:var(--side);font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff}
+.stage{overflow-x:auto;padding-bottom:6px}
+.screen{display:none}.screen.on{display:block}
+.note{max-width:1100px;margin:12px auto 0;color:var(--dim);font-size:13px}
+.note b{color:var(--fg)}
+.win{width:1360px;height:740px;margin:0 auto;background:var(--win);border-radius:12px;box-shadow:var(--shadow);display:grid;grid-template-columns:250px 1fr;overflow:hidden;position:relative;border:1px solid var(--line)}
+/* sidebar */
+.side{background:var(--side);display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+.hb{height:46px;display:flex;align-items:center;gap:8px;padding:0 10px;flex:none}
+.hb .t{font-weight:700;flex:1}
+.ib{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--dim)}
+.ib:hover{background:var(--hover)}
+.seg{display:flex;background:var(--hover);border-radius:9px;padding:3px;margin:0 10px 12px}
+.seg span{flex:1;text-align:center;padding:4px 0;border-radius:7px;font-weight:600;color:var(--dim)}
+.seg .on{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding:10px 16px 4px}
+.row{display:flex;align-items:center;gap:10px;padding:7px 10px;margin:1px 6px;border-radius:8px}
+.row.sel{background:var(--accent-bg)}
+.row .n{margin-left:auto;font-size:12px;font-weight:700;background:var(--accent);color:#fff;border-radius:99px;padding:0 7px;min-width:20px;text-align:center}
+.row .n.q{background:none;color:var(--dim);font-weight:500}
+.rb{width:3px;height:22px;border-radius:2px}
+.emo{font-size:17px;width:22px;text-align:center}
+.small{font-size:12px;color:var(--dim)}
+/* avatars */
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;flex:none}
+.av.s{width:26px;height:26px;font-size:11px}
+.av.l{width:44px;height:44px;font-size:17px}
+/* content */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.main .hb{border-bottom:1px solid var(--line)}
+.btn{padding:5px 13px;border-radius:8px;background:var(--hover);font-weight:600}
+.btn.p{background:var(--accent);color:#fff}
+.deck{flex:1;display:flex;min-height:0;overflow:hidden}
+.col{width:330px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--line);min-height:0}
+.ch{padding:10px 12px 0;display:flex;flex-direction:column;gap:8px;flex:none}
+.cid{display:flex;align-items:center;gap:10px}
+.cid .who{min-width:0;flex:1}
+.cid b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cid .small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabrow{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 -12px;padding:0 8px}
+.tabrow span{padding:6px 10px 7px;font-weight:600;color:var(--dim);border-bottom:2px solid transparent;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.tabrow .on{color:var(--fg);border-color:var(--accent)}
+.tabrow i{font-style:normal;font-size:11px;font-weight:700;background:var(--accent);color:#fff;border-radius:99px;padding:0 6px}
+.feed{flex:1;overflow:hidden;min-height:0;position:relative}
+.feed::after{content:"";position:absolute;inset:auto 0 0;height:50px;background:linear-gradient(transparent,var(--win));pointer-events:none}
+.newbar{margin:8px 12px 0;padding:5px;text-align:center;border-radius:99px;background:var(--accent-bg);color:var(--accent);font-weight:700;font-size:13px}
+.post{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line)}
+.post.unread{box-shadow:inset 3px 0 var(--accent)}
+.post .bd{min-width:0;flex:1}
+.ph{display:flex;gap:6px;align-items:baseline}
+.ph b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph .small{white-space:nowrap}
+.ph time{margin-left:auto;color:var(--dim);font-size:12px;flex:none}
+.post p{margin:2px 0 0;overflow-wrap:anywhere}
+.post a{color:var(--accent);text-decoration:none}
+.boost{font-size:12px;color:var(--dim);padding:8px 12px 0 58px;margin-bottom:-6px}
+.cw{margin-top:4px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px;background:var(--hover)}
+.cw span{flex:1}.cw button{font-weight:700;font-size:12px;color:var(--accent)}
+.img{margin-top:8px;height:130px;border-radius:10px;position:relative;overflow:hidden}
+.img em{position:absolute;left:6px;bottom:6px;font-style:normal;font-size:11px;font-weight:800;background:rgba(0,0,0,.65);color:#fff;border-radius:5px;padding:1px 6px}
+.link{margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.link div:first-child{height:70px}
+.link div+div{padding:6px 10px}
+.link b{display:block;font-size:13px}
+.act{display:flex;gap:2px;margin-top:6px;margin-left:-8px;color:var(--dim)}
+.act span{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:7px;font-size:12px}
+.act span:hover{background:var(--hover)}
+.act .on{color:var(--orange)}.act .fav{color:#e5a50a}
+.poll{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.poll div{position:relative;border-radius:7px;padding:4px 10px;background:var(--hover);overflow:hidden;display:flex;justify-content:space-between;font-size:13px}
+.poll div i{position:absolute;inset:0 auto 0 0;background:var(--accent-bg)}
+.poll div span{position:relative}
+.ntf{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line)}
+.ntf .ic{width:36px;text-align:right;flex:none;font-size:18px;line-height:1.2}
+.ntf .q{margin-top:4px;padding-left:9px;border-left:2px solid var(--line);color:var(--dim);font-size:13px}
+.conv{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line);align-items:center}
+.conv .bd{min-width:0;flex:1}
+.conv .bd div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dim)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
+.addcol{width:210px;flex:none;display:grid;place-items:center;color:var(--dim);text-align:center;padding:20px}
+.addcol div{border:2px dashed var(--line);border-radius:14px;padding:26px 16px;width:100%}
+/* overlays */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.38);display:grid;place-items:center}
+.dlg{background:var(--win);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column}
+.dlg .hb{border-bottom:1px solid var(--line)}
+.field{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:10px 12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:99px;background:var(--hover);font-size:13px}
+.chip.on{background:var(--accent-bg);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.ring{width:26px;height:26px;border-radius:50%;background:conic-gradient(var(--accent) 0 22%,var(--hover) 0);display:grid;place-items:center}
+.ring::after{content:"";width:18px;height:18px;border-radius:50%;background:var(--win)}
+.two{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0}
+.two>div{padding:14px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.two>div+div{border-left:1px solid var(--line);background:var(--side)}
+.item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card);border:1px solid var(--line)}
+.item .grip{color:var(--dim);letter-spacing:-2px}
+.item .small{margin-left:auto}
+.opt{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px}
+.opt:hover{background:var(--hover)}
+.opt .add{margin-left:auto;color:var(--accent);font-weight:700}
+.sw{width:34px;height:20px;border-radius:99px;background:var(--accent);position:relative;flex:none}
+.sw::after{content:"";position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff}
+.sw.off{background:var(--line)}.sw.off::after{right:auto;left:2px}
+/* phone */
+.phones{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.ph1{width:360px;height:740px;background:var(--win);border-radius:28px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.ph1 .col{width:auto;border:0;flex:1}
+.bar{display:flex;justify-content:space-around;align-items:center;padding:8px 10px 14px;border-top:1px solid var(--line);background:var(--side);flex:none}
+.bar button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--dim);position:relative;padding:2px 8px}
+.bar .on{color:var(--fg);font-weight:700}
+.bar .on .av{box-shadow:0 0 0 2px var(--win),0 0 0 4px var(--accent)}
+.bar em{position:absolute;top:-2px;right:2px;font-style:normal;font-size:10px;font-weight:800;background:var(--accent);color:#fff;border-radius:99px;padding:0 5px}
+.fab{position:absolute;right:16px;bottom:92px;width:52px;height:52px;border-radius:16px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.avw{position:relative;display:inline-flex;flex:none}
+.nb{position:absolute;right:-3px;bottom:-3px;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:800;color:#fff;display:grid;place-items:center;border:2px solid var(--win);box-sizing:content-box;width:13px;height:13px}
+.nb.m{background:#6364ff}.nb.b{background:#1185fe}
+.notice{margin:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;gap:8px}
+.notice p{margin:0}
+.quote{margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;background:var(--card)}
+.quote b{font-size:13px}
+.ghost{opacity:.45}
+@media (prefers-reduced-motion:no-preference){.tabs button{transition:background .12s}}
+</style>
+
+<div class="intro">
+  <h1>Dandelion Deck</h1>
+  <p>Mockups for the multi-column reader for Mastodon and Bluesky. One column per profile, all columns of the selected role side by side. Example data only; layout follows libadwaita.</p>
+</div>
+<div class="tabs" role="tablist">
+  <button role="tab" data-s="deck" aria-selected="true">1 · Deck</button>
+  <button role="tab" data-s="reply" aria-selected="false">2 · Reply</button>
+  <button role="tab" data-s="columns" aria-selected="false">3 · Columns of a role</button>
+  <button role="tab" data-s="bluesky" aria-selected="false">4 · Bluesky column</button>
+  <button role="tab" data-s="narrow" aria-selected="false">5 · Narrow window</button>
+</div>
+<div class="stage" id="stage"></div>
+<p class="note" id="note"></p>
+
+<script>
+const C={blog:"var(--orange)",priv:"var(--blue)",proj:"var(--purple)"};
+const av=(i,c,cls="")=>`<span class="av ${cls}" style="background:${c}">${i}</span>`;
+const nw=(a,n)=>`<span class="avw">${a}<span class="nb ${n}">${n=="b"?"B":"M"}</span></span>`;
+const ic={reply:"↩",boost:"⇄",fav:"★",bm:"⚑",more:"⋯"};
+const act=(r,b,f,o={})=>`<div class="act"><span>${ic.reply} ${r}</span><span class="${o.b?"on":""}">${ic.boost} ${b}</span><span class="${o.f?"fav":""}">${ic.fav} ${f}</span><span>${ic.bm}</span><span>${ic.more}</span></div>`;
+const post=(a,name,h,t,body,extra="",ac=act(2,5,12),cls="",pre="")=>`${pre}<div class="post ${cls}">${a}<div class="bd"><div class="ph"><b>${name}</b><span class="small">${h}</span><time>${t}</time></div>${body}${extra}${ac}</div></div>`;
+const colHead=(a,name,h,tabs,net="m")=>`<div class="ch"><div class="cid">${nw(a,net)}<div class="who"><b>${name}</b><span class="small">${h}</span></div><button class="ib" title="Column options">⋯</button></div><div class="tabrow">${tabs.map(([n,on,b])=>`<span class="${on?"on":""}">${n}${b?`<i>${b}</i>`:""}</span>`).join("")}</div></div>`;
+const tabsOf=(act,nn,mm)=>[["Home",act==0],["Notifications",act==1,nn],["Messages",act==2,mm]];
+
+const colHome=`<div class="col">${colHead(av("L",C.blog),"linuxundich.de","@linuxundich@social.tchncs.de",tabsOf(0,3,0))}
+<div class="feed"><div class="newbar">4 new posts</div>
+${post(av("M","#c64600","s"),"Mara Vogel","@mara@fosstodon.org","9 min",`<p>Wayland-Fraktionierung ist in GNOME 50 endlich rund. Zwei Monitore, 125 % und 150 %, keine unscharfen Fenster mehr. <a>#gnome</a></p>`,`<div class="img" style="background:linear-gradient(135deg,#3b6fb6,#8fd0c9 60%,#f3d18a)"><em>ALT</em></div>`,act(4,18,63,{f:1}),"unread")}
+${post(av("R","#26a269","s"),"Rust Weekly","@rustweekly@mastodon.social","31 min",`<p>Neuer Artikel: Warum <a>#gtk4</a>-rs Listenmodelle schneller sind als jedes Eigenbau-Widget.</p>`,`<div class="link"><div style="background:linear-gradient(120deg,#613583,#c061cb)"></div><div><b>Listenmodelle in gtk4-rs</b><span class="small">blog.example.org</span></div></div>`,act(1,22,40),"unread",`<div class="boost">⇄ boosted by Ben Kruse</div>`)}
+${post(av("T","#a51d2d","s"),"Tobias Meier","@tobi@social.tchncs.de","1 h",`<div class="cw"><span>Politik, kurz</span><button>Show</button></div>`,"",act(0,1,3))}
+${post(av("J","#1c71d8","s"),"Jana K.","@jana@chaos.social","2 h",`<p>Welche Tastatur nutzt ihr fürs Schreiben?</p>`,`<div class="poll"><div><i style="width:58%"></i><span>Mechanisch</span><span>58 %</span></div><div><i style="width:31%"></i><span>Laptop</span><span>31 %</span></div><div><i style="width:11%"></i><span>Ergo</span><span>11 %</span></div></div>`,act(9,2,17))}
+</div></div>`;
+
+const colNtf=`<div class="col">${colHead(av("T","var(--blue)"),"Toff","@toff@mastodon.social",tabsOf(1,5,1))}
+<div class="feed">
+<div class="ntf unread" style="box-shadow:inset 3px 0 var(--accent)"><div class="ic">@</div><div style="min-width:0;flex:1"><div><b>Mara Vogel</b> <span class="small">mentioned you · 4 min</span></div><div class="q" style="color:var(--fg)">@toff Danke für den Hinweis zur Alt-Text-Pflicht. Das spart mir Nachfragen.</div>${act(0,0,1)}</div></div>
+<div class="ntf"><div class="ic" style="color:#e5a50a">★</div><div><div>${av("B","#613583","s")} <b>Ben Kruse</b> and 11 others favourited</div><div class="q">Dandelion 0.3.1: neue Oberfläche, Kalender, Zeitslots …</div></div></div>
+<div class="ntf"><div class="ic" style="color:var(--green)">⇄</div><div><div><b>Rust Weekly</b> boosted <span class="small">· 2 h</span></div><div class="q">Neues Release von Pulsgeber: Profil-Pille im Panel.</div></div></div>
+<div class="ntf"><div class="ic" style="color:var(--blue)">+</div><div><div><b>Lena Fischer</b> <span class="small">followed you</span></div><div class="q">@lena@mas.to · 214 followers</div></div></div>
+<div class="ntf"><div class="ic">▤</div><div><div>Poll ended: <b>Mechanisch</b> won with 58 %</div></div></div>
+</div></div>`;
+
+const colMsg=`<div class="col">${colHead(av("P","var(--purple)"),"Pulsgeber","@pulsgeber@fosstodon.org",tabsOf(2,0,2))}
+<div class="feed">
+<div class="conv">${av("A","#c64600")}<div class="bd"><b>Anna Roth</b> <span class="small">· 12 min</span><div>Hast du kurz Zeit für einen Bugreport zum TCC-Profil?</div></div><span class="dot"></span></div>
+<div class="conv">${av("D","#26a269")}<div class="bd"><b>Dirk &amp; 2 others</b> <span class="small">· 3 h</span><div>Treffen am Samstag steht, 14 Uhr beim Bahnhof.</div></div><span class="dot"></span></div>
+<div class="conv">${av("S","#a51d2d")}<div class="bd"><b>Sabine Lutz</b> <span class="small">· yesterday</span><div>Danke, läuft jetzt!</div></div></div>
+<div class="conv">${av("H","#1c71d8")}<div class="bd"><b>Hendrik W.</b> <span class="small">· Mon</span><div>Du: Ich schaue es mir morgen an.</div></div></div>
+</div></div>`;
+
+const BL="#1185fe";
+const colBsky=`<div class="col">${colHead(av("L",BL),"linuxundich.de","@linuxundich.de",tabsOf(0,2,1),"b")}
+<div class="feed"><div class="newbar">6 new posts</div>
+${post(av("O","#613583","s"),"Ole Brandt","@ole.bsky.social","6 min",`<p>Erster Eindruck vom neuen Flatpak-Portal für Dateiauswahl: endlich wirklich nativ unter KDE und GNOME.</p>`,`<div class="quote"><b>Flathub</b> <span class="small">@flathub.org</span><br>Diese Woche: 212 Updates, 9 neue Apps.</div>`,act(3,7,29,{f:1}),"unread")}
+${post(av("M","#c64600","s"),"Mara Vogel","@mara.bsky.social","28 min",`<p>Zwei Monitore, 125 % und 150 %. Kein einziges unscharfes Fenster mehr.</p>`,`<div class="img" style="height:110px;background:linear-gradient(135deg,#3b6fb6,#8fd0c9 60%,#f3d18a)"><em>ALT</em></div>`,act(2,11,54),"unread",`<div class="boost">⇄ reposted by Ben Kruse</div>`)}
+${post(av("X","#a51d2d","s"),"Xaver B.","@xaver.example.social","1 h",`<div class="cw"><span>Hidden by label: graphic media</span><button>Show</button></div>`,"",act(0,0,2))}
+${post(av("N","#26a269","s"),"Nele S.","@nele.dev","3 h",`<p>Thread: Warum Bluesky-Feeds mehr wie Listen als wie Algorithmen funktionieren. 1/4</p>`,"",act(5,3,21))}
+</div></div>`;
+const colBskyMsg=`<div class="col">${colHead(av("L",BL),"linuxundich.de","@linuxundich.de",tabsOf(2,2,1),"b")}
+<div class="feed"><div class="notice"><b>Chats need more access</b><p class="small">The app password of this profile does not include direct messages. Create a new app password with chat access in the Bluesky settings and enter it here. Home and notifications keep working.</p><div style="display:flex;gap:8px"><button class="btn p">Update app password</button><button class="btn">Not now</button></div></div>
+<div class="ghost"><div class="conv">${av("A","#c64600")}<div class="bd"><b>Anna Roth</b><div>Hast du kurz Zeit für einen Bugreport?</div></div></div><div class="conv">${av("D","#26a269")}<div class="bd"><b>Dirk W.</b><div>Treffen am Samstag steht.</div></div></div></div>
+</div></div>`;
+const colList=`<div class="col">${colHead(av("☰","var(--teal)"),"Linux news","List · linuxundich.de",[["Home"],["Linux news",true],["#gnome"],["Bookmarks"]])}
+<div class="feed">
+${post(av("G","#1c71d8","s"),"GNOME","@gnome@floss.social","14 min",`<p>GNOME 50.1 ist da: Fixes für Wayland-Eingabe und den Dateiauswahldialog. <a>#gnome</a></p>`,"",act(6,41,120,{b:1}),"unread")}
+${post(av("F","#e5a50a","s"),"Flathub","@flathub@floss.social","1 h",`<p>Diese Woche: 212 Updates, 9 neue Apps.</p>`,"",act(2,12,48))}
+${post(av("K","#26a269","s"),"KDE","@kde@floss.social","3 h",`<p>Plasma 6.6.1 behebt den Absturz beim Drücken von Super.</p>`,"",act(3,20,77))}
+</div></div>`;
+
+const sidebar=(sel)=>`<div class="side"><div class="hb"><span class="t">Dandelion</span><button class="ib">⌕</button><button class="ib">☰</button></div>
+<div class="seg"><span>Write</span><span class="on">Read</span></div>
+<div class="lbl">Roles</div>
+<div class="row ${sel=="priv"?"sel":""}"><span class="rb" style="background:var(--blue)"></span><span class="emo">🏠</span>Private<span class="n">12</span></div>
+<div class="row ${sel=="blog"?"sel":""}"><span class="rb" style="background:var(--orange)"></span><span class="emo">✍️</span>Blog<span class="n">7</span></div>
+<div class="row ${sel=="proj"?"sel":""}"><span class="rb" style="background:var(--purple)"></span><span class="emo">🧩</span>Project<span class="n q">2</span></div>
+<div class="lbl">Columns in Blog</div>
+<div class="row">${av("L",C.blog,"s")}<span style="min-width:0"><b style="display:block;font-weight:600">linuxundich.de</b><span class="small">Home</span></span><span class="n">4</span></div>
+<div class="row">${nw(av("L",BL,"s"),"b")}<span style="min-width:0"><b style="display:block;font-weight:600">linuxundich.de</b><span class="small">Bluesky · Home</span></span><span class="n">6</span></div>
+<div class="row">${av("T",C.priv,"s")}<span style="min-width:0"><b style="display:block;font-weight:600">toff</b><span class="small">Notifications</span></span><span class="n">3</span></div>
+<div class="row">${av("P",C.proj,"s")}<span style="min-width:0"><b style="display:block;font-weight:600">pulsgeber</b><span class="small">Messages</span></span><span class="n">2</span></div>
+<div class="row"><span class="av s" style="background:var(--teal)">☰</span><span style="min-width:0"><b style="display:block;font-weight:600">Linux news</b><span class="small">List</span></span></div>
+<div class="row" style="color:var(--accent);font-weight:600"><span class="av s" style="background:var(--hover);color:var(--accent)">+</span>Add column</div>
+<div style="margin-top:auto;padding:10px 16px;border-top:1px solid var(--line)" class="small">Mastodon live · Bluesky every 45 s</div></div>`;
+
+const topbar=(title)=>`<div class="hb"><b style="font-size:15px">${title}</b><span class="small">4 profiles · 1 list</span><span style="flex:1"></span><button class="ib" title="Refresh">⟳</button><button class="ib" title="Columns">▥</button><button class="btn p">✎ New post</button></div>`;
+
+const deckWith=b=>`${sidebar("blog")}<div class="main">${topbar("Blog")}<div class="deck">${colHome}${b}${colNtf}${colMsg}${colList}</div></div>`;
+const deckInner=deckWith(colBsky);
+
+const screens={
+deck:`<div class="win">${deckInner}</div>`,
+reply:`<div class="win">${deckInner}<div class="dim"><div class="dlg" style="width:520px">
+<div class="hb"><button class="btn">Cancel</button><b style="flex:1;text-align:center">Reply</b><button class="btn p">Reply</button></div>
+<div style="padding:14px;display:flex;flex-direction:column;gap:12px">
+<div class="post" style="border:1px solid var(--line);border-radius:10px;background:var(--card)">${av("M","#c64600","s")}<div class="bd"><div class="ph"><b>Mara Vogel</b><span class="small">@mara@fosstodon.org</span></div><p>Wayland-Fraktionierung ist in GNOME 50 endlich rund. Zwei Monitore, 125 % und 150 % …</p></div></div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="small">From</span><span class="chip on">${av("L",C.blog,"s")}@linuxundich@social.tchncs.de</span><span class="chip">${av("T",C.priv,"s")}@toff@mastodon.social</span></div>
+<div class="field" style="min-height:120px"><span style="color:var(--accent)">@mara@fosstodon.org</span> Klingt gut, ich teste es heute Abend mit zwei Bildschirmen und schreibe dir, wie es läuft.</div>
+<div style="display:flex;align-items:center;gap:10px"><button class="btn">🌐 Public ▾</button><button class="btn">🖼</button><button class="btn">CW</button><span style="flex:1"></span><span class="small">462</span><span class="ring"></span></div>
+<div class="small">Replies go to the profile of the column you came from. Cross-posting and scheduling stay in <b>Write</b>.</div>
+</div></div></div></div>`,
+columns:`<div class="win">${deckInner}<div class="dim"><div class="dlg" style="width:880px;height:560px">
+<div class="hb"><b style="flex:1;font-size:15px">Columns · Blog</b><button class="btn p">Done</button></div>
+<div class="two"><div><div class="lbl" style="padding:0 0 4px">Order in this role · drag to move</div>
+<div class="item"><span class="grip">⋮⋮</span>${av("L",C.blog,"s")}<span><b>linuxundich.de</b><br><span class="small">Home · Notifications · Messages</span></span><span class="small">380 sp</span></div>
+<div class="item"><span class="grip">⋮⋮</span>${nw(av("L",BL,"s"),"b")}<span><b>linuxundich.de</b><br><span class="small">Bluesky · Home · Notifications · Messages</span></span><span class="small">380 sp</span></div>
+<div class="item"><span class="grip">⋮⋮</span>${av("T",C.priv,"s")}<span><b>toff</b><br><span class="small">Home · Notifications · Messages</span></span><span class="small">380 sp</span></div>
+<div class="item"><span class="grip">⋮⋮</span>${av("P",C.proj,"s")}<span><b>pulsgeber</b><br><span class="small">Home · Notifications · Messages</span></span><span class="small">380 sp</span></div>
+<div class="item"><span class="grip">⋮⋮</span><span class="av s" style="background:var(--teal)">☰</span><span><b>Linux news</b><br><span class="small">List of linuxundich.de</span></span><span class="small">✕</span></div>
+<div class="lbl" style="padding:12px 0 2px">Options for linuxundich.de</div>
+<div class="opt">Show boosts and reposts<span style="flex:1"></span><span class="sw"></span></div>
+<div class="opt">Show replies<span style="flex:1"></span><span class="sw"></span></div>
+<div class="opt">Desktop notifications<span style="flex:1"></span><span class="sw off"></span></div>
+</div>
+<div><div class="lbl" style="padding:0 0 4px">Add column</div>
+<div class="small">Profile</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip on">${av("L",C.blog,"s")}linuxundich</span><span class="chip">${av("L",BL,"s")}linuxundich.de · Bluesky</span><span class="chip">${av("T",C.priv,"s")}toff</span><span class="chip">${av("P",C.proj,"s")}pulsgeber</span></div>
+<div class="lbl" style="padding:10px 0 2px">Lists and saved feeds</div>
+<div class="opt"><span class="av s" style="background:var(--teal)">☰</span>Linux news<span class="add">Added</span></div>
+<div class="opt"><span class="av s" style="background:var(--teal)">☰</span>Rust<span class="add">+ Add</span></div>
+<div class="opt"><span class="av s" style="background:var(--blue)">☰</span>Linux Devs · feed<span class="add">+ Add</span></div>
+<div class="lbl" style="padding:10px 0 2px">Followed hashtags · Mastodon</div>
+<div class="opt"><span class="av s" style="background:var(--green)">#</span>gnome<span class="add">+ Add</span></div>
+<div class="opt"><span class="av s" style="background:var(--green)">#</span>flatpak<span class="add">+ Add</span></div>
+<div class="lbl" style="padding:10px 0 2px">Others</div>
+<div class="opt"><span class="av s" style="background:var(--orange)">⚑</span>Bookmarks<span class="add">+ Add</span></div>
+<div class="opt"><span class="av s" style="background:var(--orange)">★</span>Favourites<span class="add">+ Add</span></div>
+</div></div></div></div></div>`,
+bluesky:`<div class="win">${deckWith(colBskyMsg)}</div>`,
+narrow:`<div class="phones">
+<div class="ph1"><div class="hb" style="padding-top:6px"><button class="btn">✍️ Blog ▾</button><span style="flex:1"></span><button class="ib">⌕</button><button class="ib">☰</button></div>
+<div class="col">${colHead(av("L",C.blog),"linuxundich.de","@linuxundich@social.tchncs.de",tabsOf(0,3,0))}
+<div class="feed"><div class="newbar">4 new posts</div>
+${post(av("M","#c64600","s"),"Mara Vogel","@mara","9 min",`<p>Wayland-Fraktionierung ist in GNOME 50 endlich rund. <a>#gnome</a></p>`,`<div class="img" style="background:linear-gradient(135deg,#3b6fb6,#8fd0c9 60%,#f3d18a)"><em>ALT</em></div>`,act(4,18,63,{f:1}),"unread")}
+${post(av("R","#26a269","s"),"Rust Weekly","@rustweekly","31 min",`<p>Listenmodelle in <a>#gtk4</a>-rs.</p>`,"",act(1,22,40),"unread",`<div class="boost">⇄ boosted by Ben Kruse</div>`)}
+</div></div>
+<div class="fab">✎</div>
+<div class="bar"><button class="on">${av("L",C.blog,"s")}<em>4</em>linuxundich</button><button>${av("T",C.priv,"s")}<em>3</em>toff</button><button>${av("P",C.proj,"s")}<em>2</em>pulsgeber</button><button>${nw(av("L",BL,"s"),"b")}<em>6</em>bluesky</button></div></div>
+<div class="ph1"><div class="hb" style="padding-top:6px"><button class="btn">✍️ Blog ▾</button><span style="flex:1"></span><button class="ib">⌕</button><button class="ib">☰</button></div>
+<div class="col">${colHead(av("T",C.priv),"toff","@toff@mastodon.social",tabsOf(1,5,1))}
+<div class="feed">
+<div class="ntf unread" style="box-shadow:inset 3px 0 var(--accent)"><div class="ic">@</div><div style="min-width:0;flex:1"><div><b>Mara Vogel</b> <span class="small">mentioned you</span></div><div class="q" style="color:var(--fg)">@toff Danke für den Hinweis zur Alt-Text-Pflicht.</div></div></div>
+<div class="ntf"><div class="ic" style="color:#e5a50a">★</div><div><div><b>Ben Kruse</b> and 11 others favourited</div><div class="q">Dandelion 0.3.1 …</div></div></div>
+<div class="ntf"><div class="ic" style="color:var(--green)">⇄</div><div><div><b>Rust Weekly</b> boosted</div></div></div>
+</div></div>
+<div class="fab">✎</div>
+<div class="bar"><button>${av("L",C.blog,"s")}<em>4</em>linuxundich</button><button class="on">${av("T",C.priv,"s")}<em>3</em>toff</button><button>${av("P",C.proj,"s")}<em>2</em>pulsgeber</button><button>${nw(av("L",BL,"s"),"b")}<em>6</em>bluesky</button></div></div>
+</div>`
+};
+const notes={
+deck:"<b>Deck.</b> The role picks the deck. Mastodon and Bluesky profiles get the same column; a small badge on the avatar shows the network. Each column has its own tab strip; unread counts show in the sidebar and on the tabs. The last column is a pinned list, which any feed can become via “Open as column”. Dandelion keeps its role colors and emoji.",
+reply:"<b>Reply.</b> Reply, quote and quick post open as a small sheet with the profile of the column preselected. The full composer with variants, threads, AI and scheduling stays in <b>Write</b>.",
+columns:"<b>Columns of a role.</b> Reorder, remove and add columns. Lists, followed hashtags, bookmarks and favourites are fetched from the account. Boost and reply filters are per column.",
+bluesky:"<b>Bluesky column.</b> Same tabs as a Mastodon column. Content labels use the same fold-out as content warnings, reposts and quotes show as on Bluesky. Chats need an app password with chat access; until then only the Messages tab shows this notice and everything else works.",
+narrow:"<b>Narrow window.</b> One column at a time. The bottom bar switches between the role's profiles with unread badges; swiping works too. The role switch sits top left."
+};
+const stage=document.getElementById("stage"),note=document.getElementById("note");
+function show(k){if(!screens[k])k="deck";stage.innerHTML=Object.entries(screens).map(([n,h])=>`<div class="screen ${n==k?"on":""}">${h}</div>`).join("");note.innerHTML=notes[k];
+ document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.s==k));}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{location.hash=b.dataset.s}));
+addEventListener("hashchange",()=>show(location.hash.slice(1)));
+show(location.hash.slice(1));
+</script>

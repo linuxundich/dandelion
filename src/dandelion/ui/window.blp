@@ -64,23 +64,67 @@ template $DandelionWindow: Adw.ApplicationWindow {
             };
           }
 
-          content: ScrolledWindow {
-            hscrollbar-policy: never;
+          [top]
+          Adw.ToggleGroup mode_group {
+            homogeneous: true;
+            margin-start: 12;
+            margin-end: 12;
+            margin-bottom: 6;
+            notify::active-name => $on_mode_changed();
 
-            child: Adw.Sidebar sidebar {
-              activated => $on_sidebar_activated();
-              setup-menu => $on_sidebar_setup_menu();
+            Adw.Toggle {
+              name: "write";
+              label: _("Write");
+            }
 
-              placeholder: Adw.StatusPage {
-                visible: false;
-                icon-name: "system-search-symbolic";
-                title: _("No Results");
+            Adw.Toggle {
+              name: "read";
+              label: _("Read");
+            }
+          }
 
-                styles [
-                  "compact",
-                ]
+          content: Stack sidebar_stack {
+            transition-type: none;
+
+            StackPage {
+              name: "write";
+
+              child: ScrolledWindow {
+                hscrollbar-policy: never;
+
+                child: Adw.Sidebar sidebar {
+                  activated => $on_sidebar_activated();
+                  setup-menu => $on_sidebar_setup_menu();
+
+                  placeholder: Adw.StatusPage {
+                    visible: false;
+                    icon-name: "system-search-symbolic";
+                    title: _("No Results");
+
+                    styles [
+                      "compact",
+                    ]
+                  };
+                };
               };
-            };
+            }
+
+            StackPage {
+              name: "read";
+
+              child: ScrolledWindow {
+                hscrollbar-policy: never;
+
+                child: ListBox read_roles {
+                  selection-mode: single;
+                  row-activated => $on_read_role_activated();
+
+                  styles [
+                    "navigation-sidebar",
+                  ]
+                };
+              };
+            }
           };
         };
       };
@@ -93,6 +137,18 @@ template $DandelionWindow: Adw.ApplicationWindow {
           [top]
           Adw.HeaderBar header_bar {
             title-widget: Adw.WindowTitle content_title {};
+
+            [end]
+            Button refresh_button {
+              icon-name: "view-refresh-symbolic";
+              tooltip-text: _("Refresh All Columns");
+              visible: false;
+              action-name: "win.refresh-deck";
+
+              accessibility {
+                label: _("Refresh All Columns");
+              }
+            }
 
             [end]
             MenuButton filter_button {
@@ -169,6 +225,12 @@ template $DandelionWindow: Adw.ApplicationWindow {
               name: "history";
 
               child: $DandelionHistoryView history {};
+            }
+
+            StackPage {
+              name: "deck";
+
+              child: $DandelionDeck deck {};
             }
           };
         };

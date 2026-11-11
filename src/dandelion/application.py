@@ -13,6 +13,7 @@ from .core.secrets import LibsecretStore
 from .core.store import Store
 from .net.http import SoupHttpClient
 from .platforms import Registry
+from .reader.service import ReaderService
 from .scheduling import SchedulingService
 
 log = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ class DandelionApplication(Adw.Application):
         self.secrets = LibsecretStore()
         self.registry = Registry(self.http, self.secrets)
         self.publisher: Publisher | None = None
+        self.reader: ReaderService | None = None
         self.scheduling: SchedulingService | None = None
         self._background = False
 
@@ -51,6 +53,8 @@ class DandelionApplication(Adw.Application):
         self.set_accels_for_action("win.view::composer", ["<primary>1"])
         self.set_accels_for_action("win.view::scheduled", ["<primary>2"])
         self.set_accels_for_action("win.view::history", ["<primary>3"])
+        self.set_accels_for_action("win.view::deck", ["<primary>4"])
+        self.set_accels_for_action("win.refresh-deck", ["F5"])
         self.set_accels_for_action("win.search", ["<primary>f"])
         self.set_accels_for_action("window.close", ["<primary>w"])
 
@@ -72,6 +76,7 @@ class DandelionApplication(Adw.Application):
         Adw.Application.do_startup(self)
         self.store = Store()
         self.publisher = Publisher(self.store, self.registry)
+        self.reader = ReaderService(self.store, self.registry)
         days = self.settings.get_int("draft-retention-days")
         if days:
             cutoff = (datetime.now(UTC) - timedelta(days=days)).isoformat(timespec="seconds")

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from gettext import gettext as _
+from gettext import ngettext
 
 from gi.repository import Adw, Gio, GLib, Gtk
 
 from .archive import ALL, CALENDAR, DRAFT, NEW, PUBLISHED, SCHEDULED, Archive, Key
 from .composer import DandelionComposer  # noqa: F401  (Typ für das Template)
-from .core.models import PostState
+from .core.models import PostState, Profile, Role
+from .deck import DandelionDeck  # noqa: F401  (Typ für das Template)
 from .history import DandelionHistoryView  # noqa: F401
 from .post_view import DandelionPostView  # noqa: F401
 from .scheduled import DandelionScheduledView  # noqa: F401
@@ -27,6 +29,11 @@ class DandelionWindow(Adw.ApplicationWindow):
     content_page: Adw.NavigationPage = Gtk.Template.Child()
     content_title: Adw.WindowTitle = Gtk.Template.Child()
     stack: Gtk.Stack = Gtk.Template.Child()
+    sidebar_stack: Gtk.Stack = Gtk.Template.Child()
+    mode_group: Adw.ToggleGroup = Gtk.Template.Child()
+    read_roles: Gtk.ListBox = Gtk.Template.Child()
+    deck: DandelionDeck = Gtk.Template.Child()
+    refresh_button: Gtk.Button = Gtk.Template.Child()
     composer: DandelionComposer = Gtk.Template.Child()
     post_view: DandelionPostView = Gtk.Template.Child()
     history: DandelionHistoryView = Gtk.Template.Child()
@@ -60,6 +67,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self._action("manage-roles", lambda *_: self.show_preferences("roles"))
         self._action("search", lambda *_: self.toggle_search())
         self._action("search-history", lambda *_: self.history.toggle_search())
+        self._action("refresh-deck", lambda *_: self.deck.refresh_all(manual=True))
 
         preview = Gio.SimpleAction.new_stateful(
             "toggle-preview", None, GLib.Variant.new_boolean(self.settings.get_boolean("show-preview")))
@@ -80,6 +88,11 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.post_view.setup(app, self)
         self.history.setup(app, self)
         self.scheduled.setup(app, self)
+        self.deck.setup(app, self)
+        self._mode_sync = False
+        self._last_write_view = "composer"
+        self._read_roles: dict[Gtk.ListBoxRow, Role] = {}
+        self._read_role_id: int | None = None
         self.filter_button.set_popover(self.scheduled.filter_popover)
         app.scheduling.connect("changed", lambda *_: self.posts_changed())
         app.scheduling.connect("missed", lambda *_: self.show_missed_dialog())
@@ -106,9 +119,103 @@ class DandelionWindow(Adw.ApplicationWindow):
     # -- Navigation ------------------------------------------------------
     def show_view(self, name: str) -> None:
         """Zeigt eine Inhaltsseite; im schmalen Fenster auch über der Seitenleiste."""
+        if name == "deck":
+            self.show_read(show_content=True)
+            return
+        self._set_mode("write")
+        if name in ("composer", "scheduled", "history"):
+            self._last_write_view = name
         self.stack.set_visible_child_name(name)
         self.split_view.set_show_content(True)
         self.archive.sync_selection()
+
+    # -- Lesen (Deck) ----------------------------------------------------
+    def _set_mode(self, mode: str) -> None:
+        self._mode_sync = True
+        try:
+            self.mode_group.set_active_name(mode)
+            self.sidebar_stack.set_visible_child_name(mode)
+            self.search_button.set_visible(mode == "write")
+        finally:
+            self._mode_sync = False
+
+    @Gtk.Template.Callback()
+    def on_mode_changed(self, group: Adw.ToggleGroup, *_args: object) -> None:
+        if self._mode_sync:
+            return
+        if group.get_active_name() == "read":
+            self.show_read()
+        else:
+            self.show_view(self._last_write_view)
+            # im schmalen Fenster in der Seitenleiste bleiben
+            self.split_view.set_show_content(False)
+
+    def show_read(self, show_content: bool = False) -> None:
+        """Schaltet auf das Deck um; ohne `show_content` bleibt die Seitenleiste vorn."""
+        self._set_mode("read")
+        self._fill_read_roles()
+        self.stack.set_visible_child_name("deck")
+        self.split_view.set_show_content(show_content)
+        self.sync_title()
+
+    def _fill_read_roles(self, force: bool = False) -> None:
+        roles = self.get_application().store.roles()
+        ids = [r.id for r in roles]
+        if not force and ids == [r.id for r in self._read_roles.values()]:
+            self._select_read_role()
+            return
+        while (row := self.read_roles.get_first_child()) is not None:
+            self.read_roles.remove(row)
+        self._read_roles = {}
+        for role in roles:
+            box = Gtk.Box(spacing=10)
+            emoji = Gtk.Label(label=role.emoji or "💬")
+            emoji.add_css_class("role-emoji")
+            box.append(emoji)
+            name = Gtk.Label(label=role.name, xalign=0, hexpand=True)
+            box.append(name)
+            row = Gtk.ListBoxRow(child=box)
+            row.update_property([Gtk.AccessibleProperty.LABEL], [role.name])
+            self.read_roles.append(row)
+            self._read_roles[row] = role
+        if self._read_role_id not in ids:
+            self._read_role_id = ids[0] if ids else None
+            self.deck.set_role(roles[0] if roles else None)
+        self._select_read_role()
+
+    def _select_read_role(self) -> None:
+        for row, role in self._read_roles.items():
+            if role.id == self._read_role_id:
+                self.read_roles.select_row(row)
+                if self.deck.role is None or self.deck.role.id != role.id:
+                    self.deck.set_role(role)
+                return
+
+    @Gtk.Template.Callback()
+    def on_read_role_activated(self, _box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
+        role = self._read_roles.get(row)
+        if role is None:
+            return
+        self._read_role_id = role.id
+        if self.deck.role is None or self.deck.role.id != role.id:
+            self.deck.set_role(role)
+        self.stack.set_visible_child_name("deck")
+        self.split_view.set_show_content(True)
+        self.sync_title()
+
+    def reload_read(self) -> None:
+        """Nach Änderungen an Rollen und Profilen."""
+        if self.mode_group.get_active_name() == "read":
+            self._fill_read_roles(force=True)
+            self.deck.reload()
+            self.sync_title()
+
+    def relogin(self, profile: Profile) -> None:
+        """Erneute Anmeldung, zum Beispiel um das Lesen zu erlauben."""
+        from .add_profile import DandelionAddProfileDialog
+        hint = profile.server if profile.platform == "mastodon" else profile.handle
+        DandelionAddProfileDialog(self.get_application(), on_added=lambda _p: self.deck.reload(),
+                                  platform=profile.platform, hint=hint).present(self)
 
     def show_post(self, post_id: int) -> None:
         if self.post_view.show_post(post_id):
@@ -121,6 +228,8 @@ class DandelionWindow(Adw.ApplicationWindow):
             return (CALENDAR, None)
         if name == "history":
             return (ALL, None)
+        if name == "deck":
+            return (NEW, None)
         if name == "post":
             post = self.post_view.post
             return (PUBLISHED, post.id if post else None)
@@ -147,6 +256,11 @@ class DandelionWindow(Adw.ApplicationWindow):
             title, subtitle = self.scheduled.title()
         elif name == "history":
             title, subtitle = _("Published"), ""
+        elif name == "deck":
+            role = self.deck.role
+            title = f"{role.emoji} {role.name}" if role else _("Read")
+            n = self.deck.column_count()
+            subtitle = ngettext("{n} column", "{n} columns", n).format(n=n) if role else ""
         elif name == "post":
             title, subtitle = self.post_view.title()
         else:
@@ -195,6 +309,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         self.preview_button.set_visible(composing)
         self.history_search_button.set_visible(name == "history")
         self.filter_button.set_visible(name == "scheduled")
+        self.refresh_button.set_visible(name == "deck")
         if name == "history":
             self.history.reload()
         elif name == "scheduled":
@@ -235,7 +350,7 @@ class DandelionWindow(Adw.ApplicationWindow):
         prefs = DandelionPreferences(self.get_application(), self)
         if page:
             prefs.set_visible_page_name(page)
-        prefs.connect("closed", lambda *_: self.composer.reload_profiles())
+        prefs.connect("closed", lambda *_: (self.composer.reload_profiles(), self.reload_read()))
         prefs.present(self)
 
     def show_missed_dialog(self) -> None:

@@ -2,6 +2,27 @@
 
 All notable changes to Dandelion are listed here.
 
+## [Unreleased]
+
+### Added
+
+- **Read mode (first step of the deck, see [docs/deck-columns.md](docs/deck-columns.md)):**
+  the sidebar has a new *Write | Read* switch. *Read* lists your roles; each
+  role shows one column per Mastodon profile with its home timeline (accounts
+  you follow). Posts show text, content warnings, boosts, counts and a note for
+  attachments, polls and link cards. New posts arrive every 60 seconds while the
+  deck is visible; when you have scrolled down they wait behind a "N new posts"
+  button. The last 400 posts per column are cached in the database.
+  `F5` refreshes all columns, `Ctrl+4` opens the deck.
+- Profiles that were signed in before reading existed show "Allow Reading"
+  with a button to sign in again.
+
+### Changed
+
+- Mastodon logins now ask for the `read` scope and the write scopes for
+  favourites, bookmarks and conversations, so later deck steps need no second
+  sign-in. Existing profiles keep working for posting.
+
 ## 0.3.1 – 2026-10-09
 
 ### Changed

@@ -16,6 +16,8 @@ src/dandelion/ui/scheduled.blp
 src/dandelion/ui/shortcuts-dialog.blp
 src/dandelion/application.py
 src/dandelion/window.py
+src/dandelion/deck.py
+src/dandelion/reader/content.py
 src/dandelion/composer.py
 src/dandelion/history.py
 src/dandelion/preferences.py

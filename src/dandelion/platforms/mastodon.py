@@ -33,7 +33,10 @@ from .base import (
     secret_label,
 )
 
-SCOPES = "read:accounts write:statuses write:media"
+# „read“ und die Schreibrechte für Favoriten, Lesezeichen und Konversationen werden
+# schon jetzt angefordert, damit das Deck später keine zweite Anmeldung braucht.
+SCOPES = ("read write:statuses write:media write:favourites write:bookmarks "
+          "write:conversations")
 OOB = "urn:ietf:wg:oauth:2.0:oob"
 APP_NAME = "Dandelion"
 APP_WEBSITE = "https://github.com/linuxundich/dandelion"

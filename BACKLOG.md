@@ -21,6 +21,20 @@ As of 2026-10-09, version 0.3.1. Shipped changes are in
       login.
 - [ ] Try the writing assistant with a real API key.
 
+## Deck (multi-column reader)
+
+Concept and phases in [docs/deck-columns.md](docs/deck-columns.md).
+
+- [x] Phase 1: read scope, `Reader` interface, Mastodon home column per profile,
+      cache, Write | Read switch, polling every 60 s
+- [ ] Phase 2: media, polls, link cards; notifications and messages tabs; read
+      markers and unread counts; Bluesky home and notifications
+- [ ] Phase 3: favourite, boost, bookmark, reply and quote sheet
+- [ ] Phase 4: streaming, lists, hashtags, "open as column", column setup page
+- [ ] Phase 5: narrow layout polish, filters, accessibility pass, 0.4.0
+- [ ] Add Ctrl+4 and F5 to the shortcuts dialog
+- [ ] Check the narrow layout (360 px) by eye; only reasoned so far
+
 ## Features
 
 - [ ] **Videos** for Bluesky, X, LinkedIn and Facebook. So far videos only go

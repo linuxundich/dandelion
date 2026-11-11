@@ -229,3 +229,10 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
   color: alpha(currentColor, 0.6);
 }
 .day-cell.selected-day { background: alpha(var(--accent-bg-color), 0.18); }
+
+/* Deck */
+.feed-list { background: transparent; }
+.feed-list > row { padding: 0; background: transparent; }
+.feed-list > row:hover { background: alpha(currentColor, 0.04); }
+.feed-row { padding: 10px 12px; border-bottom: 1px solid alpha(currentColor, 0.12); }
+.deck-column .numeric { font-feature-settings: "tnum"; }
