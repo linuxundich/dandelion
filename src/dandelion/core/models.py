@@ -214,3 +214,6 @@ class DeckColumnSpec:
     title: str = ""
     position: int = 0
     id: int | None = None
+    #: Pro Spalte ausblenbar (nur Home und Listen, nicht Benachrichtigungen)
+    hide_boosts: bool = False
+    hide_replies: bool = False

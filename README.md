@@ -40,10 +40,13 @@
 - **Optional writing assistant** with Google Gemini, OpenAI, xAI or OpenRouter: rephrase,
   correct, translate, adapt to a network, suggest hashtags and describe images.
   It only makes suggestions and can be switched off completely.
-- **Read mode (preview):** a deck with one column per Mastodon or Bluesky
-  profile of a role: home timeline, notifications and messages, with images,
-  polls, link cards and unread counts. Reading only for now; replying,
-  boosting and favouriting follow.
+- **Read mode (the deck):** one column per Mastodon or Bluesky profile of a
+  role with home, notifications and messages, plus single columns for lists,
+  hashtags, bookmarks and feeds. Images with alt text, polls, link cards and
+  quotes, unread counts, live updates on Mastodon, and everything you need to
+  answer: reply, quote, boost or repost, favourite, bookmark, follow, mute and
+  block. Keyboard navigation with `j` `k` `h` `l`. Narrow windows show one
+  column at a time.
 - **Secure:** login data and API keys are stored in the system keyring
   (Secret Service), never in plain text.
 - **Adaptive layout** from 360 px phones to wide desktop screens: the
@@ -53,6 +56,10 @@
 | Calendar | Writing assistant |
 |---|---|
 | ![Calendar](data/screenshots/scheduled.png) | ![Assistant](data/screenshots/assistant.png) |
+
+![The deck: one column per profile](data/screenshots/deck.png)
+
+*The deck with example posts: a Mastodon and a Bluesky profile of one role.*
 
 ## Networks
 

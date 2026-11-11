@@ -123,6 +123,11 @@ class FeedPost:
     bookmarked: bool = False
     like_uri: str | None = None       # Bluesky: Eintrag des eigenen Likes
     repost_uri: str | None = None
+    #: Antwort auf ein anderes Konto (Threads mit sich selbst zählen nicht)
+    is_reply: bool = False
+    #: Server-Filter: `hidden` blendet den Beitrag aus, `filter_title` klappt ihn zu
+    hidden: bool = False
+    filter_title: str = ""
 
     @property
     def has_poll(self) -> bool:

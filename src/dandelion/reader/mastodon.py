@@ -89,7 +89,7 @@ def parse_status(raw: dict) -> FeedPost:
     if c and c.get("url"):
         card = FeedCard(c["url"], c.get("title") or c["url"], c.get("description") or "",
                         c.get("image"))
-    return FeedPost(
+    post = FeedPost(
         id=str(raw["id"]), network="mastodon", account=_account(status["account"]),
         created_at=status.get("created_at") or raw.get("created_at") or "",
         html=status.get("content") or "", spoiler=status.get("spoiler_text") or "",
@@ -102,7 +102,24 @@ def parse_status(raw: dict) -> FeedPost:
         likes=int(status.get("favourites_count") or 0),
         ref=str(status["id"]), visibility=status.get("visibility"),
         favourited=bool(status.get("favourited")), boosted=bool(status.get("reblogged")),
-        bookmarked=bool(status.get("bookmarked")))
+        bookmarked=bool(status.get("bookmarked")),
+        is_reply=bool(status.get("in_reply_to_id")) and
+        str(status.get("in_reply_to_account_id") or "") != str(status["account"].get("id", "")))
+    _apply_filters(post, status.get("filtered") or [])
+    return post
+
+
+def _apply_filters(post: FeedPost, matches: list[dict]) -> None:
+    """Filter des Servers (Einstellungen > Filter): ausblenden oder hinter Warnung zuklappen."""
+    for match in matches:
+        flt = match.get("filter") or {}
+        if flt.get("filter_action") == "hide":
+            post.hidden = True
+        elif flt.get("title") and not post.filter_title:
+            post.filter_title = flt["title"]
+    if post.filter_title and not post.spoiler:
+        post.spoiler = _("Filtered: {title}").format(title=post.filter_title)
+        post.sensitive = True
 
 
 def parse_notification(raw: dict) -> FeedPost:

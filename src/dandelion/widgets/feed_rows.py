@@ -172,6 +172,7 @@ def poll_widget(poll: FeedPoll) -> Gtk.Widget:
         row.append(head)
         bar = Gtk.ProgressBar(fraction=share)
         bar.add_css_class("feed-poll")
+        bar.update_property([Gtk.AccessibleProperty.LABEL], [f"{title}: {round(share * 100)} %"])
         row.append(bar)
         box.append(row)
     state = _("closed") if poll.expired else _("open")
@@ -285,7 +286,7 @@ def _action_button(icon: str, count: int, tip: str, callback) -> Gtk.Button:  # 
     label.add_css_class("numeric")
     box.append(label)
     btn.set_child(box)
-    btn.update_property([Gtk.AccessibleProperty.LABEL], [tip])
+    btn.update_property([Gtk.AccessibleProperty.LABEL], [f"{tip}, {count}" if count else tip])
     btn.connect("clicked", lambda *_args: callback())
     return btn
 
@@ -316,6 +317,7 @@ def _toggle_button(post: FeedPost, kind: str, actions, tip: str) -> Gtk.ToggleBu
         n = getattr(post, count_attr) if count_attr else 0
         label.set_label(str(n) if n else "")
         label.set_visible(bool(n))
+        btn.update_property([Gtk.AccessibleProperty.LABEL], [f"{tip}, {n}" if n else tip])
 
     def apply(on: bool) -> None:
         setattr(post, attr, on)
@@ -374,7 +376,7 @@ def _more_button(post: FeedPost, actions) -> Gtk.MenuButton:  # type: ignore[no-
 
 
 def action_bar(post: FeedPost, actions) -> Gtk.Box:  # type: ignore[no-untyped-def]
-    bar = Gtk.Box(spacing=2, margin_top=2, margin_start=-8)
+    bar = Gtk.Box(spacing=2, margin_top=2)
     reply = _action_button("mail-reply-sender-symbolic", post.replies, _("Reply"),
                            lambda: actions.reply(post))
     boost = _toggle_button(post, "boost", actions, _("Boost"))
@@ -450,8 +452,10 @@ def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False,
         if counts.get_first_child():
             body.append(counts)
 
-    root.update_property([Gtk.AccessibleProperty.LABEL],
-                         [f"{post.account.name}: {excerpt(post_text(post), 200)}"])
+    age_text = relative_time(post.created_at) if post.created_at else ""
+    who = ", ".join(x for x in (_("Unread") if unread else "", caption or "", post.account.name,
+                                age_text) if x)
+    root.a11y = f"{who}: {excerpt(post_text(post), 200)}"  # type: ignore[attr-defined]
     return root
 
 
@@ -493,7 +497,10 @@ def notification_row(post: FeedPost, avatars: AvatarCache, unread: bool = False)
         body.append(quote)
     elif post.reason == "follow":
         body.append(_dim(f"@{post.account.acct}", "caption", ellipsize=True))
-    root.update_property([Gtk.AccessibleProperty.LABEL], [re.sub(r"<[^>]+>", "", text)])
+    plain = re.sub(r"<[^>]+>", "", html.unescape(text))
+    if post.subject:
+        plain += ": " + excerpt(post_text(post.subject), 120)
+    root.a11y = (_("Unread") + ", " if unread else "") + plain  # type: ignore[attr-defined]
     return root
 
 
@@ -526,6 +533,6 @@ def conversation_row(conv: FeedConversation, avatars: AvatarCache) -> Gtk.Box:
         dot = Gtk.Box(width_request=9, height_request=9, valign=Gtk.Align.CENTER)
         dot.add_css_class("unread-dot")
         root.append(dot)
-    root.update_property([Gtk.AccessibleProperty.LABEL],
-                         [f"{names}: {excerpt(post_text(conv.last), 120) if conv.last else ''}"])
+    root.a11y = ((_("Unread") + ", " if conv.unread else "") + names + ": "  # type: ignore[attr-defined]
+                 + (excerpt(post_text(conv.last), 120) if conv.last else ""))
     return root

@@ -152,6 +152,9 @@ def parse_feed_item(raw: dict) -> FeedPost:
     reason = raw.get("reason") or {}
     by = reason.get("by") if reason.get("$type", "").endswith("reasonRepost") else None
     post = parse_post_view(raw["post"], by)
+    reply = raw.get("reply") or {}
+    parent_author = ((reply.get("parent") or {}).get("author") or {}).get("did")
+    post.is_reply = bool(reply) and parent_author != raw["post"].get("author", {}).get("did")
     if by:
         post.id = f"{post.id}|{by.get('did', '')}"
         post.created_at = reason.get("indexedAt") or post.created_at

@@ -184,10 +184,16 @@ class FeedView(Gtk.Box):
 
     # -- Anzeige ------------------------------------------------------------
     def visible_items(self) -> list[FeedItem]:
+        spec = self.column.spec
+        items = [i for i in self.items if not (isinstance(i, FeedPost) and i.hidden)]
         if self.feed == NOTIFICATIONS and self.only_mentions:
-            return [i for i in self.items
+            return [i for i in items
                     if isinstance(i, FeedPost) and i.reason in ("mention", "reply", "quote")]
-        return self.items
+        if self.feed not in (NOTIFICATIONS, MESSAGES) and (spec.hide_boosts or spec.hide_replies):
+            return [i for i in items if isinstance(i, FeedPost)
+                    and not (spec.hide_boosts and i.boosted_by)
+                    and not (spec.hide_replies and i.is_reply)]
+        return items
 
     def _row(self, item: FeedItem) -> Gtk.Widget:
         avatars = self.column.deck.avatars
@@ -203,7 +209,12 @@ class FeedView(Gtk.Box):
             self.listbox.remove(row)
         items = self.visible_items()
         for item in items[: self.shown]:
-            self.listbox.append(self._row(item))
+            widget = self._row(item)
+            self.listbox.append(widget)
+            label = getattr(widget, "a11y", None)
+            if label:                                 # Bildschirmleser lesen die Zeile als Ganzes
+                self.listbox.get_last_child().update_property(
+                    [Gtk.AccessibleProperty.LABEL], [label])
         self.older_button.set_visible(not (self._exhausted and self.shown >= len(items)))
         self.stack.set_visible_child_name("list" if items else "empty")
 

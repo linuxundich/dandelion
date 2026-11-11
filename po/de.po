@@ -120,95 +120,119 @@ msgstr "Optionaler Schreibassistent, der nur Vorschläge macht"
 msgid "Dark style"
 msgstr "Dunkler Stil"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:85
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:81
+msgid "Read: one column per profile, with live updates"
+msgstr "Lesen: eine Spalte je Profil, mit Live-Aktualisierung"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:88
+msgid "Dandelion can read now."
+msgstr "Dandelion kann jetzt auch lesen."
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:90
+msgid "A deck with one column per Mastodon or Bluesky profile: home, notifications and messages"
+msgstr "Ein Deck mit einer Spalte je Mastodon- oder Bluesky-Profil: Start, Benachrichtigungen und Nachrichten"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:91
+msgid "Lists, hashtags, bookmarks and feeds as extra columns; live updates on Mastodon"
+msgstr "Listen, Hashtags, Lesezeichen und Feeds als zusätzliche Spalten; Live-Aktualisierung bei Mastodon"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:92
+msgid "Reply, quote, boost, favourite, bookmark, follow, mute and block from the column"
+msgstr "Antworten, Zitieren, Boosten, Favorisieren, Merken, Folgen, Stummschalten und Blockieren direkt aus der Spalte"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:93
+msgid "Unread counts, server filters, keyboard navigation and a one-column layout for narrow windows"
+msgstr "Ungelesen-Zähler, Server-Filter, Tastatursteuerung und ein einspaltiges Layout für schmale Fenster"
+
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:100
 msgid "Calendar: month navigation in its own row, no longer next to the back button"
 msgstr "Kalender: Monatswechsel in einer eigenen Zeile, nicht mehr neben dem Zurück-Knopf"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:86
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:101
 msgid "Profile chips show avatars only instead of wrapping into a second row"
 msgstr "Profil-Pillen zeigen nur noch Avatare, statt in eine zweite Zeile umzubrechen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:92
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:107
 msgid "A new window layout that grows with the screen."
 msgstr "Eine neue Fensteraufteilung, die mit dem Bildschirm wächst."
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:94
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:109
 msgid "Drafts, scheduled and published posts share one sidebar with search"
 msgstr "Entwürfe, geplante und veröffentlichte Beiträge teilen sich eine Seitenleiste mit Suche"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:95
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:110
 msgid "The editor is a plain writing surface with an options popover and a character ring"
 msgstr "Der Editor ist eine schlichte Schreibfläche mit Optionen-Menü und Zeichenring"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:96
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:111
 msgid "The preview grows with the window and shows two columns on wide screens"
 msgstr "Die Vorschau wächst mit dem Fenster und zeigt auf breiten Bildschirmen zwei Spalten"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:97
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:112
 msgid "Calendar page with published posts and free time slots; drag a draft onto a day to schedule it"
 msgstr "Kalenderseite mit veröffentlichten Beiträgen und freien Zeitfenstern; Entwürfe lassen sich auf einen Tag ziehen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:98
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:113
 msgid "Detail page for published posts"
 msgstr "Detailseite für veröffentlichte Beiträge"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:99
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:114
 msgid "OpenRouter as a further AI provider and a word limit for AI alt text"
 msgstr "OpenRouter als weiterer KI-Anbieter und eine Wortgrenze für KI-Alt-Texte"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:106
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:121
 msgid "The writing assistant asks Gemini and OpenAI for less reasoning and uses fewer tokens"
 msgstr "Der Schreibassistent bittet Gemini und OpenAI um weniger Nachdenken und verbraucht weniger Tokens"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:107
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:122
 msgid "Images for alt text are scaled down before they are sent"
 msgstr "Bilder für Alt-Texte werden vor dem Senden verkleinert"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:108
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:123
 msgid "Gemini thought summaries no longer end up in suggestions"
 msgstr "Gedanken-Zusammenfassungen von Gemini landen nicht mehr in Vorschlägen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:115
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:130
 msgid "New icon: the seeds fly away from the dandelion like rays"
 msgstr "Neues Icon: Die Samen fliegen strahlenförmig von der Pusteblume davon"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:116
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:131
 msgid "Flatpak bundle with translations included"
 msgstr "Flatpak-Paket mit enthaltenen Übersetzungen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:123
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:138
 msgid "Long posts can be split into threads on Mastodon, Bluesky and X"
 msgstr "Lange Beiträge lassen sich auf Mastodon, Bluesky und X in Threads aufteilen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:124
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:139
 msgid "Mastodon posts can be scheduled on the server, so they appear even when the computer is off"
 msgstr "Mastodon-Beiträge lassen sich auf dem Server planen und erscheinen so auch bei ausgeschaltetem Rechner"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:125
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:140
 msgid "Calendar view for scheduled posts with drag and drop"
 msgstr "Kalenderansicht für geplante Beiträge mit Ziehen und Ablegen"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:126
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:141
 msgid "Time slots per role and scheduling into the next free slot"
 msgstr "Zeitslots pro Rolle und Planen in den nächsten freien Slot"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:132
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:147
 msgid "First release."
 msgstr "Erste Veröffentlichung."
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:134
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:149
 msgid "Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 msgstr "Mastodon, Bluesky, LinkedIn, Facebook-Seiten und X"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:135
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:150
 msgid "Roles, profiles, previews and exact character counters"
 msgstr "Rollen, Profile, Vorschauen und exakte Zeichenzähler"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:136
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:151
 msgid "Scheduled posts with a background service"
 msgstr "Geplante Beiträge mit Hintergrunddienst"
 
-#: data/de.linuxundich.Dandelion.metainfo.xml.in:137
+#: data/de.linuxundich.Dandelion.metainfo.xml.in:152
 msgid "Optional writing assistant"
 msgstr "Optionaler Schreibassistent"
 
@@ -321,7 +345,8 @@ msgid "Entries like “openai:text” or “gemini:images”."
 msgstr "Einträge wie „openai:text“ oder „gemini:images“."
 
 #: src/dandelion/ui/window.blp:25 src/dandelion/ui/window.blp:28
-#: src/dandelion/ui/shortcuts-dialog.blp:9 src/dandelion/window.py:159
+#: src/dandelion/ui/shortcuts-dialog.blp:9 src/dandelion/window.py:302
+#: src/dandelion/deck.py:68 src/dandelion/quickpost.py:30
 #: src/dandelion/archive.py:169
 msgid "New Post"
 msgstr "Neuer Beitrag"
@@ -331,7 +356,7 @@ msgid "Main Menu"
 msgstr "Hauptmenü"
 
 #: src/dandelion/ui/window.blp:48 src/dandelion/ui/window.blp:51
-#: src/dandelion/ui/window.blp:137 src/dandelion/ui/window.blp:141
+#: src/dandelion/ui/window.blp:205 src/dandelion/ui/window.blp:209
 msgid "Search"
 msgstr "Suchen"
 
@@ -339,98 +364,117 @@ msgstr "Suchen"
 msgid "Search posts"
 msgstr "Beiträge durchsuchen"
 
-#: src/dandelion/ui/window.blp:77 src/dandelion/history.py:76
+#: src/dandelion/ui/window.blp:77
+msgid "Write"
+msgstr "Schreiben"
+
+#: src/dandelion/ui/window.blp:82 src/dandelion/ui/shortcuts-dialog.blp:68
+#: src/dandelion/window.py:290
+msgid "Read"
+msgstr "Lesen"
+
+#: src/dandelion/ui/window.blp:102 src/dandelion/history.py:76
 msgid "No Results"
 msgstr "Keine Ergebnisse"
 
-#: src/dandelion/ui/window.blp:89 src/dandelion/ui/shortcuts-dialog.blp:53
+#: src/dandelion/ui/window.blp:133 src/dandelion/ui/shortcuts-dialog.blp:53
 msgid "Compose"
 msgstr "Verfassen"
 
-#: src/dandelion/ui/window.blp:100 src/dandelion/ui/window.blp:104
+#: src/dandelion/ui/window.blp:144 src/dandelion/ui/window.blp:149
+#: src/dandelion/columns_dialog.py:35
+msgid "Columns"
+msgstr "Spalten"
+
+#: src/dandelion/ui/window.blp:156 src/dandelion/ui/window.blp:161
+#: src/dandelion/ui/shortcuts-dialog.blp:137
+msgid "Refresh All Columns"
+msgstr "Alle Spalten aktualisieren"
+
+#: src/dandelion/ui/window.blp:168 src/dandelion/ui/window.blp:172
 msgid "Filter"
 msgstr "Filtern"
 
-#: src/dandelion/ui/window.blp:111 src/dandelion/scheduled.py:408
+#: src/dandelion/ui/window.blp:179 src/dandelion/scheduled.py:408
 msgid "_Publish"
 msgstr "_Veröffentlichen"
 
-#: src/dandelion/ui/window.blp:115 src/dandelion/composer.py:761
+#: src/dandelion/ui/window.blp:183 src/dandelion/composer.py:761
 msgid "Publish to all selected profiles"
 msgstr "Auf allen ausgewählten Profilen veröffentlichen"
 
-#: src/dandelion/ui/window.blp:116
+#: src/dandelion/ui/window.blp:184
 msgid "More Publishing Options"
 msgstr "Weitere Optionen zum Veröffentlichen"
 
-#: src/dandelion/ui/window.blp:126 src/dandelion/ui/window.blp:129
+#: src/dandelion/ui/window.blp:194 src/dandelion/ui/window.blp:197
 #: src/dandelion/ui/composer.blp:81 src/dandelion/ui/composer.blp:512
 #: src/dandelion/composer.py:787
 msgid "Preview"
 msgstr "Vorschau"
 
-#: src/dandelion/ui/window.blp:194 src/dandelion/ai_service.py:84
+#: src/dandelion/ui/window.blp:268 src/dandelion/ai_service.py:84
 msgid "_Send"
 msgstr "_Senden"
 
-#: src/dandelion/ui/window.blp:202
+#: src/dandelion/ui/window.blp:276
 msgid "_Schedule…"
 msgstr "_Planen …"
 
-#: src/dandelion/ui/window.blp:207
+#: src/dandelion/ui/window.blp:281
 msgid "In Next _Free Slot"
 msgstr "In nächsten _freien Slot"
 
-#: src/dandelion/ui/window.blp:216
+#: src/dandelion/ui/window.blp:290
 msgid "_New Post"
 msgstr "_Neuer Beitrag"
 
-#: src/dandelion/ui/window.blp:223
+#: src/dandelion/ui/window.blp:297
 msgid "_Roles and Profiles"
 msgstr "_Rollen und Profile"
 
-#: src/dandelion/ui/window.blp:228
+#: src/dandelion/ui/window.blp:302
 msgid "_Preferences"
 msgstr "_Einstellungen"
 
-#: src/dandelion/ui/window.blp:233
+#: src/dandelion/ui/window.blp:307
 msgid "_Keyboard Shortcuts"
 msgstr "_Tastenkürzel"
 
-#: src/dandelion/ui/window.blp:238
+#: src/dandelion/ui/window.blp:312
 msgid "_About Dandelion"
 msgstr "_Info zu Dandelion"
 
-#: src/dandelion/ui/window.blp:247 src/dandelion/ui/window.blp:285
+#: src/dandelion/ui/window.blp:321 src/dandelion/ui/window.blp:359
 msgid "_Duplicate"
 msgstr "_Duplizieren"
 
-#: src/dandelion/ui/window.blp:254 src/dandelion/ui/window.blp:297
+#: src/dandelion/ui/window.blp:328 src/dandelion/ui/window.blp:371
 #: src/dandelion/history.py:190 src/dandelion/preferences.py:575
 msgid "_Delete"
 msgstr "_Löschen"
 
-#: src/dandelion/ui/window.blp:263
+#: src/dandelion/ui/window.blp:337
 msgid "Change _Time…"
 msgstr "_Zeit ändern …"
 
-#: src/dandelion/ui/window.blp:268
+#: src/dandelion/ui/window.blp:342
 msgid "_Pause"
 msgstr "_Pausieren"
 
-#: src/dandelion/ui/window.blp:274
+#: src/dandelion/ui/window.blp:348
 msgid "_Resume"
 msgstr "_Fortsetzen"
 
-#: src/dandelion/ui/window.blp:280 src/dandelion/scheduled.py:321
+#: src/dandelion/ui/window.blp:354 src/dandelion/scheduled.py:321
 msgid "Send _Now"
 msgstr "Jetzt _senden"
 
-#: src/dandelion/ui/window.blp:292 src/dandelion/window.py:264
+#: src/dandelion/ui/window.blp:366 src/dandelion/window.py:409
 msgid "Move to _Drafts"
 msgstr "In _Entwürfe verschieben"
 
-#: src/dandelion/ui/window.blp:306
+#: src/dandelion/ui/window.blp:380
 msgid "Use as New _Draft"
 msgstr "Als neuen _Entwurf verwenden"
 
@@ -468,6 +512,7 @@ msgid "to"
 msgstr "an"
 
 #: src/dandelion/ui/composer.blp:208 src/dandelion/ui/composer.blp:213
+#: src/dandelion/quickpost.py:80 src/dandelion/quickpost.py:93
 msgid "Content warning"
 msgstr "Inhaltswarnung"
 
@@ -585,7 +630,8 @@ msgstr "Eine Rolle bündelt Profile, Sprache, Sichtbarkeit und eine Signatur, zu
 msgid "Login data is stored in the system keyring."
 msgstr "Anmeldedaten liegen im Schlüsselbund des Systems."
 
-#: src/dandelion/ui/preferences.blp:41 src/dandelion/ui/shortcuts-dialog.blp:79
+#: src/dandelion/ui/preferences.blp:41
+#: src/dandelion/ui/shortcuts-dialog.blp:143
 msgid "General"
 msgstr "Allgemein"
 
@@ -613,7 +659,7 @@ msgstr "Signatur der Rolle anhängen"
 msgid "Can be turned off for each post"
 msgstr "Lässt sich für jeden Beitrag abschalten"
 
-#: src/dandelion/ui/preferences.blp:62 src/dandelion/ui/shortcuts-dialog.blp:68
+#: src/dandelion/ui/preferences.blp:62 src/dandelion/ui/shortcuts-dialog.blp:73
 msgid "Show Preview"
 msgstr "Vorschau anzeigen"
 
@@ -670,7 +716,7 @@ msgstr "Im Hintergrund veröffentlichen"
 msgid "Next Post"
 msgstr "Nächster Beitrag"
 
-#: src/dandelion/ui/preferences.blp:120
+#: src/dandelion/ui/preferences.blp:120 src/dandelion/deck.py:33
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
@@ -858,7 +904,8 @@ msgstr "Limits"
 msgid "Check Connection"
 msgstr "Verbindung prüfen"
 
-#: src/dandelion/ui/profile-page.blp:65
+#: src/dandelion/ui/profile-page.blp:65 src/dandelion/feedview.py:347
+#: src/dandelion/feedview.py:351 src/dandelion/feedview.py:352
 msgid "Sign In Again"
 msgstr "Erneut anmelden"
 
@@ -1016,7 +1063,8 @@ msgid "_Done"
 msgstr "_Fertig"
 
 #: src/dandelion/ui/alt-text-dialog.blp:18
-#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/composer.py:1674
+#: src/dandelion/ui/schedule-dialog.blp:18 src/dandelion/feedview.py:89
+#: src/dandelion/account_popover.py:159 src/dandelion/composer.py:1674
 #: src/dandelion/history.py:189 src/dandelion/preferences.py:574
 #: src/dandelion/preferences.py:678 src/dandelion/scheduled.py:407
 #: src/dandelion/ai_service.py:83
@@ -1145,81 +1193,642 @@ msgstr "Ansicht"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:63 src/dandelion/window.py:149
+#: src/dandelion/ui/shortcuts-dialog.blp:63 src/dandelion/window.py:287
 #: src/dandelion/send_dialog.py:66 src/dandelion/scheduled.py:277
 #: src/dandelion/archive.py:199 src/dandelion/post_view.py:70
 #: src/dandelion/post_view.py:80
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:73
+#: src/dandelion/ui/shortcuts-dialog.blp:78
 msgid "Search Posts"
 msgstr "Beiträge durchsuchen"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:82
+#: src/dandelion/ui/shortcuts-dialog.blp:84
+msgid "Reading"
+msgstr "Lesen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:87
+msgid "Next or Previous Post"
+msgstr "Nächster oder vorheriger Beitrag"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:92
+msgid "Next or Previous Column"
+msgstr "Nächste oder vorherige Spalte"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:97
+msgid "Top of the List"
+msgstr "Anfang der Liste"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:102 src/dandelion/columns_dialog.py:87
+msgid "Home, Notifications, Messages"
+msgstr "Start, Benachrichtigungen, Nachrichten"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:107 src/dandelion/quickpost.py:30
+#: src/dandelion/quickpost.py:51 src/dandelion/widgets/feed_rows.py:380
+msgid "Reply"
+msgstr "Antworten"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:112
+#: src/dandelion/widgets/feed_rows.py:382
+msgid "Boost"
+msgstr "Boosten"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:117
+#: src/dandelion/widgets/feed_rows.py:383
+msgid "Favourite"
+msgstr "Favorisieren"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:122
+#: src/dandelion/widgets/feed_rows.py:384
+msgid "Bookmark"
+msgstr "Lesezeichen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:127
+#: src/dandelion/widgets/feed_rows.py:367
+msgid "Open in Browser"
+msgstr "Im Browser öffnen"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:132
+msgid "New Post as This Profile"
+msgstr "Neuer Beitrag mit diesem Profil"
+
+#: src/dandelion/ui/shortcuts-dialog.blp:146
 msgid "Preferences"
 msgstr "Einstellungen"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:87
+#: src/dandelion/ui/shortcuts-dialog.blp:151
 msgid "Keyboard Shortcuts"
 msgstr "Tastenkürzel"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:92
+#: src/dandelion/ui/shortcuts-dialog.blp:156
 msgid "Close Window"
 msgstr "Fenster schließen"
 
-#: src/dandelion/ui/shortcuts-dialog.blp:97
+#: src/dandelion/ui/shortcuts-dialog.blp:161
 msgid "Quit"
 msgstr "Beenden"
 
-#: src/dandelion/application.py:37
+#: src/dandelion/application.py:39
 msgid "Run without a window to publish scheduled posts"
 msgstr "Ohne Fenster laufen, um geplante Beiträge zu veröffentlichen"
 
-#: src/dandelion/application.py:168
+#: src/dandelion/application.py:173
 msgid "Write once, post to Mastodon, Bluesky and more."
 msgstr "Einmal schreiben, auf Mastodon, Bluesky und mehr veröffentlichen."
 
 #. Translators: Replace "translator-credits" with your name/username,
 #. and optionally an email or URL.
-#: src/dandelion/application.py:171
+#: src/dandelion/application.py:176
 msgid "translator-credits"
 msgstr "Christoph Langner"
 
-#: src/dandelion/window.py:156
+#: src/dandelion/window.py:211
+#, python-brace-format
+msgid "{n} unread"
+msgid_plural "{n} unread"
+msgstr[0] "{n} ungelesen"
+msgstr[1] "{n} ungelesen"
+
+#: src/dandelion/window.py:292
+#, python-brace-format
+msgid "{n} column"
+msgid_plural "{n} columns"
+msgstr[0] "{n} Spalte"
+msgstr[1] "{n} Spalten"
+
+#: src/dandelion/window.py:299
 msgid "Scheduled Post"
 msgstr "Geplanter Beitrag"
 
-#: src/dandelion/window.py:157
+#: src/dandelion/window.py:300
 msgid "Paused Post"
 msgstr "Pausierter Beitrag"
 
-#: src/dandelion/window.py:158
+#: src/dandelion/window.py:301
 msgid "Missed Post"
 msgstr "Verpasster Beitrag"
 
-#: src/dandelion/window.py:159
+#: src/dandelion/window.py:302
 msgid "Draft"
 msgstr "Entwurf"
 
-#: src/dandelion/window.py:259
+#: src/dandelion/window.py:404
 #, python-brace-format
 msgid "A Scheduled Post Was Not Sent"
 msgid_plural "{n} Scheduled Posts Were Not Sent"
 msgstr[0] "Ein geplanter Beitrag wurde nicht gesendet"
 msgstr[1] "{n} geplante Beiträge wurden nicht gesendet"
 
-#: src/dandelion/window.py:261
+#: src/dandelion/window.py:406
 msgid "The computer was off or asleep at the planned time."
 msgstr "Der Rechner war zum geplanten Zeitpunkt aus oder im Ruhezustand."
 
-#: src/dandelion/window.py:263
+#: src/dandelion/window.py:408
 msgid "_Decide Later"
 msgstr "_Später entscheiden"
 
-#: src/dandelion/window.py:265
+#: src/dandelion/window.py:410
 msgid "_Send Now"
 msgstr "Jetzt _senden"
+
+#: src/dandelion/deck.py:33
+msgid "Home"
+msgstr "Start"
+
+#: src/dandelion/deck.py:33
+msgid "Messages"
+msgstr "Nachrichten"
+
+#: src/dandelion/deck.py:66
+#, python-brace-format
+msgid "New Post as {name}"
+msgstr "Neuer Beitrag als {name}"
+
+#: src/dandelion/deck.py:72 src/dandelion/deck.py:74
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+#: src/dandelion/deck.py:79 src/dandelion/deck.py:81
+#: src/dandelion/columns_dialog.py:93
+msgid "Remove Column"
+msgstr "Spalte entfernen"
+
+#: src/dandelion/deck.py:151
+msgid "Nothing to Read Here"
+msgstr "Hier gibt es nichts zu lesen"
+
+#: src/dandelion/deck.py:152
+msgid "Add a Mastodon or Bluesky profile to this role to see its timeline."
+msgstr "Füge dieser Rolle ein Mastodon- oder Bluesky-Profil hinzu, um seine Zeitleiste zu sehen."
+
+#: src/dandelion/deck.py:154
+msgid "Roles and Profiles"
+msgstr "Rollen und Profile"
+
+#: src/dandelion/deck.py:285
+#, python-brace-format
+msgid "{title} is already a column"
+msgstr "{title} ist schon eine Spalte"
+
+#: src/dandelion/deck.py:290
+#, python-brace-format
+msgid "Column added: {title}"
+msgstr "Spalte hinzugefügt: {title}"
+
+#: src/dandelion/feedview.py:40
+msgid "No Posts Yet"
+msgstr "Noch keine Beiträge"
+
+#: src/dandelion/feedview.py:40
+msgid "Follow some accounts to fill this column."
+msgstr "Folge einigen Konten, um diese Spalte zu füllen."
+
+#: src/dandelion/feedview.py:41
+msgid "No Notifications"
+msgstr "Keine Benachrichtigungen"
+
+#: src/dandelion/feedview.py:41
+msgid "Mentions, favourites, boosts and new followers appear here."
+msgstr "Erwähnungen, Favoriten, Boosts und neue Follower erscheinen hier."
+
+#: src/dandelion/feedview.py:43
+msgid "No Messages"
+msgstr "Keine Nachrichten"
+
+#: src/dandelion/feedview.py:43
+msgid "Direct conversations appear here."
+msgstr "Direkte Unterhaltungen erscheinen hier."
+
+#: src/dandelion/feedview.py:80 src/dandelion/account_popover.py:142
+msgid "The action failed."
+msgstr "Die Aktion ist fehlgeschlagen."
+
+#: src/dandelion/feedview.py:88
+msgid "Open this hashtag as a column in the deck?"
+msgstr "Diesen Hashtag als Spalte im Deck öffnen?"
+
+#: src/dandelion/feedview.py:90
+msgid "Open in _Browser"
+msgstr "Im _Browser öffnen"
+
+#: src/dandelion/feedview.py:91
+msgid "Open as _Column"
+msgstr "Als _Spalte öffnen"
+
+#: src/dandelion/feedview.py:133
+msgid "All"
+msgstr "Alle"
+
+#: src/dandelion/feedview.py:134
+msgid "Mentions"
+msgstr "Erwähnungen"
+
+#: src/dandelion/feedview.py:154
+msgid "Show Older"
+msgstr "Ältere zeigen"
+
+#: src/dandelion/feedview.py:170
+msgid "No Posts"
+msgstr "Keine Beiträge"
+
+#: src/dandelion/feedview.py:170
+msgid "Nothing in this list yet."
+msgstr "In dieser Liste ist noch nichts."
+
+#: src/dandelion/feedview.py:249
+#, python-brace-format
+msgid "{n} new item"
+msgid_plural "{n} new items"
+msgstr[0] "{n} neuer Eintrag"
+msgstr[1] "{n} neue Einträge"
+
+#: src/dandelion/feedview.py:344
+msgid "Allow Reading"
+msgstr "Lesen erlauben"
+
+#: src/dandelion/feedview.py:345
+#, python-brace-format
+msgid "{handle} was signed in before Dandelion could read timelines. Sign in again to allow reading."
+msgstr "{handle} wurde angemeldet, bevor Dandelion Zeitleisten lesen konnte. Melde dich erneut an, um das Lesen zu erlauben."
+
+#: src/dandelion/feedview.py:355
+msgid "Could Not Load Posts"
+msgstr "Beiträge konnten nicht geladen werden"
+
+#: src/dandelion/feedview.py:356 src/dandelion/feedview.py:365
+msgid "Try Again"
+msgstr "Erneut versuchen"
+
+#: src/dandelion/feedview.py:363
+msgid "Could Not Read the Answer"
+msgstr "Die Antwort konnte nicht gelesen werden"
+
+#: src/dandelion/feedview.py:364
+msgid "The server sent data Dandelion does not understand."
+msgstr "Der Server hat Daten gesendet, die Dandelion nicht versteht."
+
+#: src/dandelion/quickpost.py:28 src/dandelion/util.py:110
+msgid "Public"
+msgstr "Öffentlich"
+
+#: src/dandelion/quickpost.py:28
+msgid "Quiet public"
+msgstr "Öffentlich, ohne Listung"
+
+#: src/dandelion/quickpost.py:29
+msgid "Followers only"
+msgstr "Nur Follower"
+
+#: src/dandelion/quickpost.py:29
+msgid "Mentioned people only"
+msgstr "Nur erwähnte Personen"
+
+#: src/dandelion/quickpost.py:30 src/dandelion/quickpost.py:52
+#: src/dandelion/widgets/feed_rows.py:365
+msgid "Quote"
+msgstr "Zitieren"
+
+#: src/dandelion/quickpost.py:31
+msgid "Posted"
+msgstr "Veröffentlicht"
+
+#: src/dandelion/quickpost.py:31
+msgid "Reply sent"
+msgstr "Antwort gesendet"
+
+#: src/dandelion/quickpost.py:31
+msgid "Quote sent"
+msgstr "Zitat gesendet"
+
+#: src/dandelion/quickpost.py:48
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#. type: ignore[no-untyped-def]
+#: src/dandelion/quickpost.py:51 src/dandelion/history.py:85
+#: src/dandelion/scheduled.py:276 src/dandelion/scheduled.py:286
+msgid "Post"
+msgstr "Beitrag"
+
+#: src/dandelion/quickpost.py:75
+msgid "From"
+msgstr "Von"
+
+#: src/dandelion/quickpost.py:93
+msgid "CW"
+msgstr "CW"
+
+#: src/dandelion/quickpost.py:168
+msgid "The post could not be sent."
+msgstr "Der Beitrag konnte nicht gesendet werden."
+
+#: src/dandelion/columns_dialog.py:45
+#, python-brace-format
+msgid "Columns in {role}"
+msgstr "Spalten in {role}"
+
+#: src/dandelion/columns_dialog.py:46
+msgid "Left to right. Without any columns, every profile gets one."
+msgstr "Von links nach rechts. Ohne eigene Spalten bekommt jedes Profil eine."
+
+#: src/dandelion/columns_dialog.py:49
+msgid "Add a Column"
+msgstr "Spalte hinzufügen"
+
+#: src/dandelion/columns_dialog.py:50
+msgid "Open a profile to see its lists, hashtags and bookmarks. Hashtags in posts can be added directly."
+msgstr "Öffne ein Profil, um seine Listen, Hashtags und Lesezeichen zu sehen. Hashtags in Beiträgen lassen sich direkt hinzufügen."
+
+#: src/dandelion/columns_dialog.py:89 src/dandelion/widgets/media_tile.py:85
+msgid "Move Left"
+msgstr "Nach links"
+
+#: src/dandelion/columns_dialog.py:91 src/dandelion/widgets/media_tile.py:86
+msgid "Move Right"
+msgstr "Nach rechts"
+
+#: src/dandelion/columns_dialog.py:95
+msgid "Show boosts and reposts"
+msgstr "Boosts und Reposts zeigen"
+
+#: src/dandelion/columns_dialog.py:96
+msgid "Show replies"
+msgstr "Antworten zeigen"
+
+#. type: ignore[index]
+#: src/dandelion/columns_dialog.py:154 src/dandelion/account_popover.py:74
+msgid "Loading…"
+msgstr "Lade …"
+
+#: src/dandelion/columns_dialog.py:168
+msgid "Could not load the lists."
+msgstr "Die Listen konnten nicht geladen werden."
+
+#: src/dandelion/columns_dialog.py:184
+msgid "Profile column"
+msgstr "Profilspalte"
+
+#: src/dandelion/columns_dialog.py:185
+msgid "Home, Notifications and Messages"
+msgstr "Start, Benachrichtigungen und Nachrichten"
+
+#: src/dandelion/columns_dialog.py:192
+msgid "Added"
+msgstr "Hinzugefügt"
+
+#: src/dandelion/columns_dialog.py:192
+msgid "Add Column"
+msgstr "Spalte hinzufügen"
+
+#: src/dandelion/account_popover.py:64
+msgid "Open Profile in Browser"
+msgstr "Profil im Browser öffnen"
+
+#: src/dandelion/account_popover.py:72
+msgid "This is your own profile."
+msgstr "Das ist dein eigenes Profil."
+
+#: src/dandelion/account_popover.py:96
+msgid "Could not load the relationship."
+msgstr "Die Beziehung konnte nicht geladen werden."
+
+#: src/dandelion/account_popover.py:105
+msgid "Follows you"
+msgstr "Folgt dir"
+
+#: src/dandelion/account_popover.py:107
+msgid "Muted"
+msgstr "Stummgeschaltet"
+
+#: src/dandelion/account_popover.py:109
+msgid "Blocked"
+msgstr "Blockiert"
+
+#: src/dandelion/account_popover.py:113
+msgid "Unfollow"
+msgstr "Entfolgen"
+
+#: src/dandelion/account_popover.py:114
+msgid "Cancel Follow Request"
+msgstr "Folgeanfrage zurückziehen"
+
+#: src/dandelion/account_popover.py:114
+msgid "Follow"
+msgstr "Folgen"
+
+#: src/dandelion/account_popover.py:118
+msgid "Unmute"
+msgstr "Stummschaltung aufheben"
+
+#: src/dandelion/account_popover.py:118
+msgid "Mute"
+msgstr "Stummschalten"
+
+#: src/dandelion/account_popover.py:120
+msgid "Unblock"
+msgstr "Blockierung aufheben"
+
+#: src/dandelion/account_popover.py:120
+msgid "Block"
+msgstr "Blockieren"
+
+#: src/dandelion/account_popover.py:156
+#, python-brace-format
+msgid "Block {name}?"
+msgstr "{name} blockieren?"
+
+#: src/dandelion/account_popover.py:157
+#, python-brace-format
+msgid "{name} will no longer see your posts and you will not see theirs."
+msgstr "{name} sieht deine Beiträge nicht mehr und du siehst die von {name} nicht mehr."
+
+#: src/dandelion/account_popover.py:160
+msgid "_Block"
+msgstr "_Blockieren"
+
+#: src/dandelion/widgets/feed_rows.py:119
+msgid "Image without description"
+msgstr "Bild ohne Beschreibung"
+
+#: src/dandelion/widgets/feed_rows.py:124
+msgid "ALT"
+msgstr "ALT"
+
+#: src/dandelion/widgets/feed_rows.py:158
+#, python-brace-format
+msgid "{n} attachment"
+msgid_plural "{n} attachments"
+msgstr[0] "{n} Anhang"
+msgstr[1] "{n} Anhänge"
+
+#: src/dandelion/widgets/feed_rows.py:178
+msgid "closed"
+msgstr "beendet"
+
+#: src/dandelion/widgets/feed_rows.py:178
+msgid "open"
+msgstr "läuft"
+
+#: src/dandelion/widgets/feed_rows.py:179
+#, python-brace-format
+msgid "{n} vote"
+msgid_plural "{n} votes"
+msgstr[0] "{n} Stimme"
+msgstr[1] "{n} Stimmen"
+
+#: src/dandelion/widgets/feed_rows.py:272
+#, python-brace-format
+msgid "{name} boosted"
+msgstr "{name} hat geboostet"
+
+#: src/dandelion/widgets/feed_rows.py:273
+msgid "Mentioned you"
+msgstr "Hat dich erwähnt"
+
+#: src/dandelion/widgets/feed_rows.py:273
+msgid "Replied to you"
+msgstr "Hat dir geantwortet"
+
+#: src/dandelion/widgets/feed_rows.py:274
+msgid "Quoted your post"
+msgstr "Hat deinen Beitrag zitiert"
+
+#: src/dandelion/widgets/feed_rows.py:274
+msgid "New post"
+msgstr "Neuer Beitrag"
+
+#: src/dandelion/widgets/feed_rows.py:275
+msgid "Edited a post"
+msgstr "Hat einen Beitrag bearbeitet"
+
+#: src/dandelion/widgets/feed_rows.py:347
+msgid "This post cannot be boosted"
+msgstr "Dieser Beitrag lässt sich nicht boosten"
+
+#: src/dandelion/widgets/feed_rows.py:368 src/dandelion/history.py:136
+msgid "Copy Link"
+msgstr "Link kopieren"
+
+#: src/dandelion/widgets/feed_rows.py:371
+#: src/dandelion/widgets/feed_rows.py:374 src/dandelion/preferences.py:289
+msgid "More"
+msgstr "Mehr"
+
+#: src/dandelion/widgets/feed_rows.py:425
+#: src/dandelion/widgets/feed_rows.py:429
+#: src/dandelion/widgets/preview_tile.py:147
+#: src/dandelion/widgets/preview_tile.py:154
+msgid "Show"
+msgstr "Anzeigen"
+
+#: src/dandelion/widgets/feed_rows.py:429
+#: src/dandelion/widgets/preview_tile.py:153
+msgid "Hide"
+msgstr "Verbergen"
+
+#: src/dandelion/widgets/feed_rows.py:431
+msgid "Sensitive content"
+msgstr "Sensible Inhalte"
+
+#: src/dandelion/widgets/feed_rows.py:447
+msgid "Replies"
+msgstr "Antworten"
+
+#: src/dandelion/widgets/feed_rows.py:448
+msgid "Boosts"
+msgstr "Boosts"
+
+#: src/dandelion/widgets/feed_rows.py:449
+msgid "Favourites"
+msgstr "Favoriten"
+
+#: src/dandelion/widgets/feed_rows.py:456
+#: src/dandelion/widgets/feed_rows.py:503
+#: src/dandelion/widgets/feed_rows.py:536
+msgid "Unread"
+msgstr "Ungelesen"
+
+#: src/dandelion/widgets/feed_rows.py:478
+#, python-brace-format
+msgid "<b>{name}</b> favourited your post"
+msgstr "<b>{name}</b> hat deinen Beitrag favorisiert"
+
+#: src/dandelion/widgets/feed_rows.py:479
+#, python-brace-format
+msgid "<b>{name}</b> boosted your post"
+msgstr "<b>{name}</b> hat deinen Beitrag geboostet"
+
+#: src/dandelion/widgets/feed_rows.py:480
+#, python-brace-format
+msgid "<b>{name}</b> followed you"
+msgstr "<b>{name}</b> folgt dir jetzt"
+
+#: src/dandelion/widgets/feed_rows.py:481
+#, python-brace-format
+msgid "<b>{name}</b> wants to follow you"
+msgstr "<b>{name}</b> möchte dir folgen"
+
+#: src/dandelion/widgets/feed_rows.py:482
+msgid "A poll you took part in has ended"
+msgstr "Eine Umfrage, an der du teilgenommen hast, ist beendet"
+
+#: src/dandelion/widgets/feed_rows.py:483
+#, python-brace-format
+msgid "<b>{name}</b> edited a post"
+msgstr "<b>{name}</b> hat einen Beitrag bearbeitet"
+
+#: src/dandelion/widgets/feed_rows.py:484
+#, python-brace-format
+msgid "<b>{name}</b>"
+msgstr "<b>{name}</b>"
+
+#: src/dandelion/widgets/feed_rows.py:515
+#, python-brace-format
+msgid "and {n} other"
+msgid_plural "and {n} others"
+msgstr[0] "und {n} weitere Person"
+msgstr[1] "und {n} weitere Personen"
+
+#: src/dandelion/reader/bluesky.py:144
+#, python-brace-format
+msgid "Content label: {label}"
+msgstr "Inhaltshinweis: {label}"
+
+#: src/dandelion/reader/bluesky.py:282
+msgid "Feed"
+msgstr "Feed"
+
+#: src/dandelion/reader/bluesky.py:293
+msgid "List"
+msgstr "Liste"
+
+#: src/dandelion/reader/bluesky.py:294
+msgid "Bookmarks"
+msgstr "Lesezeichen"
+
+#: src/dandelion/reader/bluesky.py:295
+msgid "Likes"
+msgstr "Likes"
+
+#: src/dandelion/reader/content.py:132
+msgid "now"
+msgstr "jetzt"
+
+#: src/dandelion/reader/content.py:134
+#, python-brace-format
+msgid "{n} min"
+msgstr "{n} Min."
+
+#: src/dandelion/reader/content.py:136
+#, python-brace-format
+msgid "{n} h"
+msgstr "{n} Std."
+
+#: src/dandelion/reader/content.py:138
+#, python-brace-format
+msgid "{n} d"
+msgstr "{n} T."
 
 #: src/dandelion/composer.py:278 src/dandelion/add_profile.py:317
 msgid "Personal"
@@ -1523,12 +2132,6 @@ msgstr "_Details"
 msgid "Try a different search."
 msgstr "Versuche eine andere Suche."
 
-#. type: ignore[no-untyped-def]
-#: src/dandelion/history.py:85 src/dandelion/scheduled.py:276
-#: src/dandelion/scheduled.py:286
-msgid "Post"
-msgstr "Beitrag"
-
 #: src/dandelion/history.py:93 src/dandelion/scheduled.py:232
 #, python-brace-format
 msgid "{n} published"
@@ -1544,10 +2147,6 @@ msgstr "{n} fehlgeschlagen"
 #: src/dandelion/history.py:129 src/dandelion/send_dialog.py:35
 msgid "Open Post"
 msgstr "Beitrag öffnen"
-
-#: src/dandelion/history.py:136
-msgid "Copy Link"
-msgstr "Link kopieren"
 
 #: src/dandelion/history.py:142
 #, python-brace-format
@@ -1685,10 +2284,6 @@ msgstr "Nach oben"
 #: src/dandelion/preferences.py:280
 msgid "Move Down"
 msgstr "Nach unten"
-
-#: src/dandelion/preferences.py:289
-msgid "More"
-msgstr "Mehr"
 
 #: src/dandelion/preferences.py:336
 msgid "New Role"
@@ -1924,10 +2519,6 @@ msgstr "Gestern"
 msgid "Today"
 msgstr "Heute"
 
-#: src/dandelion/util.py:110
-msgid "Public"
-msgstr "Öffentlich"
-
 #: src/dandelion/util.py:111
 msgid "Quiet Public"
 msgstr "Still öffentlich"
@@ -2087,7 +2678,7 @@ msgstr "Der Server ist derzeit nicht erreichbar."
 msgid "Unexpected answer from the server (HTTP {status})."
 msgstr "Unerwartete Antwort vom Server (HTTP {status})."
 
-#: src/dandelion/platforms/base.py:244 src/dandelion/platforms/mastodon.py:148
+#: src/dandelion/platforms/base.py:244 src/dandelion/platforms/mastodon.py:151
 #: src/dandelion/platforms/bluesky.py:229
 msgid "No login data found. Please sign in again."
 msgstr "Keine Anmeldedaten gefunden. Bitte melde dich erneut an."
@@ -2097,25 +2688,25 @@ msgstr "Keine Anmeldedaten gefunden. Bitte melde dich erneut an."
 msgid "{platform} could not be reached. Check your internet connection."
 msgstr "{platform} ist nicht erreichbar. Prüfe deine Internetverbindung."
 
-#: src/dandelion/platforms/mastodon.py:108
+#: src/dandelion/platforms/mastodon.py:111
 msgid "Please enter the address of your Mastodon server, for example mastodon.social."
 msgstr "Bitte gib die Adresse deines Mastodon-Servers ein, zum Beispiel mastodon.social."
 
-#: src/dandelion/platforms/mastodon.py:114
+#: src/dandelion/platforms/mastodon.py:117
 #, python-brace-format
 msgid "No Mastodon server was found at {instance}."
 msgstr "Unter {instance} wurde kein Mastodon-Server gefunden."
 
-#: src/dandelion/platforms/mastodon.py:155
+#: src/dandelion/platforms/mastodon.py:158
 msgid "The server could not be reached. Check your internet connection."
 msgstr "Der Server ist nicht erreichbar. Prüfe deine Internetverbindung."
 
-#: src/dandelion/platforms/mastodon.py:169
+#: src/dandelion/platforms/mastodon.py:172
 #, python-brace-format
 msgid "The server rejected the post: {reason}"
 msgstr "Der Server hat den Beitrag abgelehnt: {reason}"
 
-#: src/dandelion/platforms/mastodon.py:274
+#: src/dandelion/platforms/mastodon.py:277
 msgid "The server published the post immediately instead of scheduling it."
 msgstr "Der Server hat den Beitrag sofort veröffentlicht, statt ihn zu planen."
 
@@ -2191,14 +2782,6 @@ msgstr "Medium {n} entfernen"
 msgid "Edit Alt Text"
 msgstr "Alt-Text bearbeiten"
 
-#: src/dandelion/widgets/media_tile.py:85
-msgid "Move Left"
-msgstr "Nach links"
-
-#: src/dandelion/widgets/media_tile.py:86
-msgid "Move Right"
-msgstr "Nach rechts"
-
 #: src/dandelion/widgets/preview_tile.py:79
 #, python-brace-format
 msgid "Preview for {handle} on {platform}"
@@ -2216,15 +2799,6 @@ msgstr[1] "{platform} · {n} Profile"
 #: src/dandelion/widgets/preview_tile.py:270
 msgid "Show more"
 msgstr "Mehr anzeigen"
-
-#: src/dandelion/widgets/preview_tile.py:147
-#: src/dandelion/widgets/preview_tile.py:154
-msgid "Show"
-msgstr "Anzeigen"
-
-#: src/dandelion/widgets/preview_tile.py:153
-msgid "Hide"
-msgstr "Verbergen"
 
 #: src/dandelion/widgets/preview_tile.py:196
 #, python-brace-format

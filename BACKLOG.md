@@ -33,8 +33,10 @@ Concept and phases in [docs/deck-columns.md](docs/deck-columns.md).
       follow, mute, block
 - [x] Phase 4: streaming, lists, hashtags, "open as column", column setup page,
       keyboard navigation
-- [ ] Phase 5: narrow layout polish, filters, accessibility pass, 0.4.0
-- [ ] Check the narrow layout (360 px) by eye; only reasoned so far
+- [x] Phase 5: narrow layout, filters, accessibility pass, German translation, 0.4.0 prepared
+- [ ] Narrow layout seen at 400 px only; try 360 px and a very short window
+- [ ] Screenshots: narrow deck and dark style of the deck
+- [ ] Screen reader pass with Orca (labels are set, never listened to)
 - [ ] Replace the `Gtk.ListBox` in the feed lists by a `Gtk.ListView` if long
       lists or many images feel slow
 - [ ] Cap the image cache folder (avatars and previews grow without limit)

@@ -30,7 +30,7 @@ from .models import (
     now_iso,
 )
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 #: Zustände, in denen ein Beitrag noch bearbeitet werden darf
 EDITABLE_STATES = ("draft", "scheduled", "paused", "missed")
@@ -40,6 +40,10 @@ class PostLocked(Exception):
     """Der Beitrag wird gerade gesendet oder ist schon veröffentlicht."""
 
 _MIGRATIONS: dict[int, str] = {
+    6: """
+ALTER TABLE deck_column ADD COLUMN hide_boosts INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE deck_column ADD COLUMN hide_replies INTEGER NOT NULL DEFAULT 0;
+""",
     5: """
 CREATE TABLE deck_column (
   id            INTEGER PRIMARY KEY,
@@ -414,16 +418,18 @@ class Store:
         rows = self.db.execute(
             "SELECT * FROM deck_column WHERE role_id = ? ORDER BY position, id", (role_id,))
         return [DeckColumnSpec(r["role_id"], r["profile_id"], r["kind"], r["feed"], r["title"],
-                               r["position"], r["id"]) for r in rows]
+                               r["position"], r["id"], bool(r["hide_boosts"]),
+                               bool(r["hide_replies"])) for r in rows]
 
     def save_deck_columns(self, role_id: int, specs: Iterable[DeckColumnSpec]) -> None:
         with self.transaction():
             self.db.execute("DELETE FROM deck_column WHERE role_id = ?", (role_id,))
             for pos, spec in enumerate(specs):
                 self.db.execute(
-                    "INSERT INTO deck_column (role_id, profile_id, kind, feed, title, position)"
-                    " VALUES (?,?,?,?,?,?)",
-                    (role_id, spec.profile_id, spec.kind, spec.feed, spec.title, pos))
+                    "INSERT INTO deck_column (role_id, profile_id, kind, feed, title, position,"
+                    " hide_boosts, hide_replies) VALUES (?,?,?,?,?,?,?,?)",
+                    (role_id, spec.profile_id, spec.kind, spec.feed, spec.title, pos,
+                     int(spec.hide_boosts), int(spec.hide_replies)))
 
     # ------------------------------------------------------------------
     # Rolle ↔ Profil

@@ -37,7 +37,7 @@ class ColumnsDialog(Adw.Dialog):
         self.service = deck.service
         self.store = deck.app.store
         self.specs: list[DeckColumnSpec] = list(self.service.columns(role))
-        self._rows: list[Adw.ActionRow] = []
+        self._rows: list[Adw.ExpanderRow] = []
         self._expanders: dict[int, tuple[Adw.ExpanderRow, list[Gtk.Widget]]] = {}
 
         page = Adw.PreferencesPage()
@@ -81,7 +81,7 @@ class ColumnsDialog(Adw.Dialog):
             profile = self.store.profile(spec.profile_id)
             if profile is None:
                 continue
-            row = Adw.ActionRow(
+            row = Adw.ExpanderRow(
                 title=spec.title if spec.kind == "feed" else profile.title,
                 subtitle=(profile.full_handle if spec.kind == "feed" else
                           f"{profile.full_handle} · " + _("Home, Notifications, Messages")))
@@ -92,10 +92,22 @@ class ColumnsDialog(Adw.Dialog):
                                         lambda i=i: self._move(i, 1), i < len(self.specs) - 1))
             row.add_suffix(_icon_button("user-trash-symbolic", _("Remove Column"),
                                         lambda i=i: self._remove(i)))
+            for attr, label in (("hide_boosts", _("Show boosts and reposts")),
+                                ("hide_replies", _("Show replies"))):
+                switch = Adw.SwitchRow(title=label, active=not getattr(spec, attr))
+                switch.connect("notify::active",
+                               lambda sw, _p, spec=spec, attr=attr: self._set_option(
+                                   spec, attr, not sw.get_active()))
+                row.add_row(switch)
             self.group.add(row)
             self._rows.append(row)
         for profile_id, (expander, _rows) in self._expanders.items():
             self._refresh_expander_state(profile_id)
+
+    def _set_option(self, spec: DeckColumnSpec, attr: str, value: bool) -> None:
+        """Schalter pro Spalte: speichern, ohne die Liste neu aufzubauen (sonst klappt sie zu)."""
+        setattr(spec, attr, value)
+        self.service.save_columns(self.role, self.specs)
 
     def _move(self, i: int, delta: int) -> None:
         j = i + delta

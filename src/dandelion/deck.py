@@ -12,7 +12,7 @@ import logging
 from gettext import gettext as _
 from typing import TYPE_CHECKING
 
-from gi.repository import Adw, Gdk, GLib, Gtk, Pango
+from gi.repository import Adw, Gdk, GLib, GObject, Gtk, Pango
 
 from .core.models import DeckColumnSpec, Profile, Role
 from .feedview import FeedView
@@ -125,13 +125,22 @@ class DeckColumn(Gtk.Box):
             view.refresh(manual=manual)
 
 
+NARROW_BELOW = "max-width: 620sp"
+
+
 class DandelionDeck(Gtk.Box):
     __gtype_name__ = "DandelionDeck"
+
+    #: Schmal: eine Spalte nach der anderen, Umschalter unten (siehe `_apply_layout`)
+    narrow = GObject.Property(type=bool, default=False)
 
     def __init__(self) -> None:
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.role: Role | None = None
         self.columns: list[DeckColumn] = []
+        self.current = 0
+        self._separators: list[Gtk.Separator] = []
+        self._column_buttons: list[Gtk.ToggleButton] = []
         self._timer = 0
 
         self.columns_box = Gtk.Box()
@@ -150,7 +159,23 @@ class DandelionDeck(Gtk.Box):
         self.stack = Gtk.Stack(vexpand=True)
         self.stack.add_named(self.scroller, "columns")
         self.stack.add_named(self.empty, "empty")
-        self.append(self.stack)
+        self.switcher = Gtk.Box(spacing=6, halign=Gtk.Align.CENTER, margin_top=6, margin_bottom=6,
+                                margin_start=6, margin_end=6)
+        self.switcher.add_css_class("linked")
+        self.switcher_bar = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER,
+                                               vscrollbar_policy=Gtk.PolicyType.NEVER,
+                                               child=self.switcher, visible=False)
+        content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        content.append(self.stack)
+        content.append(Gtk.Separator())
+        content.append(self.switcher_bar)
+        self.bin = Adw.BreakpointBin(width_request=300, height_request=200, child=content,
+                                     vexpand=True)
+        breakpoint_ = Adw.Breakpoint.new(Adw.BreakpointCondition.parse(NARROW_BELOW))
+        breakpoint_.add_setter(self, "narrow", True)
+        self.bin.add_breakpoint(breakpoint_)
+        self.append(self.bin)
+        self.connect("notify::narrow", lambda *_a: self._apply_layout())
         self.connect("map", self._on_map)
         self.connect("unmap", self._on_unmap)
 
@@ -173,6 +198,7 @@ class DandelionDeck(Gtk.Box):
         while (child := self.columns_box.get_first_child()) is not None:
             self.columns_box.remove(child)
         self.columns = []
+        self._separators = []
         specs = self.service.columns(self.role) if self.role is not None else []
         for spec in specs:
             profile = self.app.store.profile(spec.profile_id)
@@ -182,12 +208,67 @@ class DandelionDeck(Gtk.Box):
             if len(specs) == 1:
                 column.set_hexpand(True)
             if self.columns:
-                self.columns_box.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
+                sep = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+                self._separators.append(sep)
+                self.columns_box.append(sep)
             self.columns.append(column)
             self.columns_box.append(column)
         self.stack.set_visible_child_name("columns" if self.columns else "empty")
+        self.current = min(self.current, max(len(self.columns) - 1, 0))
+        self._build_switcher()
+        self._apply_layout()
         self._sync_streams()
         self.win.sync_title()
+
+    # -- Schmales Layout ----------------------------------------------------
+    def _build_switcher(self) -> None:
+        while (child := self.switcher.get_first_child()) is not None:
+            self.switcher.remove(child)
+        self._column_buttons = []
+        group: Gtk.ToggleButton | None = None
+        for i, column in enumerate(self.columns):
+            button = Gtk.ToggleButton()
+            if group is not None:
+                button.set_group(group)
+            group = group or button
+            title = column.spec.title if column.spec.kind == "feed" else column.profile.title
+            box = Gtk.Box(spacing=6)
+            avatar = Adw.Avatar(size=24, text=column.profile.title, show_initials=True)
+            self.avatars.apply(avatar, column.profile.avatar_url)
+            overlay = Gtk.Overlay(child=avatar)
+            overlay.add_overlay(platform_badge(column.profile.platform))
+            box.append(overlay)
+            if column.spec.kind == "feed":
+                label = Gtk.Label(label=title, ellipsize=Pango.EllipsizeMode.END, max_width_chars=12)
+                box.append(label)
+            button.set_child(box)
+            button.set_tooltip_text(title)
+            button.update_property([Gtk.AccessibleProperty.LABEL], [title])
+            button.set_active(i == self.current)
+            button.connect("toggled", lambda b, i=i: self.select_column(i) if b.get_active() else None)
+            self.switcher.append(button)
+            self._column_buttons.append(button)
+
+    def select_column(self, index: int) -> None:
+        """Zeigt im schmalen Layout die Spalte `index`; im breiten scrollt es dorthin."""
+        if not 0 <= index < len(self.columns):
+            return
+        self.current = index
+        if index < len(self._column_buttons) and not self._column_buttons[index].get_active():
+            self._column_buttons[index].set_active(True)
+        self._apply_layout()
+
+    def _apply_layout(self) -> None:
+        narrow = bool(self.narrow)
+        self.scroller.set_policy(Gtk.PolicyType.NEVER if narrow else Gtk.PolicyType.AUTOMATIC,
+                                 Gtk.PolicyType.NEVER)
+        for sep in self._separators:
+            sep.set_visible(not narrow)
+        for i, column in enumerate(self.columns):
+            column.set_visible(not narrow or i == self.current)
+            column.set_size_request(0 if narrow else COLUMN_WIDTH, -1)
+            column.set_hexpand(narrow or len(self.columns) == 1)
+        self.switcher_bar.set_visible(narrow and len(self.columns) > 1)
 
     def column_count(self) -> int:
         return len(self.columns)
@@ -337,6 +418,7 @@ class DandelionDeck(Gtk.Box):
         elif key in ("h", "l"):
             i = self.columns.index(column) + (1 if key == "l" else -1)
             if 0 <= i < len(self.columns):
+                self.select_column(i)
                 self._focus_row(self.columns[i].current_view(), max(index, 0))
         elif key in ("1", "2", "3"):
             feeds = list(column.views)

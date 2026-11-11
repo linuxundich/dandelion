@@ -2,7 +2,10 @@
 
 All notable changes to Dandelion are listed here.
 
-## [Unreleased]
+## 0.4.0 – 2026-11-11
+
+Dandelion can read now: a multi-column deck for Mastodon and Bluesky next to the
+writing side. Plan and phases in [docs/deck-columns.md](docs/deck-columns.md).
 
 ### Added
 
@@ -59,6 +62,15 @@ All notable changes to Dandelion are listed here.
   `1` `2` `3` between tabs, `g` to the top, `r` reply, `b` boost, `f` favourite,
   `m` bookmark, `o` open in browser, `n` new post. Choosing a role moves the
   focus into the deck. The shortcuts dialog lists them.
+
+- **Filters:** filters set up on a Mastodon server hide a post or fold it behind
+  "Filtered: …". Each column can hide boosts and reposts or replies (column
+  setup, per column).
+- **Narrow windows:** below about 620 px the deck shows one column at a time with
+  a switcher of profile avatars at the bottom; `h` and `l` switch columns.
+- **Screen readers:** every row reads as a whole (unread, who, when, text) and the
+  action buttons announce their counts.
+- German translation of everything new.
 
 ### Changed
 

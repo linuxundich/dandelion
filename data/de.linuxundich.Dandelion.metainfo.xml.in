@@ -77,8 +77,23 @@
       <caption>Dark style</caption>
       <image>https://raw.githubusercontent.com/linuxundich/dandelion/main/data/screenshots/composer-dark.png</image>
     </screenshot>
+    <screenshot>
+      <caption>Read: one column per profile, with live updates</caption>
+      <image>https://raw.githubusercontent.com/linuxundich/dandelion/main/data/screenshots/deck.png</image>
+    </screenshot>
   </screenshots>
   <releases>
+    <release version="0.4.0" date="2026-11-11">
+      <description>
+        <p>Dandelion can read now.</p>
+        <ul>
+          <li>A deck with one column per Mastodon or Bluesky profile: home, notifications and messages</li>
+          <li>Lists, hashtags, bookmarks and feeds as extra columns; live updates on Mastodon</li>
+          <li>Reply, quote, boost, favourite, bookmark, follow, mute and block from the column</li>
+          <li>Unread counts, server filters, keyboard navigation and a one-column layout for narrow windows</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.3.1" date="2026-10-09">
       <description>
         <ul>

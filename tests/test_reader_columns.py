@@ -159,3 +159,39 @@ def test_stream_notifications_and_noise(http, run):
     assert service.handle_stream_event(m, event("filters_changed", "")) is None
     assert service.handle_stream_event(m, {"event": "update", "payload": "kein json"}) is None
     assert service.handle_stream_event(b, event("update", status("1"))) is None   # Bluesky: kein Stream
+
+
+# -- Phase 5: Filter ------------------------------------------------------------
+def test_column_options_are_stored(http, run):
+    store, service, role, m, b = world(http, run)
+    service.save_columns(role, [
+        DeckColumnSpec(role.id, m.id, "profile", hide_boosts=True),
+        DeckColumnSpec(role.id, b.id, "profile", hide_replies=True)])
+    first, second = service.columns(role)
+    assert (first.hide_boosts, first.hide_replies) == (True, False)
+    assert (second.hide_boosts, second.hide_replies) == (False, True)
+
+
+def test_server_filters_hide_or_fold():
+    from dandelion.reader.mastodon import parse_status
+    hidden = parse_status(status("1", filtered=[{"filter": {"title": "Politik", "filter_action": "hide"}}]))
+    assert hidden.hidden
+    warned = parse_status(status("2", filtered=[{"filter": {"title": "Spoiler", "filter_action": "warn"}}]))
+    assert not warned.hidden and warned.sensitive and "Spoiler" in warned.spoiler
+    own = parse_status(status("3", spoiler_text="Eigene Warnung",
+                              filtered=[{"filter": {"title": "X", "filter_action": "warn"}}]))
+    assert own.spoiler == "Eigene Warnung"
+
+
+def test_reply_detection():
+    from dandelion.reader.bluesky import parse_feed_item
+    from dandelion.reader.mastodon import parse_status
+    assert parse_status(status("1", in_reply_to_id="9", in_reply_to_account_id="42")).is_reply
+    mine = status("2", in_reply_to_id="9")
+    mine["in_reply_to_account_id"] = mine["account"]["id"]
+    assert not parse_status(mine).is_reply                  # Thread mit sich selbst
+    assert not parse_status(status("3")).is_reply
+    reply = {"post": post_view(), "reply": {"parent": {"author": {"did": "did:plc:other"}}}}
+    assert parse_feed_item(reply).is_reply
+    own = {"post": post_view(), "reply": {"parent": {"author": {"did": "did:plc:ole"}}}}
+    assert not parse_feed_item(own).is_reply
