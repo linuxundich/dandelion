@@ -10,6 +10,8 @@ from .base import (
     HOME,
     MESSAGES,
     NOTIFICATIONS,
+    ACTIONS,
+    RELATIONS,
     FeedAccount,
     FeedCard,
     FeedConversation,
@@ -20,6 +22,7 @@ from .base import (
     Page,
     ReadScopeMissing,
     Reader,
+    Relationship,
     norm_ts,
 )
 
@@ -76,7 +79,10 @@ def parse_status(raw: dict) -> FeedPost:
         poll=_poll(status["poll"]) if status.get("poll") else None,
         boosted_by=boosted_by, replies=int(status.get("replies_count") or 0),
         boosts=int(status.get("reblogs_count") or 0),
-        likes=int(status.get("favourites_count") or 0))
+        likes=int(status.get("favourites_count") or 0),
+        ref=str(status["id"]), visibility=status.get("visibility"),
+        favourited=bool(status.get("favourited")), boosted=bool(status.get("reblogged")),
+        bookmarked=bool(status.get("bookmarked")))
 
 
 def parse_notification(raw: dict) -> FeedPost:
@@ -159,3 +165,37 @@ class MastodonReader(Reader):
                                      form={f"{feed}[last_read_id]": item_id})
         except PlatformError:
             pass
+
+    # -- Handeln ------------------------------------------------------------
+    def patch_raw(self, feed: str, raw: dict, post: FeedPost) -> None:
+        status = raw.get("reblog") or (raw.get("status") if "type" in raw else None) or raw
+        status.update(favourited=post.favourited, reblogged=post.boosted,
+                      bookmarked=post.bookmarked, favourites_count=post.likes,
+                      reblogs_count=post.boosts)
+
+    async def act(self, profile: Profile, post: FeedPost, action: str) -> dict[str, str | None]:
+        if action not in ACTIONS:
+            raise ValueError(action)
+        verb = {"boost": "reblog", "unboost": "unreblog"}.get(action, action)
+        await self.platform._api(profile, "POST", f"/api/v1/statuses/{post.ref}/{verb}")
+        return {}
+
+    async def relationship(self, profile: Profile, account: FeedAccount) -> Relationship:
+        resp = await self.platform._api(profile, "GET", "/api/v1/accounts/relationships",
+                                        params={"id[]": [account.id]})
+        data = (resp.json() or [{}])[0]
+        return _relationship(data)
+
+    async def set_relationship(self, profile: Profile, account: FeedAccount, action: str,
+                               current: Relationship) -> Relationship:
+        if action not in RELATIONS:
+            raise ValueError(action)
+        resp = await self.platform._api(profile, "POST", f"/api/v1/accounts/{account.id}/{action}")
+        return _relationship(resp.json() or {})
+
+
+def _relationship(data: dict) -> Relationship:
+    return Relationship(following=bool(data.get("following")),
+                        followed_by=bool(data.get("followed_by")),
+                        requested=bool(data.get("requested")), muted=bool(data.get("muting")),
+                        blocking=bool(data.get("blocking")))

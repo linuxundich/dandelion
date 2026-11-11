@@ -76,6 +76,20 @@ class FeedPoll:
 
 
 @dataclass
+class Relationship:
+    """Beziehung des eigenen Profils zu einem anderen Konto."""
+
+    following: bool = False
+    followed_by: bool = False
+    requested: bool = False       # Mastodon: Folgeanfrage offen
+    muted: bool = False
+    blocking: bool = False
+    #: Bluesky löscht Beziehungen über den Eintrag, der sie angelegt hat
+    follow_uri: str | None = None
+    block_uri: str | None = None
+
+
+@dataclass
 class FeedPost:
     id: str
     network: str
@@ -98,6 +112,17 @@ class FeedPost:
     #: Nur bei Benachrichtigungen: Anlass (mention, favourite, boost, follow, …) und Bezug
     reason: str | None = None
     subject: FeedPost | None = None
+    #: Zum Handeln: ID des Beitrags im Netzwerk (bei einem Boost die des Originals),
+    #: Bluesky zusätzlich Prüfsumme (cid) und Wurzel des Threads
+    ref: str = ""
+    cid: str | None = None
+    root_ref: tuple[str, str] | None = None
+    visibility: str | None = None
+    favourited: bool = False
+    boosted: bool = False
+    bookmarked: bool = False
+    like_uri: str | None = None       # Bluesky: Eintrag des eigenen Likes
+    repost_uri: str | None = None
 
     @property
     def has_poll(self) -> bool:
@@ -133,6 +158,10 @@ class Page:
     cursor: str | None = None
 
 
+ACTIONS = ("favourite", "unfavourite", "boost", "unboost", "bookmark", "unbookmark")
+RELATIONS = ("follow", "unfollow", "mute", "unmute", "block", "unblock")
+
+
 class Reader(ABC):
     """Liest Beiträge eines Profils."""
 
@@ -160,3 +189,22 @@ class Reader(ABC):
 
     async def push_marker(self, profile: Profile, feed: str, item_id: str) -> None:
         """Meldet den Lesestand dem Server, falls das Netzwerk das kennt."""
+
+    # -- Handeln ------------------------------------------------------------
+    def patch_raw(self, feed: str, raw: dict, post: FeedPost) -> None:
+        """Überträgt Favorit, Boost und Lesezeichen von `post` in die Rohdaten im Cache."""
+
+    async def act(self, profile: Profile, post: FeedPost, action: str) -> dict[str, str | None]:
+        """Favorit, Boost oder Lesezeichen setzen oder zurücknehmen (siehe `ACTIONS`).
+
+        Gibt Änderungen am Beitrag zurück, etwa `like_uri` bei Bluesky.
+        """
+        raise PlatformError("not supported")
+
+    async def relationship(self, profile: Profile, account: FeedAccount) -> Relationship:
+        raise PlatformError("not supported")
+
+    async def set_relationship(self, profile: Profile, account: FeedAccount, action: str,
+                               current: Relationship) -> Relationship:
+        """Folgen, Stummschalten oder Blockieren (siehe `RELATIONS`)."""
+        raise PlatformError("not supported")

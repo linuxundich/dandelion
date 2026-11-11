@@ -29,7 +29,8 @@ Concept and phases in [docs/deck-columns.md](docs/deck-columns.md).
       cache, Write | Read switch, polling every 60 s
 - [x] Phase 2: media, polls, link cards; notifications and messages tabs; read
       markers and unread counts; Bluesky home and notifications
-- [ ] Phase 3: favourite, boost, bookmark, reply and quote sheet
+- [x] Phase 3: favourite, boost, bookmark, reply and quote sheet, quick post,
+      follow, mute, block
 - [ ] Phase 4: streaming, lists, hashtags, "open as column", column setup page
 - [ ] Phase 5: narrow layout polish, filters, accessibility pass, 0.4.0
 - [ ] Add Ctrl+4 and F5 to the shortcuts dialog
@@ -39,6 +40,11 @@ Concept and phases in [docs/deck-columns.md](docs/deck-columns.md).
 - [ ] Cap the image cache folder (avatars and previews grow without limit)
 - [ ] Open images in a viewer instead of the browser
 - [ ] Show the thread context of replies
+- [ ] Reply from the Messages tab (conversations) and mark them read
+- [ ] Mastodon quotes (Mastodon 4.5 `quoted_status_id`) once servers support them
+- [ ] Attach images to a quick post (use the full composer for now)
+- [ ] Check the Bluesky bookmark, like and graph calls against a real account
+      (written from the API description, tested with fakes only)
 
 ## Features
 

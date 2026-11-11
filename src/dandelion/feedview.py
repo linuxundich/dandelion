@@ -16,12 +16,15 @@ from .reader.base import (
     MESSAGES,
     NOTIFICATIONS,
     POST_REASONS,
+    FeedAccount,
     FeedConversation,
     FeedItem,
     FeedPost,
     ReadScopeMissing,
 )
 from .util import spawn
+from .account_popover import AccountPopover
+from .quickpost import ComposeSheet
 from .widgets.feed_rows import conversation_row, notification_row, post_row
 
 if TYPE_CHECKING:
@@ -41,6 +44,49 @@ EMPTY = {
 }
 
 
+class FeedActions:
+    """Was die Aktionsleiste und die Konten einer Liste tun dürfen."""
+
+    def __init__(self, view: FeedView) -> None:
+        self.view = view
+
+    @property
+    def win(self):  # type: ignore[no-untyped-def]
+        return self.view.column.deck.win
+
+    def can_quote(self) -> bool:
+        return self.view.service.can_quote(self.view.profile)
+
+    def reply(self, post: FeedPost) -> None:
+        self._sheet("reply", post)
+
+    def quote(self, post: FeedPost) -> None:
+        self._sheet("quote", post)
+
+    def _sheet(self, mode: str, post: FeedPost | None) -> None:
+        ComposeSheet(self.view.column.deck.app, self.win, self.view.profile, mode, post,
+                     on_sent=lambda: self.view.column.refresh()).present(self.win)
+
+    async def toggle(self, post: FeedPost, kind: str, on: bool) -> bool:
+        """Favorit, Boost oder Lesezeichen setzen; `False` bei einem Fehler (nach Meldung)."""
+        action = kind if on else f"un{kind}"
+        try:
+            await self.view.service.act(self.view.profile, post, action, self.view.feed)
+        except PlatformError as e:
+            self.win.toast(e.message)
+            return False
+        except Exception:
+            log.exception("Aktion %s fehlgeschlagen", action)
+            self.win.toast(_("The action failed."))
+            return False
+        return True
+
+    def account(self, widget: Gtk.Widget, account: FeedAccount) -> None:
+        popover = AccountPopover(self.view, account)
+        popover.set_parent(widget)
+        popover.popup()
+
+
 class FeedView(Gtk.Box):
     def __init__(self, column: DeckColumn, feed: str) -> None:
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -48,6 +94,7 @@ class FeedView(Gtk.Box):
         self.feed = feed
         self.profile: Profile = column.profile
         self.service = column.deck.service
+        self.actions = FeedActions(self)
         self.items: list[FeedItem] = []
         self.shown = FIRST_ROWS
         self.pending = 0
@@ -127,7 +174,7 @@ class FeedView(Gtk.Box):
         unread = bool(self.snapshot and item.sort_ts > self.snapshot)
         if self.feed == NOTIFICATIONS and item.reason not in POST_REASONS:
             return notification_row(item, avatars, unread)
-        return post_row(item, avatars, unread)
+        return post_row(item, avatars, unread, self.actions)
 
     def _render(self) -> None:
         while (row := self.listbox.get_first_child()) is not None:

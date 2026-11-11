@@ -17,6 +17,8 @@ from ..platforms.bluesky import Bluesky, post_url
 from .base import (
     HOME,
     NOTIFICATIONS,
+    ACTIONS,
+    RELATIONS,
     FeedAccount,
     FeedCard,
     FeedItem,
@@ -24,6 +26,7 @@ from .base import (
     FeedPost,
     Page,
     Reader,
+    Relationship,
     norm_ts,
 )
 
@@ -125,7 +128,15 @@ def parse_post_view(view: dict, repost_by: dict | None = None) -> FeedPost:
         url=post_url(author.get("handle", ""), view.get("uri", "")),
         language=(record.get("langs") or [None])[0],
         replies=int(view.get("replyCount") or 0), boosts=int(view.get("repostCount") or 0),
-        likes=int(view.get("likeCount") or 0))
+        likes=int(view.get("likeCount") or 0),
+        ref=view.get("uri", ""), cid=view.get("cid"))
+    viewer = view.get("viewer") or {}
+    post.like_uri, post.repost_uri = viewer.get("like"), viewer.get("repost")
+    post.favourited, post.boosted = bool(post.like_uri), bool(post.repost_uri)
+    post.bookmarked = bool(viewer.get("bookmarked"))
+    parent = (record.get("reply") or {}).get("root")
+    if parent and parent.get("uri") and parent.get("cid"):
+        post.root_ref = (parent["uri"], parent["cid"])
     labels = _labels(view, author)
     if labels:
         post.sensitive = True
@@ -155,7 +166,10 @@ def parse_notification(raw: dict, subjects: dict[str, dict]) -> FeedPost:
         post = FeedPost(
             id=raw["uri"], network="bluesky", account=actor, created_at=created,
             markup=facets_markup(record.get("text", ""), record.get("facets")),
-            url=post_url(actor.acct, raw["uri"]), reason=reason)
+            url=post_url(actor.acct, raw["uri"]), reason=reason, ref=raw["uri"], cid=raw.get("cid"))
+        root = (record.get("reply") or {}).get("root") or {}
+        if root.get("uri") and root.get("cid"):
+            post.root_ref = (root["uri"], root["cid"])
         emb = record.get("embed") or {}
         images = emb.get("images") or (emb.get("media") or {}).get("images") or []
         post.media = [FeedMedia("image", "", None, i.get("alt") or "") for i in images]
@@ -229,3 +243,83 @@ class BlueskyReader(Reader):
                       .replace("+00:00", "Z")})
         except PlatformError:
             pass
+
+    # -- Handeln ------------------------------------------------------------
+    def patch_raw(self, feed: str, raw: dict, post: FeedPost) -> None:
+        view = raw.get("post")
+        if not view:
+            return
+        view["likeCount"], view["repostCount"] = post.likes, post.boosts
+        view["viewer"] = {**(view.get("viewer") or {}), "like": post.like_uri,
+                          "repost": post.repost_uri, "bookmarked": post.bookmarked}
+
+    async def _create(self, profile: Profile, collection: str, record: dict) -> str:
+        sess = await self.platform._session(profile)
+        record = {"$type": collection, "createdAt": _now(), **record}
+        resp = await self.platform._xrpc(profile, "POST", "com.atproto.repo.createRecord", json={
+            "repo": sess["did"], "collection": collection, "record": record})
+        return resp.json()["uri"]
+
+    async def _delete(self, profile: Profile, collection: str, uri: str | None) -> None:
+        if not uri:
+            return
+        sess = await self.platform._session(profile)
+        await self.platform._xrpc(profile, "POST", "com.atproto.repo.deleteRecord", json={
+            "repo": sess["did"], "collection": collection, "rkey": uri.rsplit("/", 1)[-1]})
+
+    async def act(self, profile: Profile, post: FeedPost, action: str) -> dict[str, str | None]:
+        if action not in ACTIONS:
+            raise ValueError(action)
+        subject = {"subject": {"uri": post.ref, "cid": post.cid}}
+        if action == "favourite":
+            return {"like_uri": await self._create(profile, "app.bsky.feed.like", subject)}
+        if action == "unfavourite":
+            await self._delete(profile, "app.bsky.feed.like", post.like_uri)
+            return {"like_uri": None}
+        if action == "boost":
+            return {"repost_uri": await self._create(profile, "app.bsky.feed.repost", subject)}
+        if action == "unboost":
+            await self._delete(profile, "app.bsky.feed.repost", post.repost_uri)
+            return {"repost_uri": None}
+        nsid = "createBookmark" if action == "bookmark" else "deleteBookmark"
+        body = {"uri": post.ref, "cid": post.cid} if action == "bookmark" else {"uri": post.ref}
+        await self.platform._xrpc(profile, "POST", f"app.bsky.bookmark.{nsid}", json=body)
+        return {}
+
+    async def relationship(self, profile: Profile, account: FeedAccount) -> Relationship:
+        data = (await self.platform._xrpc(profile, "GET", "app.bsky.actor.getProfile",
+                                          params={"actor": account.id})).json()
+        viewer = data.get("viewer") or {}
+        return Relationship(following=bool(viewer.get("following")),
+                            followed_by=bool(viewer.get("followedBy")),
+                            muted=bool(viewer.get("muted")), blocking=bool(viewer.get("blocking")),
+                            follow_uri=viewer.get("following"), block_uri=viewer.get("blocking"))
+
+    async def set_relationship(self, profile: Profile, account: FeedAccount, action: str,
+                               current: Relationship) -> Relationship:
+        if action not in RELATIONS:
+            raise ValueError(action)
+        rel = Relationship(**vars(current))
+        if action == "follow":
+            rel.follow_uri = await self._create(profile, "app.bsky.graph.follow",
+                                                {"subject": account.id})
+            rel.following = True
+        elif action == "unfollow":
+            await self._delete(profile, "app.bsky.graph.follow", rel.follow_uri)
+            rel.follow_uri, rel.following = None, False
+        elif action in ("mute", "unmute"):
+            await self.platform._xrpc(
+                profile, "POST", f"app.bsky.graph.{action}Actor", json={"actor": account.id})
+            rel.muted = action == "mute"
+        elif action == "block":
+            rel.block_uri = await self._create(profile, "app.bsky.graph.block",
+                                               {"subject": account.id})
+            rel.blocking = True
+        else:
+            await self._delete(profile, "app.bsky.graph.block", rel.block_uri)
+            rel.block_uri, rel.blocking = None, False
+        return rel
+
+
+def _now() -> str:
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")

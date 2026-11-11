@@ -28,6 +28,21 @@ All notable changes to Dandelion are listed here.
 - Profiles that were signed in before reading existed show "Allow Reading"
   with a button to sign in again.
 
+- **Interaction in the deck:** every post has a bar with reply, boost or
+  repost, favourite or like, bookmark and a menu (quote on Bluesky, open in
+  browser, copy link). Buttons switch at once and snap back with a message if
+  the network refuses; the cached copy is updated too. Private and direct posts
+  cannot be boosted.
+- **Reply, quote and quick post** open a small window with the profile of the
+  column: character counter for the network, content warning and visibility on
+  Mastodon, the post you answer shown above the text. The pencil button in a
+  column header writes a new post as that profile. The full composer with
+  variants, threads and scheduling stays in *Write*.
+- **Click an avatar or name** for follow or unfollow, mute or unmute, block or
+  unblock (with a confirmation) and "Open profile in browser".
+- Bluesky replies keep the thread root; Bluesky quotes embed the post.
+  Mastodon quotes are not offered yet.
+
 ### Changed
 
 - Mastodon logins now ask for the `read` scope and the write scopes for

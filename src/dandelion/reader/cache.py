@@ -51,6 +51,19 @@ class FeedCache:
             " ORDER BY created_at DESC LIMIT ?", (profile_id, feed, limit))
         return [json.loads(r[0]) for r in rows]
 
+    def update(self, profile_id: int, feed: str, remote_id: str, change) -> None:  # type: ignore[no-untyped-def]
+        """Ändert die gespeicherten Rohdaten eines Eintrags (zum Beispiel nach einem Favoriten)."""
+        row = self.db.execute(
+            "SELECT raw_json FROM feed_item WHERE profile_id = ? AND feed = ? AND remote_id = ?",
+            (profile_id, feed, remote_id)).fetchone()
+        if row is None:
+            return
+        raw = json.loads(row[0])
+        change(raw)
+        self.db.execute(
+            "UPDATE feed_item SET raw_json = ? WHERE profile_id = ? AND feed = ? AND remote_id = ?",
+            (json.dumps(raw, ensure_ascii=False), profile_id, feed, remote_id))
+
     def oldest_id(self, profile_id: int, feed: str) -> str | None:
         row = self.db.execute(
             "SELECT remote_id FROM feed_item WHERE profile_id = ? AND feed = ?"

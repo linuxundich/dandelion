@@ -57,6 +57,12 @@ class DeckColumn(Gtk.Box):
         handle.add_css_class("caption")
         who.append(handle)
         head.append(who)
+        self.new_post_button = Gtk.Button(icon_name="document-edit-symbolic", valign=Gtk.Align.CENTER,
+                                          tooltip_text=_("New Post as {name}").format(name=profile.title))
+        self.new_post_button.add_css_class("flat")
+        self.new_post_button.update_property([Gtk.AccessibleProperty.LABEL], [_("New Post")])
+        self.new_post_button.connect("clicked", lambda *_a: self._new_post())
+        head.append(self.new_post_button)
         self.refresh_button = Gtk.Button(icon_name="view-refresh-symbolic", valign=Gtk.Align.CENTER,
                                          tooltip_text=_("Refresh"))
         self.refresh_button.add_css_class("flat")
@@ -80,6 +86,11 @@ class DeckColumn(Gtk.Box):
         self.append(self.stack)
         self.update_badges()
         self.refresh(manual=True)
+
+    def _new_post(self) -> None:
+        from .quickpost import ComposeSheet
+        ComposeSheet(self.deck.app, self.deck.win, self.profile, "new",
+                     on_sent=lambda: self.refresh()).present(self.deck.win)
 
     def update_badges(self) -> None:
         for feed, view in self.views.items():

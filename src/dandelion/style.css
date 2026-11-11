@@ -261,3 +261,9 @@ textview.inherited, .inherited text { color: alpha(currentColor, 0.6); }
   font-weight: 700;
 }
 progressbar.feed-poll trough, progressbar.feed-poll progress { min-height: 6px; }
+.feed-act { padding: 2px 8px; min-height: 28px; min-width: 0; }
+.feed-act:checked { background: none; }
+.feed-act-boost:checked { color: var(--success-color); }
+.feed-act-favourite:checked { color: var(--warning-color); }
+.feed-act-bookmark:checked { color: var(--accent-color); }
+.feed-compose { background: transparent; font-size: 1.05em; }

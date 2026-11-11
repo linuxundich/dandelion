@@ -3,12 +3,25 @@
 
 from __future__ import annotations
 
-from ..core.models import Profile
+from uuid import uuid4
+
+from ..core.models import Profile, TargetPart
 from ..core.store import Store
 from ..platforms import Registry
 from ..platforms.bluesky import Bluesky
 from ..platforms.mastodon import Mastodon
-from .base import HOME, MESSAGES, NOTIFICATIONS, FeedConversation, FeedItem, Reader
+from ..platforms.base import Composition, PlatformError
+from .base import (
+    HOME,
+    MESSAGES,
+    NOTIFICATIONS,
+    FeedAccount,
+    FeedConversation,
+    FeedItem,
+    FeedPost,
+    Reader,
+    Relationship,
+)
 from .bluesky import BlueskyReader
 from .cache import KEEP_PER_FEED, FeedCache
 from .mastodon import MastodonReader
@@ -130,3 +143,49 @@ class ReaderService:
             return
         self.cache.set_marker(pid, feed, newest[1])
         await reader.push_marker(profile, feed, newest[0])
+
+    # -- Handeln ------------------------------------------------------------
+    async def act(self, profile: Profile, post: FeedPost, action: str,
+                  feed: str | None = None) -> None:
+        """Favorit, Boost oder Lesezeichen; passt den Beitrag und, mit `feed`, den Cache an."""
+        reader = self._need_reader(profile)
+        changes = await reader.act(profile, post, action)
+        for field_name, value in changes.items():
+            setattr(post, field_name, value)
+        if feed and profile.id is not None:
+            self.cache.update(profile.id, feed, post.id,
+                              lambda raw: reader.patch_raw(feed, raw, post))
+
+    async def relationship(self, profile: Profile, account: FeedAccount) -> Relationship:
+        return await self._need_reader(profile).relationship(profile, account)
+
+    async def set_relationship(self, profile: Profile, account: FeedAccount, action: str,
+                               current: Relationship) -> Relationship:
+        return await self._need_reader(profile).set_relationship(profile, account, action, current)
+
+    async def send(self, profile: Profile, comp: Composition, *, reply_to: FeedPost | None = None,
+                   quote: FeedPost | None = None) -> TargetPart:
+        """Schickt einen Beitrag, eine Antwort oder ein Zitat von diesem Profil."""
+        platform = self.registry.get(profile.platform)
+        parent = root = None
+        if reply_to is not None:
+            parent = TargetPart(idx=0, remote_id=reply_to.ref, remote_cid=reply_to.cid)
+            if reply_to.root_ref:
+                root = TargetPart(idx=0, remote_id=reply_to.root_ref[0],
+                                  remote_cid=reply_to.root_ref[1])
+        kwargs = {}
+        if quote is not None:
+            if profile.platform != "bluesky":
+                raise PlatformError("quotes are only supported on Bluesky")
+            kwargs["quote"] = TargetPart(idx=0, remote_id=quote.ref, remote_cid=quote.cid)
+        return await platform.post(profile, comp, [], reply_to=parent, root=root or parent,
+                                   idempotency_key=uuid4().hex, **kwargs)
+
+    def can_quote(self, profile: Profile) -> bool:
+        return profile.platform == "bluesky"
+
+    def _need_reader(self, profile: Profile) -> Reader:
+        reader = self.reader_for(profile)
+        if reader is None:
+            raise PlatformError("not supported")
+        return reader

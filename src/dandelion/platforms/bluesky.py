@@ -348,7 +348,7 @@ class Bluesky(Platform):
 
     async def post(self, profile: Profile, comp: Composition, media_refs: list[str], *,
                    reply_to: TargetPart | None, root: TargetPart | None,
-                   idempotency_key: str) -> TargetPart:
+                   idempotency_key: str, quote: TargetPart | None = None) -> TargetPart:
         sess = await self._session(profile)
         text, spans = self.shorten(comp.text)
         facets = await self.build_facets(text, spans)
@@ -369,6 +369,13 @@ class Bluesky(Platform):
             embed = await self._link_embed(profile, spans[0][2])
             if embed:
                 record["embed"] = embed
+        if quote and quote.remote_id and quote.remote_cid:
+            ref = {"$type": "app.bsky.embed.record",
+                   "record": {"uri": quote.remote_id, "cid": quote.remote_cid}}
+            media = record.get("embed")
+            record["embed"] = ({"$type": "app.bsky.embed.recordWithMedia", "record": ref,
+                                "media": media} if media and media.get("$type") ==
+                               "app.bsky.embed.images" else ref)
         if comp.content_label in CONTENT_LABELS:
             record["labels"] = {"$type": "com.atproto.label.defs#selfLabels",
                                 "values": [{"val": comp.content_label}]}

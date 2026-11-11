@@ -20,6 +20,7 @@ from ..reader.base import (
     FeedPost,
 )
 from ..reader.content import relative_time, to_markup, to_text
+from ..util import spawn
 from .avatars import AvatarCache
 from .profile_chip import platform_badge
 
@@ -85,6 +86,15 @@ def _clickable(widget: Gtk.Widget, url: str) -> None:
         return
     click = Gtk.GestureClick()
     click.connect("released", lambda *_args: open_url(widget, url))
+    widget.add_controller(click)
+    widget.set_cursor_from_name("pointer")
+
+
+def _account_click(widget: Gtk.Widget, account: FeedAccount, actions) -> None:  # type: ignore[no-untyped-def]
+    if actions is None:
+        return
+    click = Gtk.GestureClick()
+    click.connect("released", lambda *_args: actions.account(widget, account))
     widget.add_controller(click)
     widget.set_cursor_from_name("pointer")
 
@@ -252,9 +262,124 @@ def _reason_caption(post: FeedPost) -> str | None:
             "update": _("Edited a post")}.get(post.reason or "")
 
 
-def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False) -> Gtk.Box:
+def _action_button(icon: str, count: int, tip: str, callback) -> Gtk.Button:  # type: ignore[no-untyped-def]
+    btn = Gtk.Button(tooltip_text=tip)
+    btn.add_css_class("flat")
+    btn.add_css_class("feed-act")
+    box = Gtk.Box(spacing=4)
+    box.append(Gtk.Image.new_from_icon_name(icon))
+    label = Gtk.Label(label=str(count) if count else "")
+    label.add_css_class("caption")
+    label.add_css_class("numeric")
+    box.append(label)
+    btn.set_child(box)
+    btn.update_property([Gtk.AccessibleProperty.LABEL], [tip])
+    btn.connect("clicked", lambda *_args: callback())
+    return btn
+
+
+def _toggle_button(post: FeedPost, kind: str, actions, tip: str) -> Gtk.ToggleButton:  # type: ignore[no-untyped-def]
+    """Favorit, Boost oder Lesezeichen: schaltet sofort um und macht es bei einem Fehler rückgängig."""
+    attr = {"favourite": "favourited", "boost": "boosted", "bookmark": "bookmarked"}[kind]
+    count_attr = {"favourite": "likes", "boost": "boosts"}.get(kind)
+    icons = {"favourite": ("non-starred-symbolic", "starred-symbolic"),
+             "boost": ("media-playlist-repeat-symbolic",) * 2,
+             "bookmark": ("bookmark-new-symbolic", "user-bookmarks-symbolic")}[kind]
+    btn = Gtk.ToggleButton(active=getattr(post, attr), tooltip_text=tip)
+    for c in ("flat", "feed-act", f"feed-act-{kind}"):
+        btn.add_css_class(c)
+    box = Gtk.Box(spacing=4)
+    image = Gtk.Image.new_from_icon_name(icons[1] if btn.get_active() else icons[0])
+    label = Gtk.Label()
+    label.add_css_class("caption")
+    label.add_css_class("numeric")
+    box.append(image)
+    box.append(label)
+    btn.set_child(box)
+    btn.update_property([Gtk.AccessibleProperty.LABEL], [tip])
+
+    def show() -> None:
+        on = getattr(post, attr)
+        image.set_from_icon_name(icons[1] if on else icons[0])
+        n = getattr(post, count_attr) if count_attr else 0
+        label.set_label(str(n) if n else "")
+        label.set_visible(bool(n))
+
+    def apply(on: bool) -> None:
+        setattr(post, attr, on)
+        if count_attr:
+            setattr(post, count_attr, max(0, getattr(post, count_attr) + (1 if on else -1)))
+        show()
+
+    handler = 0
+
+    def on_toggled(b: Gtk.ToggleButton) -> None:
+        on = b.get_active()
+        apply(on)
+
+        async def run() -> None:
+            if await actions.toggle(post, kind, on):
+                return
+            apply(not on)                                  # Fehler: zurücksetzen
+            b.handler_block(handler)
+            b.set_active(not on)
+            b.handler_unblock(handler)
+        spawn(run())
+
+    handler = btn.connect("toggled", on_toggled)
+    show()
+    if kind == "boost" and post.visibility in ("private", "direct"):
+        btn.set_sensitive(False)
+        btn.set_tooltip_text(_("This post cannot be boosted"))
+    return btn
+
+
+def _more_button(post: FeedPost, actions) -> Gtk.MenuButton:  # type: ignore[no-untyped-def]
+    pop = Gtk.Popover()
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+
+    def item(icon: str, text: str, callback) -> None:  # type: ignore[no-untyped-def]
+        row = Gtk.Box(spacing=8)
+        row.append(Gtk.Image.new_from_icon_name(icon))
+        row.append(Gtk.Label(label=text, xalign=0))
+        b = Gtk.Button(child=row)
+        b.add_css_class("flat")
+        b.connect("clicked", lambda *_a: (pop.popdown(), callback()))
+        box.append(b)
+
+    if actions.can_quote():
+        item("format-indent-more-symbolic", _("Quote"), lambda: actions.quote(post))
+    if post.url:
+        item("web-browser-symbolic", _("Open in Browser"), lambda: open_url(btn, post.url))
+        item("edit-copy-symbolic", _("Copy Link"),
+             lambda: btn.get_clipboard().set(post.url))
+    pop.set_child(box)
+    btn = Gtk.MenuButton(icon_name="view-more-symbolic", popover=pop, tooltip_text=_("More"))
+    btn.add_css_class("flat")
+    btn.add_css_class("feed-act")
+    btn.update_property([Gtk.AccessibleProperty.LABEL], [_("More")])
+    return btn
+
+
+def action_bar(post: FeedPost, actions) -> Gtk.Box:  # type: ignore[no-untyped-def]
+    bar = Gtk.Box(spacing=2, margin_top=2, margin_start=-8)
+    bar.append(_action_button("mail-reply-sender-symbolic", post.replies, _("Reply"),
+                              lambda: actions.reply(post)))
+    bar.append(_toggle_button(post, "boost", actions, _("Boost")))
+    bar.append(_toggle_button(post, "favourite", actions, _("Favourite")))
+    bar.append(_toggle_button(post, "bookmark", actions, _("Bookmark")))
+    spacer = Gtk.Box(hexpand=True)
+    bar.append(spacer)
+    bar.append(_more_button(post, actions))
+    return bar
+
+
+def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False,
+             actions=None) -> Gtk.Box:  # type: ignore[no-untyped-def]
     root = _frame(unread)
-    root.append(avatar_for(post.account, avatars, 36))
+    avatar = avatar_for(post.account, avatars, 36)
+    _account_click(avatar, post.account, actions)
+    root.append(avatar)
     body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, hexpand=True)
     root.append(body)
 
@@ -265,6 +390,7 @@ def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False) -> Gtk.
     head = Gtk.Box(spacing=6)
     name = Gtk.Label(label=post.account.name, xalign=0, ellipsize=Pango.EllipsizeMode.END)
     name.add_css_class("heading")
+    _account_click(name, post.account, actions)
     head.append(name)
     age = _dim(relative_time(post.created_at) if post.created_at else "", "caption", "numeric")
     age.set_hexpand(True)
@@ -293,14 +419,17 @@ def post_row(post: FeedPost, avatars: AvatarCache, unread: bool = False) -> Gtk.
     else:
         body.append(details)
 
-    counts = Gtk.Box(spacing=16, margin_top=4)
-    for icon, n, tip in (("mail-reply-sender-symbolic", post.replies, _("Replies")),
-                         ("media-playlist-repeat-symbolic", post.boosts, _("Boosts")),
-                         ("starred-symbolic", post.likes, _("Favourites"))):
-        if n:
-            counts.append(_icon_count(icon, n, tip))
-    if counts.get_first_child():
-        body.append(counts)
+    if actions is not None and post.ref:
+        body.append(action_bar(post, actions))
+    else:
+        counts = Gtk.Box(spacing=16, margin_top=4)
+        for icon, n, tip in (("mail-reply-sender-symbolic", post.replies, _("Replies")),
+                             ("media-playlist-repeat-symbolic", post.boosts, _("Boosts")),
+                             ("starred-symbolic", post.likes, _("Favourites"))):
+            if n:
+                counts.append(_icon_count(icon, n, tip))
+        if counts.get_first_child():
+            body.append(counts)
 
     root.update_property([Gtk.AccessibleProperty.LABEL],
                          [f"{post.account.name}: {excerpt(post_text(post), 200)}"])
