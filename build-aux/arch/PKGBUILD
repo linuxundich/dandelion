@@ -1,6 +1,6 @@
 # Maintainer: Christoph Langner <mail@christoph-langner.de>
 pkgname=dandelion
-pkgver=0.3.1
+pkgver=0.4.0
 pkgrel=1
 pkgdesc="Write once, post to Mastodon, Bluesky, LinkedIn, Facebook pages and X"
 arch=('any')
@@ -27,7 +27,7 @@ optdepends=(
   'hunspell-en_us: English spell checking'
 )
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('eaa9e34fad2e669cfe55410189f99f076dd7c2deced79367baafe6fc11d5e2c5')
+sha256sums=('d809f6f73182faf6c60299d1f12b3de2f6c1269fe977b0ec22249a21f036931c')
 
 build() {
   arch-meson "$pkgname-$pkgver" build
